@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { MyApp } from "./MyApp.js";
+import { MyCake } from "./MyCake.js";
 
 class MyPlate extends THREE.Object3D {
     /**
@@ -20,9 +21,9 @@ class MyPlate extends THREE.Object3D {
         this.plateShininess = 20;
 
         this.plate = new THREE.CylinderGeometry(
-            this.radius * 2,
+            this.radius * 1.5,
             this.radius,
-            this.radius / 2,
+            this.radius / 4,
             this.segments,
             1,
             true
@@ -35,12 +36,16 @@ class MyPlate extends THREE.Object3D {
             shininess: this.plateShininess,
             side: THREE.DoubleSide
         });
+        this.cake = new MyCake(this.app, this.radius, 0.5, 32, 0x80461B, 10);
 
         this.plateMesh = new THREE.Mesh(this.plate, this.plateMaterial);
         this.plateBaseMesh = new THREE.Mesh(this.plateBase, this.plateMaterial);
         this.plateMesh.rotation.x = Math.PI / 2;
-        this.plateMesh.position.z = this.radius / 4;
+        this.plateMesh.position.z = this.radius/8;
+        this.cake.rotateX(Math.PI / 2);
+        this.cake.position.z = this.cake.height / 1.9
         this.plateBaseMesh.add(this.plateMesh);
+        this.plateBaseMesh.add(this.cake);
         this.add(this.plateBaseMesh);
     }
 }

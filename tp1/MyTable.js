@@ -59,7 +59,7 @@ class MyTable extends THREE.Object3D {
             this.legsRadius,
             this.height - 1
         );
-        this.plate = plate ?? new MyPlate(this.app, 0.7, 32, 0xffffff);
+        this.plate = plate ?? new MyPlate(this.app, 0.8, 32, 0xffffff);
         this.cake ??= cake;
         this.topMaterial = new THREE.MeshPhongMaterial({
             color: this.topColor,
