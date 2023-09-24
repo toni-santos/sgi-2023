@@ -83,6 +83,10 @@ class MyGuiInterface {
             .add(this.app.activeCamera.position, "x", 0, 10)
             .name("x coord");
         cameraFolder.open();
+
+        const lightFolder = this.datgui.addFolder("Point Light");
+        lightFolder.add(this.contents.pointLight, "visible", true).name("enable");
+        lightFolder.open()
     }
 }
 

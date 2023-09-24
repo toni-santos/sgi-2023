@@ -1,6 +1,9 @@
 import * as THREE from "three";
 import { MyApp } from "./MyApp.js";
 import { MyTable } from "./MyTable.js";
+import { MyShelf } from "./MyShelf.js";
+import { MyPlate } from "./MyPlate.js";
+import { MyCompanionCube } from "./MyCompanionCube.js";
 
 class MyRoom extends THREE.Object3D {
     /**
@@ -28,8 +31,21 @@ class MyRoom extends THREE.Object3D {
 
         this.floor = new THREE.PlaneGeometry(floorEdge, floorEdge);
         this.wall = new THREE.PlaneGeometry(floorEdge, wallEdge);
-        table ??= new MyTable(this, 10, 5, 5, 1, 0.5, 0xaa0000, 0xbbbbbb);
+        this.plate = new MyPlate(this.app, 0.7, 32, 0xffffff);
+        table ??= new MyTable(
+            this,
+            10,
+            5,
+            5,
+            1,
+            0.5,
+            0xaa0000,
+            0xbbbbbb,
+            this.plate
+        );
         this.table = table;
+        this.shelf = new MyShelf(this);
+        this.cube = new MyCompanionCube(this, 3);
 
         this.floorShininess = 2;
         this.wallShininess = 2;
@@ -106,16 +122,24 @@ class MyRoom extends THREE.Object3D {
     }
 
     transformMeshes() {
+        this.shelf.position.z = -this.floorDelta / 2;
         this.table.position.set(
             0,
             -this.wallDelta + this.table.height - this.table.topHeight / 2.01,
             0
         );
+        this.cube.rotateY(Math.PI / 4);
+        this.cube.position.set(
+            -10,
+            -this.wallDelta + this.cube.edge * 1.1 / 2,
+            0
+        )
     }
 
     addMeshes() {
         this.add(this.table);
-        this.add(this.newTable);
+        this.add(this.shelf);
+        this.add(this.cube);
         for (const mesh of this.meshes) {
             this.add(mesh);
         }

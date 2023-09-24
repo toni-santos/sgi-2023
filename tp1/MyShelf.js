@@ -1,0 +1,66 @@
+import * as THREE from "three";
+import { MyApp } from "./MyApp.js";
+import { MyTable } from "./MyTable.js";
+import { randomInteger } from "./MyUtils.js";
+
+class MyShelf extends THREE.Object3D {
+    /**
+     *
+     * @param {MyApp} app the application object
+     * @param {number} width the width of each shelf section
+     * @param {number} height the height of each shelf section
+     * @param {number} topHeight the height of each shelf section
+     * @param {number} depth the depth of each shelf section
+     * @param {number} rows the number of rows on the shelf
+     * @param {number} cols the number of columns on the shelf
+     */
+    constructor(app, rows = 2, cols = 4, width = 10, height = 5, depth = 5) {
+        super();
+        this.app = app;
+        this.type = "Group";
+        this.rows = rows;
+        this.cols = cols;
+        this.width = width;
+        this.height = height;
+        this.depth = depth;
+        this.shelfTopHeight = 0.2;
+
+        for (let i = 0; i < this.rows; i++) {
+            for (let j = 0; j < this.cols; j++) {
+                this.section = this.createSection(
+                    this.width,
+                    this.height,
+                    this.depth
+                );
+                this.section.position.set(this.width * j, this.height * i, 0);
+                //placeBalls();
+                this.add(this.section);
+            }
+        }
+
+        this.position.set(
+            -(this.width * (this.cols - 1)) / 2,
+            -this.height + this.shelfTopHeight / 2,
+            0
+        );
+    }
+
+    createSection(width, height, depth) {
+        const sect = new MyTable(
+            this,
+            width,
+            height,
+            depth,
+            this.shelfTopHeight,
+            0.1,
+            0x33447d,
+            0x33447d
+        );
+        sect.rotateX(Math.PI);
+        return sect;
+    }
+}
+
+MyShelf.prototype.isGroup = true;
+
+export { MyShelf };

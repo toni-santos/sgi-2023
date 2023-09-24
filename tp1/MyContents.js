@@ -75,7 +75,7 @@ class MyContents {
         if (this.room === null) {
             this.room = new MyRoom(
                 this,
-                15,
+                60,
                 10,
                 this.floorColor,
                 this.wallColor
@@ -84,14 +84,14 @@ class MyContents {
         }
 
         // add a point light on top of the model
-        const pointLight = new THREE.PointLight(0xffffff, 100, 0);
-        pointLight.position.set(3, 6, 0);
-        this.app.scene.add(pointLight);
+        this.pointLight = new THREE.PointLight(0xffffff, 100, 0);
+        this.pointLight.position.set(3, 10, 6);
+        this.app.scene.add(this.pointLight);
 
         // add a point light helper for the previous point light
         const sphereSize = 0.5;
         const pointLightHelper = new THREE.PointLightHelper(
-            pointLight,
+            this.pointLight,
             sphereSize
         );
         this.app.scene.add(pointLightHelper);

@@ -4,7 +4,6 @@ import { MyPlate } from "./MyPlate.js";
 import { MyCake } from "./MyCake.js";
 import { arrayMult } from "./MyUtils.js";
 
-/** Chamar o prato com o Bolo como argumento */
 class MyTable extends THREE.Object3D {
     /**
      *
@@ -57,9 +56,9 @@ class MyTable extends THREE.Object3D {
         this.leg = new THREE.CylinderGeometry(
             this.legsRadius,
             this.legsRadius,
-            this.height - 1
+            this.height - this.topHeight
         );
-        this.plate = plate ?? new MyPlate(this.app, 0.8, 32, 0xffffff);
+        this.plate = plate;
         this.cake ??= cake;
         this.topMaterial = new THREE.MeshPhongMaterial({
             color: this.topColor,
@@ -101,8 +100,10 @@ class MyTable extends THREE.Object3D {
     }
 
     transformMeshes() {
-        this.plate.rotateX(-Math.PI / 2);
-        this.plate.position.y = this.topHeight / 1.99;
+        if (this.plate) {
+            this.plate.rotateX(-Math.PI / 2);
+            this.plate.position.y = this.topHeight / 1.99;
+        }
     }
 
     addMeshes() {
@@ -115,7 +116,7 @@ class MyTable extends THREE.Object3D {
         for (const mesh of this.legMeshes) {
             this.topMesh.add(mesh);
         }
-        this.topMesh.add(this.plate);
+        if (this.plate) this.topMesh.add(this.plate);
         this.add(this.topMesh);
     }
 
