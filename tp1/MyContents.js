@@ -84,7 +84,7 @@ class MyContents {
         }
 
         // add a point light on top of the model
-        this.pointLight = new THREE.PointLight(0xffffff, 100, 0);
+        this.pointLight = new THREE.PointLight(0xffffff, 30, 0);
         this.pointLight.position.set(3, 10, 6);
         this.app.scene.add(this.pointLight);
 

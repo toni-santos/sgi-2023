@@ -41,7 +41,7 @@ class MyCake extends THREE.Object3D {
         let candleAngle = this.angle - candleAngleDelta;
 
         for (let i = 0; i < this.candles; i++) {
-            let candle = new MyCandle(this.app, this.radius/25, this.radius/3, 32, 0xff0000, false);
+            let candle = new MyCandle(this.app, this.radius/25, this.radius/3, 32, 0xff0000);
             candle.position.x = Math.sin(candleAngle) * (this.radius/2 + 0.1);
             candle.position.z = Math.cos(candleAngle) * (this.radius/2 + 0.1);
             candle.position.y = candle.height;

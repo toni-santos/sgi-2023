@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { MyApp } from "./MyApp.js";
 import { MyTable } from "./MyTable.js";
+import { MyPersonalityCore } from "./MyPersonalityCore.js";
 import { randomInteger } from "./MyUtils.js";
 
 class MyShelf extends THREE.Object3D {
@@ -33,7 +34,7 @@ class MyShelf extends THREE.Object3D {
                     this.depth
                 );
                 this.section.position.set(this.width * j, this.height * i, 0);
-                //placeBalls();
+                this.placeBalls();
                 this.add(this.section);
             }
         }
@@ -58,6 +59,21 @@ class MyShelf extends THREE.Object3D {
         );
         sect.rotateX(Math.PI);
         return sect;
+    }
+
+    placeBalls() {
+        const randomArray = [];
+        for (let i = 0; i < 3; i++) {
+            const value = Math.round(Math.random());
+            if (value) {
+                this.core = new MyPersonalityCore(this, 1.5, 32, 0xffffff);
+                this.core.position.set(i*this.core.radius * 2 - 2*this.core.radius + Math.random(), -this.core.radius*1.01, value ? Math.random() : -Math.random());
+                this.core.rotateX(Math.PI * Math.random());
+                this.core.rotateY(Math.PI * Math.random());
+                this.core.rotateZ(Math.PI * Math.random());
+                this.section.add(this.core);
+            }
+        }
     }
 }
 

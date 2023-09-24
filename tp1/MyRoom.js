@@ -4,6 +4,7 @@ import { MyTable } from "./MyTable.js";
 import { MyShelf } from "./MyShelf.js";
 import { MyPlate } from "./MyPlate.js";
 import { MyCompanionCube } from "./MyCompanionCube.js";
+import { MyPersonalityCore } from "./MyPersonalityCore.js";
 
 class MyRoom extends THREE.Object3D {
     /**

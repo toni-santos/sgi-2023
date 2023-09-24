@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { MyApp } from "./MyApp.js";
 
 class MyCandle extends THREE.Object3D {
-    constructor(app, radius, height, segments, color, lightHelper, object) {
+    constructor(app, radius, height, segments, color, object) {
         super();
         this.app = app;
         this.type = "Group";
@@ -12,7 +12,6 @@ class MyCandle extends THREE.Object3D {
         this.color = color;
         this.object = object;
         this.candleShininess = 10;
-        this.lightHelper = lightHelper;
 
         this.stick = new THREE.CylinderGeometry(
             this.radius,

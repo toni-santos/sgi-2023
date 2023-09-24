@@ -43,7 +43,7 @@ class MyPlate extends THREE.Object3D {
         this.plateMesh.rotation.x = Math.PI / 2;
         this.plateMesh.position.z = this.radius/8;
         this.cake.rotateX(Math.PI / 2);
-        this.cake.position.z = this.cake.height / 1.9
+        this.cake.position.z = this.cake.height / 1.9;
         this.plateBaseMesh.add(this.plateMesh);
         this.plateBaseMesh.add(this.cake);
         this.add(this.plateBaseMesh);
