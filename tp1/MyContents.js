@@ -24,6 +24,7 @@ class MyContents  {
         // plane related attributes
         this.diffusePlaneColor = "#00ffff"
         this.specularPlaneColor = "#777777"
+        this.spotlightColor = 0xffffff
         this.planeShininess = 30
         this.planeMaterial = new THREE.MeshPhongMaterial({ color: this.diffusePlaneColor, 
             specular: this.diffusePlaneColor, emissive: "#000000", shininess: this.planeShininess })
@@ -56,6 +57,7 @@ class MyContents  {
         }
 
         // add a point light on top of the model
+        /*
         const pointLight = new THREE.PointLight( 0xffffff, 500, 0 );
         pointLight.position.set( 0, 20, 0 );
         this.app.scene.add( pointLight );
@@ -65,10 +67,31 @@ class MyContents  {
         const pointLightHelper = new THREE.PointLightHelper( pointLight, sphereSize );
         this.app.scene.add( pointLightHelper );
 
-        // add an ambient light
-        const ambientLight = new THREE.AmbientLight( 0x555555 );
-        this.app.scene.add( ambientLight );
+        // add a directional light
+        const light2 = new THREE.DirectionalLight(0xffffff, 1);
+        light2.position.set(-5, 10, -2);
+        light2.target.position.set(9, 2, 0);
+        this.app.scene.add(light2.target);
+        this.app.scene.add(light2);
 
+        // add a directional light helper for the previous point light
+        const sphereSize = 0.5;
+        const light2Helper = new THREE.DirectionalLightHelper(light2, sphereSize);
+        this.app.scene.add(light2Helper);
+        */
+
+        // add a spotlight on top of the model
+        this.light3 = new THREE.SpotLight(this.spotlightColor, 15, 8, Math.PI*2/9, 0, 0);
+        this.light3.position.set(2, 5, 1);
+        this.light3.target.position.set(1, 0, 1);
+        this.app.scene.add(this.light3);
+
+        // add a spotlight helper for the previous point light
+        this.light3Helper = new THREE.SpotLightHelper(this.light3, this.spotlightColor);
+        this.app.scene.add(this.light3Helper);
+        // add an ambient light
+        const ambientLight = new THREE.AmbientLight( 0x555555, 4 );
+        this.app.scene.add( ambientLight );
         this.buildBox()
         
         // Create a Plane Mesh with basic material
@@ -95,6 +118,38 @@ class MyContents  {
     updateSpecularPlaneColor(value) {
         this.specularPlaneColor = value
         this.planeMaterial.specular.set(this.specularPlaneColor)
+    }
+    /**
+     * updates the spotlight color
+     * @param {THREE.Color} value 
+     */
+    updateSpotlightColor(value) {
+        this.spotlightColor = value;
+        this.light3.color.set(this.spotlightColor);
+        this.app.scene.remove(this.light3Helper);
+        this.light3Helper = new THREE.SpotLightHelper(this.light3, this.spotlightColor);
+        this.app.scene.add(this.light3Helper);
+    }
+
+    updateSpotlightDistance(value) {
+        this.light3.distance = value;
+        this.light3Helper.update();
+    }
+
+    updateSpotlightAngle(value) {
+        this.light3.angle = value * (Math.PI/180);
+        console.log(this.light3.angle)
+        this.light3Helper.update();
+    }
+
+    updateSpotlightPenumbra(value) {
+        this.light3.penumbra = value;
+        this.light3Helper.update();
+    }
+
+    updateSpotlightDecay(value) {
+        this.light3.decay = value;
+        this.light3Helper.update();
     }
     /**
      * updates the plane shininess and the material
