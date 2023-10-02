@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { MyApp } from "./MyApp.js";
+import { MyTechStrip } from "./MyTechStrip.js";
 
 class MyPersonalityCore extends THREE.Object3D {
     constructor(app, radius, segments, color, object) {
@@ -34,18 +35,25 @@ class MyPersonalityCore extends THREE.Object3D {
             Math.sin(Math.PI/5) * this.radius,
             this.segments
         );
+        this.techStrip = new MyTechStrip(this.app, this.radius, Math.PI/5);
         this.coreLight = new THREE.PointLight(
             0xe38b27,
             1,
             100
         );
 
+        this.metallicTexture =
+            new THREE.TextureLoader().load('textures/metallic_sheen.jpg');
+        this.metallicTexture.wrapS = THREE.RepeatWrapping;
+        this.metallicTexture.wrapT = THREE.RepeatWrapping;
+
         this.coreMaterial = new THREE.MeshPhongMaterial({
-            color: this.color,
+            color: 0xd4cfc1,
             specular: "#ffffff",
-            emissive: "#ffffff",
-            emissiveIntensity: 0.1,
-            shininess: this.coreShininess,
+            emissive: "#808080",
+            emissiveIntensity: 0.2,
+            map: this.metallicTexture,
+            shininess: 1,
             side: THREE.DoubleSide
         });
 
@@ -64,10 +72,12 @@ class MyPersonalityCore extends THREE.Object3D {
         this.planeMesh.rotation.x = Math.PI / 2;
         this.planeMesh.position.y = Math.cos(Math.PI/5) * this.radius ;
         this.coreLight.position.y = Math.cos(Math.PI/5) * this.radius ;
-        this.coreBulbMesh.position.y = 0;
+        this.techStrip.rotateX(-Math.PI / 2);
+        this.techStrip.rotateY(Math.PI / 5);
         this.coreMesh.add(this.coreLight);
         this.coreMesh.add(this.planeMesh);
         this.coreMesh.add(this.coreBulbMesh);
+        this.coreMesh.add(this.techStrip);
         this.add(this.coreMesh);
     }
 }

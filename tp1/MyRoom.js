@@ -4,7 +4,7 @@ import { MyTable } from "./MyTable.js";
 import { MyShelf } from "./MyShelf.js";
 import { MyPlate } from "./MyPlate.js";
 import { MyCompanionCube } from "./MyCompanionCube.js";
-import { MyPersonalityCore } from "./MyPersonalityCore.js";
+import { MyPictureFrame } from "./MyPictureFrame.js";
 
 class MyRoom extends THREE.Object3D {
     /**
@@ -33,21 +33,23 @@ class MyRoom extends THREE.Object3D {
         this.floor = new THREE.PlaneGeometry(floorEdge, floorEdge);
         this.wall = new THREE.PlaneGeometry(floorEdge, wallEdge);
         this.plate = new MyPlate(this.app, 0.7, 32, 0xffffff);
+        this.tableFrame = new MyPictureFrame(this, 2, 2.5, 10, 0xffffff, new THREE.TextureLoader().load('textures/cavej.jpg'));
         table ??= new MyTable(
             this,
             10,
             5,
             5,
-            1,
             0.5,
-            0xaa0000,
-            0xbbbbbb,
-            this.plate
+            0.3,
+            0xA1662F,
+            0xf0f0f0,
+            this.plate,
+            this.tableFrame
         );
         this.table = table;
         this.shelf = new MyShelf(this);
         this.cube = new MyCompanionCube(this, 3);
-
+        this.frame = new MyPictureFrame(this, 2, 2.5, 10, 0xffffff, new THREE.TextureLoader().load('textures/cavecarol.jpg'));
         this.floorShininess = 2;
         this.wallShininess = 2;
         this.floorDelta = floorEdge / 2;
@@ -134,12 +136,15 @@ class MyRoom extends THREE.Object3D {
             -10,
             -this.wallDelta + this.cube.edge * 1.1 / 2,
             0
-        )
+        );
+        this.frame.position.set(this.table.width / 2, -this.table.height + this.frame.height/2, this.table.legDelta[2] + this.table.legsRadius + this.frame.height/2 * Math.sin(Math.PI/10));
+        this.frame.rotateX(-Math.PI/10);
     }
 
     addMeshes() {
         this.add(this.table);
         this.add(this.shelf);
+        this.add(this.frame);
         this.add(this.cube);
         for (const mesh of this.meshes) {
             this.add(mesh);

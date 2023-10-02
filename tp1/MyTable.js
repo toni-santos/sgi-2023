@@ -3,6 +3,7 @@ import { MyApp } from "./MyApp.js";
 import { MyPlate } from "./MyPlate.js";
 import { MyCake } from "./MyCake.js";
 import { arrayMult } from "./MyUtils.js";
+import { MyPictureFrame } from "./MyPictureFrame.js";
 
 class MyTable extends THREE.Object3D {
     /**
@@ -28,7 +29,7 @@ class MyTable extends THREE.Object3D {
         topColor = 0xffffff,
         legsColor = 0xffffff,
         plate,
-        cake
+        frame
     ) {
         super();
         this.app = app;
@@ -41,13 +42,13 @@ class MyTable extends THREE.Object3D {
         this.topColor = topColor;
         this.legsColor = legsColor;
         this.legDelta = [
-            this.width / 2 - this.legsRadius,
+            this.width / 2 - this.legsRadius * 2,
             -this.height / 2,
-            this.depth / 2 - this.legsRadius
+            this.depth / 2 - this.legsRadius * 2
         ];
 
         this.topShininess = 2;
-        this.legsShininess = 20;
+        this.legsShininess = 30;
         this.top = new THREE.BoxGeometry(
             this.width,
             this.topHeight,
@@ -59,18 +60,32 @@ class MyTable extends THREE.Object3D {
             this.height - this.topHeight
         );
         this.plate = plate;
-        this.cake ??= cake;
+        this.frame ??= frame;
+
+        this.woodTexture =
+            new THREE.TextureLoader().load('textures/wood.jpg');
+        this.woodTexture.wrapS = THREE.RepeatWrapping;
+        this.woodTexture.wrapT = THREE.RepeatWrapping;
+
         this.topMaterial = new THREE.MeshPhongMaterial({
             color: this.topColor,
             specular: "#ffffff",
             emissive: "#000000",
+            map: this.woodTexture,
             shininess: this.topShininess,
             side: THREE.DoubleSide
         });
+        
+        this.metallicTexture =
+            new THREE.TextureLoader().load('textures/metallic_sheen.jpg');
+        this.metallicTexture.wrapS = THREE.RepeatWrapping;
+        this.metallicTexture.wrapT = THREE.RepeatWrapping;
+
         this.legsMaterial = new THREE.MeshPhongMaterial({
             color: this.legsColor,
             specular: "#555555",
             emissive: "#000000",
+            map: this.metallicTexture,
             shininess: this.legsShininess
         });
         this.topMesh = new THREE.Mesh(this.top, this.topMaterial);
@@ -104,6 +119,11 @@ class MyTable extends THREE.Object3D {
             this.plate.rotateX(-Math.PI / 2);
             this.plate.position.y = this.topHeight / 1.99;
         }
+        if (this.frame) {
+            this.frame.rotateY(Math.PI/9)
+            this.frame.rotateX(-Math.PI/2);
+            this.frame.position.set(-(this.width/2) * 0.5, this.topHeight / 1.99, (this.depth/2) * 0.5 );
+        }
     }
 
     addMeshes() {
@@ -118,6 +138,7 @@ class MyTable extends THREE.Object3D {
         }
         if (this.plate) this.topMesh.add(this.plate);
         this.add(this.topMesh);
+        this.add(this.frame);
     }
 
     createLegMesh(leg, material, dx, dy, dz) {

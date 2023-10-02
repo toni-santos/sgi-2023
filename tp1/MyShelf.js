@@ -62,7 +62,6 @@ class MyShelf extends THREE.Object3D {
     }
 
     placeBalls() {
-        const randomArray = [];
         for (let i = 0; i < 3; i++) {
             const value = Math.round(Math.random());
             if (value) {
