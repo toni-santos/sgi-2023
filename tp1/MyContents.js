@@ -1,5 +1,7 @@
 import * as THREE from 'three';
 import { MyAxis } from './MyAxis.js';
+import { RectAreaLightUniformsLib } from './RectAreaLightUniformsLib.js';
+import { RectAreaLightHelper } from 'three/addons/helpers/RectAreaLightHelper.js';
 
 /**
  *  This class contains the contents of out application
@@ -22,24 +24,52 @@ class MyContents  {
         this.boxDisplacement = new THREE.Vector3(0,2,0)
 
         // plane related attributes
-        this.diffusePlaneColor = "#00ffff"
-        this.specularPlaneColor = "#777777"
+        //texture
+        this.planeTexture = new THREE.TextureLoader().load('textures/feup_b.jpg');
+        this.boxTexture = new THREE.TextureLoader().load('textures/feup_entry.jpg');
+        this.planeTexture.wrapS = THREE.RepeatWrapping;
+        this.planeTexture.wrapT = THREE.RepeatWrapping;
+
+        // material
+        this.diffusePlaneColor =  "rgb(128,128,128)"
+        this.specularPlaneColor = "rgb(0,0,0)"
         this.spotlightColor = 0xffffff
-        this.planeShininess = 30
-        this.planeMaterial = new THREE.MeshPhongMaterial({ color: this.diffusePlaneColor, 
-            specular: this.diffusePlaneColor, emissive: "#000000", shininess: this.planeShininess })
+        this.planeShininess = 0
+
+        // relating texture and material:
+        // two alternatives with different results
+        // alternative 1
+        this.planeMaterial = new THREE.MeshPhongMaterial({
+            color: this.diffusePlaneColor,
+            specular: this.specularPlaneColor,
+            emissive: "#000000", shininess: this.planeShininess,
+            map: this.planeTexture })
+
+        this.boxMaterial = new THREE.MeshPhongMaterial({
+            color: 0xffffff,
+            specular: 0x000000,
+            emissive: "#000000",
+            map: this.boxTexture })
+
+        // end of alternative 1
+
+        // alternative 2
+
+//        this.planeMaterial = new THREE.MeshLambertMaterial({
+//        map : this.planeTexture });
+       // end of alternative 2
     }
 
     /**
      * builds the box mesh with material assigned
      */
     buildBox() {    
-        let boxMaterial = new THREE.MeshPhongMaterial({ color: "#ffff77", 
-        specular: "#000000", emissive: "#000000", shininess: 90 })
+        //let boxMaterial = new THREE.MeshStandardMaterial({ color: "#ffff77", 
+        //emissive: "#000000"})
 
         // Create a Cube Mesh with basic material
         let box = new THREE.BoxGeometry(  this.boxMeshSize,  this.boxMeshSize,  this.boxMeshSize );
-        this.boxMesh = new THREE.Mesh( box, boxMaterial );
+        this.boxMesh = new THREE.Mesh( box, this.boxMaterial );
         this.boxMesh.rotation.x = -Math.PI / 2;
         this.boxMesh.position.y = this.boxDisplacement.y;
     }
@@ -85,21 +115,40 @@ class MyContents  {
         this.light3.position.set(2, 5, 1);
         this.light3.target.position.set(1, 0, 1);
         this.app.scene.add(this.light3);
+        this.app.scene.add(this.light3.target);
 
         // add a spotlight helper for the previous point light
         this.light3Helper = new THREE.SpotLightHelper(this.light3, this.spotlightColor);
         this.app.scene.add(this.light3Helper);
+
+        //RectAreaLightUniformsLib.init()
+        this.rectAreaLight = new THREE.RectAreaLight(0xffffff, 15);
+        this.rectAreaLight.position.set(0, 10, 10)
+        this.app.scene.add(this.rectAreaLight);
+
+        // add a rectarealight helper for the previous point light
+        this.rectLightHelper = new RectAreaLightHelper(this.rectAreaLight, 0xffffff);
+        this.app.scene.add(this.rectLightHelper);
+
         // add an ambient light
         const ambientLight = new THREE.AmbientLight( 0x555555, 4 );
         this.app.scene.add( ambientLight );
         this.buildBox()
         
         // Create a Plane Mesh with basic material
-        
-        let plane = new THREE.PlaneGeometry( 10, 10 );
+        let planeSizeU = 10;
+        let planeSizeV = 7;
+        let planeUVRate = planeSizeV / planeSizeU;
+        let planeTextureUVRate = 3354 / 2385; // image dimensions
+        let planeTextureRepeatU = 3;
+        let planeTextureRepeatV = planeTextureRepeatU * planeUVRate * planeTextureUVRate;
+        this.planeTexture.repeat.set(planeTextureRepeatU, planeTextureRepeatV );
+        this.planeTexture.rotation = 0;
+        this.planeTexture.offset = new THREE.Vector2(0,0);
+        let plane = new THREE.PlaneGeometry( planeSizeU, planeSizeV );
         this.planeMesh = new THREE.Mesh( plane, this.planeMaterial );
         this.planeMesh.rotation.x = -Math.PI / 2;
-        this.planeMesh.position.y = -0;
+        this.planeMesh.position.y = 0;
         this.app.scene.add( this.planeMesh );
     }
     
@@ -131,6 +180,20 @@ class MyContents  {
         this.app.scene.add(this.light3Helper);
     }
 
+    updateSpotlightTargetX(value) {
+        this.app.scene.remove(this.light3.target)
+        this.light3.target.x = value;
+        this.app.scene.add(this.light3.target)
+        this.light3Helper.update();
+    }
+
+    updateSpotlightTargetY(value) {
+        this.app.scene.remove(this.light3.target)
+        this.light3.target.y = value;
+        this.app.scene.add(this.light3.target)
+        this.light3Helper.update();
+    }
+
     updateSpotlightDistance(value) {
         this.light3.distance = value;
         this.light3Helper.update();
@@ -138,7 +201,6 @@ class MyContents  {
 
     updateSpotlightAngle(value) {
         this.light3.angle = value * (Math.PI/180);
-        console.log(this.light3.angle)
         this.light3Helper.update();
     }
 
@@ -158,6 +220,18 @@ class MyContents  {
     updatePlaneShininess(value) {
         this.planeShininess = value
         this.planeMaterial.shininess = this.planeShininess
+    }
+
+    updateTextureWrappingS(value) {
+        switch (value) {
+            case "repeat": this.planeMesh.material.map.wrapS = THREE.RepeatWrapping; break;
+            case "mirrored repeat": this.planeMesh.material.map.wrapS = THREE.MirroredRepeatWrapping; break;
+            case "clamp to edge": this.planeMesh.material.map.wrapS = THREE.ClampToEdgeWrapping; break;
+        }
+    }
+
+    updateTextureAngle(value) {
+        this.planeMesh.material.map.rotation = value * (Math.PI/180);
     }
     
     /**

@@ -1,6 +1,7 @@
 import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 import { MyApp } from './MyApp.js';
 import { MyContents } from './MyContents.js';
+import * as THREE from 'three';
 
 /**
     This class customizes the gui interface for the app
@@ -59,14 +60,27 @@ class MyGuiInterface  {
         cameraFolder.add(this.app.activeCamera.position, 'x', 0, 10).name("x coord")
         cameraFolder.open()
 
-        const lightFolder = this.datgui.addFolder('Spotlight')
-        lightFolder.add(this.contents.light3.position, 'y', 0, 20);
-        lightFolder.addColor(data, 'spotlight color').onChange( (value) => {this.contents.updateSpotlightColor(value)});
+        const lightFolder = this.datgui.addFolder('Spotlight');
+        lightFolder.add(this.contents.light3.position, 'x', 0, 20).name("position x");
+        lightFolder.add(this.contents.light3.position, 'y', 0, 20).name("position y");
+        lightFolder.add(this.contents.light3.target.position, 'x', -20, 20).onChange((value) => {this.contents.updateSpotlightTargetX(value)}).name("target x");
+        lightFolder.add(this.contents.light3.target.position, 'y', -20, 20).onChange((value) => {this.contents.updateSpotlightTargetY(value)}).name("target y");
+        lightFolder.add(this.contents.light3, 'intensity', 0, 20);
         lightFolder.add(this.contents.light3, 'distance', 0, 20).onChange((value) => {this.contents.updateSpotlightDistance(value)});
         lightFolder.add(this.contents.light3, 'angle', 0, 45).onChange((value) => {this.contents.updateSpotlightAngle(value)});
         lightFolder.add(this.contents.light3, 'penumbra', 0, 1).onChange((value) => {this.contents.updateSpotlightPenumbra(value)});
         lightFolder.add(this.contents.light3, 'decay', 0, 20).onChange((value) => {this.contents.updateSpotlightDecay(value)});
-        lightFolder.open()
+        lightFolder.addColor(data, 'spotlight color').onChange( (value) => {this.contents.updateSpotlightColor(value)});
+        lightFolder.open();
+
+        const textureFolder = this.datgui.addFolder('Plane Texture');
+        textureFolder.add(this.contents.planeMesh.material.map, 'wrapS', [ "repeat", "mirrored repeat", "clamp to edge" ] ).onChange((value) => {this.contents.updateTextureWrappingS(value)}).name("wrapping mode S");
+        textureFolder.add(this.contents.planeMesh.material.map.repeat, 'x', 1, 5).name("repeat x");
+        textureFolder.add(this.contents.planeMesh.material.map.repeat, 'y', 1, 5).name("repeat y");
+        textureFolder.add(this.contents.planeMesh.material.map.offset, 'x', -10, 10).name("offset x");
+        textureFolder.add(this.contents.planeMesh.material.map.offset, 'y', -10, 10).name("offset y");
+        textureFolder.add(this.contents.planeMesh.material.map.repeat, 'x', 1, 5).name("repeat x");
+        textureFolder.add(this.contents.planeMesh.material.map, 'rotation', -180, 180).onChange((value) => {this.contents.updateTextureAngle(value)});
     }
 }
 
