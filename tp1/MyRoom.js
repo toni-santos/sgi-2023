@@ -4,7 +4,7 @@ import { MyTable } from "./MyTable.js";
 import { MyShelf } from "./MyShelf.js";
 import { MyPlate } from "./MyPlate.js";
 import { MyCompanionCube } from "./MyCompanionCube.js";
-import { MyPictureFrame } from "./MyPictureFrame.js";
+import { MyFrame } from "./MyFrame.js";
 
 class MyRoom extends THREE.Object3D {
     /**
@@ -33,7 +33,7 @@ class MyRoom extends THREE.Object3D {
         this.floor = new THREE.PlaneGeometry(floorEdge, floorEdge);
         this.wall = new THREE.PlaneGeometry(floorEdge, wallEdge);
         this.plate = new MyPlate(this.app, 0.7, 32, 0xffffff);
-        this.tableFrame = new MyPictureFrame(this, 2, 2.5, 10, 0xffffff, new THREE.TextureLoader().load('textures/cavej.jpg'));
+        this.tableFrame = new MyFrame(this, 2, 2.5, 10, 0xffffff, new THREE.TextureLoader().load('textures/cavej.jpg'));
         table ??= new MyTable(
             this,
             10,
@@ -49,7 +49,7 @@ class MyRoom extends THREE.Object3D {
         this.table = table;
         this.shelf = new MyShelf(this);
         this.cube = new MyCompanionCube(this, 3);
-        this.frame = new MyPictureFrame(this, 2, 2.5, 10, 0xffffff, new THREE.TextureLoader().load('textures/cavecarol.jpg'));
+        this.frame = new MyFrame(this, 2, 2.5, 10, 0xffffff, new THREE.TextureLoader().load('textures/cavecarol.jpg'));
         this.floorShininess = 2;
         this.wallShininess = 2;
         this.floorDelta = floorEdge / 2;

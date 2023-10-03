@@ -3,7 +3,7 @@ import { MyApp } from "./MyApp.js";
 import { MyPlate } from "./MyPlate.js";
 import { MyCake } from "./MyCake.js";
 import { arrayMult } from "./MyUtils.js";
-import { MyPictureFrame } from "./MyPictureFrame.js";
+import { MyFrame } from "./MyFrame.js";
 
 class MyTable extends THREE.Object3D {
     /**
@@ -60,7 +60,7 @@ class MyTable extends THREE.Object3D {
             this.height - this.topHeight
         );
         this.plate = plate;
-        this.frame ??= frame;
+        this.frame = frame;
 
         this.woodTexture =
             new THREE.TextureLoader().load('textures/wood.jpg');
@@ -138,7 +138,7 @@ class MyTable extends THREE.Object3D {
         }
         if (this.plate) this.topMesh.add(this.plate);
         this.add(this.topMesh);
-        this.add(this.frame);
+        if (this.frame) this.add(this.frame);
     }
 
     createLegMesh(leg, material, dx, dy, dz) {

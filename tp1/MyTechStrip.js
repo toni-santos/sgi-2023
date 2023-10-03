@@ -18,6 +18,7 @@ class MyTechStrip extends THREE.Object3D {
         this.type = "Group";
         this.radius = radius * 1.05;
         this.angle = 2 * angle;
+        this.coreShininess = 30;
 
         this.techStrip = new THREE.CylinderGeometry(
             this.radius,

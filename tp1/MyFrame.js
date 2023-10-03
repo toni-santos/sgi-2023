@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { MyApp } from "./MyApp.js";
 
-class MyPictureFrame extends THREE.Object3D {
+class MyFrame extends THREE.Object3D {
     constructor(app, width, height, segments, color, imageTexture, object) {
         super();
         this.app = app;
@@ -85,10 +85,10 @@ class MyPictureFrame extends THREE.Object3D {
         this.backMesh.position.set(0, 0, 0)
         this.imageMesh.position.set(0, 0, this.depth * 0.9);
         this.backMesh.add(this.imageMesh);
-        this.backMesh.add(this.topMesh);
-        this.backMesh.add(this.botMesh);
-        this.backMesh.add(this.leftMesh);
-        this.backMesh.add(this.rightMesh);
+        this.add(this.topMesh);
+        this.add(this.botMesh);
+        this.add(this.leftMesh);
+        this.add(this.rightMesh);
         this.leftMesh.rotateZ(Math.PI/2);
         this.rightMesh.rotateZ(Math.PI/2);
         this.topMesh.position.set(0, height/2, this.depth/2);
@@ -100,4 +100,4 @@ class MyPictureFrame extends THREE.Object3D {
     }
 }
 
-export { MyPictureFrame };
+export { MyFrame };
