@@ -5,6 +5,7 @@ import { MyShelf } from "./MyShelf.js";
 import { MyPlate } from "./MyPlate.js";
 import { MyCompanionCube } from "./MyCompanionCube.js";
 import { MyFrame } from "./MyFrame.js";
+import { MyWindow } from "./MyWindow.js";
 
 class MyRoom extends THREE.Object3D {
     /**
@@ -50,6 +51,7 @@ class MyRoom extends THREE.Object3D {
         this.shelf = new MyShelf(this);
         this.cube = new MyCompanionCube(this, 3);
         this.frame = new MyFrame(this, 2, 2.5, 10, 0xffffff, new THREE.TextureLoader().load('textures/cavecarol.jpg'));
+        this.window = new MyWindow(this, wallEdge / 2, wallEdge / 3, 0xffffff, new THREE.TextureLoader().load('textures/landscape.jpg'))
         this.floorShininess = 2;
         this.wallShininess = 2;
         this.floorDelta = floorEdge / 2;
@@ -139,12 +141,15 @@ class MyRoom extends THREE.Object3D {
         );
         this.frame.position.set(this.table.width / 2, -this.table.height + this.frame.height/2, this.table.legDelta[2] + this.table.legsRadius + this.frame.height/2 * Math.sin(Math.PI/10));
         this.frame.rotateX(-Math.PI/10);
+        this.window.position.set(this.floorDelta - 0.01, this.wallDelta / 3, this.floorDelta / 3);
+        this.window.rotateY(-Math.PI / 2);
     }
 
     addMeshes() {
         this.add(this.table);
         this.add(this.shelf);
         this.add(this.frame);
+        this.add(this.window);
         this.add(this.cube);
         for (const mesh of this.meshes) {
             this.add(mesh);
