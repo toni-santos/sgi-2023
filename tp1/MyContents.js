@@ -27,8 +27,8 @@ class MyContents {
         // plane related attributes
         this.diffusePlaneColor = "#00ffff";
         this.specularPlaneColor = "#777777";
-        this.floorColor = 0x333333;
-        this.wallColor = 0x222299;
+        this.floorColor = 0x3c3d40;
+        this.wallColor = 0xced2d9;
         this.planeShininess = 30;
         this.planeMaterial = new THREE.MeshPhongMaterial({
             color: this.diffusePlaneColor,
@@ -75,8 +75,8 @@ class MyContents {
         if (this.room === null) {
             this.room = new MyRoom(
                 this,
-                60,
-                10,
+                100,
+                12,
                 this.floorColor,
                 this.wallColor
             );
@@ -84,20 +84,35 @@ class MyContents {
         }
 
         // add a point light on top of the model
-        this.pointLight = new THREE.PointLight(0xffffff, 30, 0);
+        this.pointLight = new THREE.PointLight(0xffffff, 0, 0);
         this.pointLight.position.set(3, 10, 6);
         this.app.scene.add(this.pointLight);
 
-        // add a point light helper for the previous point light
-        const sphereSize = 0.5;
-        const pointLightHelper = new THREE.PointLightHelper(
-            this.pointLight,
-            sphereSize
-        );
-        this.app.scene.add(pointLightHelper);
+        const lightPos = new THREE.Vector3(-10, 10, 0);
+        this.leftLight = new THREE.SpotLight(0xffffff, 0.6, 0, Math.PI, 1, 0.8);
+        this.leftLight.position.set(lightPos.x, lightPos.y, lightPos.z);
+        this.app.scene.add(this.leftLight);
+        this.leftLightTarget = new THREE.Object3D();
+        this.leftLightTarget.position.set(lightPos.x, 0, lightPos.z);
+        this.leftLight.target = this.leftLightTarget;
+
+        this.leftLightHelper = new THREE.SpotLightHelper(this.leftLight);
+        this.app.scene.add(this.leftLightHelper);
+
+        this.rightLight = new THREE.SpotLight(0xffffff, 0.6, 0, Math.PI, 1, 0.8);
+        this.rightLight.position.set(-lightPos.x, lightPos.y, lightPos.z);
+        this.app.scene.add(this.rightLight);
+        this.rightLightTarget = new THREE.Object3D();
+        this.rightLightTarget.position.set(-lightPos.x, 0, lightPos.z);
+        this.rightLight.target = this.rightLightTarget;
+
+        this.rightLightHelper = new THREE.SpotLightHelper(this.rightLight);
+        this.app.scene.add(this.rightLightHelper);
+
+        this.app.scene.fog = new THREE.Fog(0x999999, 0.015, 150);
 
         // add an ambient light
-        const ambientLight = new THREE.AmbientLight(0x999999);
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.01);
         this.app.scene.add(ambientLight);
 
         this.buildBox();

@@ -76,6 +76,12 @@ class MyRoom extends THREE.Object3D {
             [0, 1, 0],
             -this.wallDelta
         );
+        this.roofMesh = this.createPlaneMesh(
+            this.floor,
+            this.floorMaterial,
+            [0, 1, 0],
+            this.wallDelta
+        );
         this.leftWallMesh = this.createPlaneMesh(
             this.wall,
             this.wallMaterial,
@@ -105,7 +111,8 @@ class MyRoom extends THREE.Object3D {
             this.leftWallMesh,
             this.rightWallMesh,
             this.frontWallMesh,
-            this.backWallMesh
+            this.backWallMesh,
+            this.roofMesh
         ];
         this.transformMeshes();
         this.addMeshes();
@@ -128,6 +135,7 @@ class MyRoom extends THREE.Object3D {
 
     transformMeshes() {
         this.shelf.position.z = -this.floorDelta / 2;
+        this.shelf.position.y = -this.wallDelta * 0.98;
         this.table.position.set(
             0,
             -this.wallDelta + this.table.height - this.table.topHeight / 2.01,
@@ -139,7 +147,7 @@ class MyRoom extends THREE.Object3D {
             -this.wallDelta + this.cube.edge * 1.1 / 2,
             0
         );
-        this.frame.position.set(this.table.width / 2, -this.table.height + this.frame.height/2, this.table.legDelta[2] + this.table.legsRadius + this.frame.height/2 * Math.sin(Math.PI/10));
+        this.frame.position.set(this.table.width / 2, -this.wallDelta + this.frame.height/2, this.table.legDelta[2] + this.table.legsRadius + this.frame.height/2 * Math.sin(Math.PI/10));
         this.frame.rotateX(-Math.PI/10);
         this.window.position.set(this.floorDelta - 0.01, this.wallDelta / 3, this.floorDelta / 3);
         this.window.rotateY(-Math.PI / 2);
