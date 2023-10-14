@@ -49,7 +49,7 @@ class MyRoom extends THREE.Object3D {
             0.5,
             0.3,
             0x45270a,
-            0xf0f0f0,
+            0x807a7a,
             this.plate,
             this.tableFrame
         );

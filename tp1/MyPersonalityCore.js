@@ -48,8 +48,8 @@ class MyPersonalityCore extends THREE.Object3D {
         this.metallicTexture.wrapT = THREE.RepeatWrapping;
 
         this.coreMaterial = new THREE.MeshPhongMaterial({
-            color: 0xd4cfc1,
-            specular: "#d4cfc1",
+            color: 0xdbd0d0,
+            specular: "#dbd0d0",
             emissive: "#808080",
             emissiveIntensity: 0,
             map: this.metallicTexture,

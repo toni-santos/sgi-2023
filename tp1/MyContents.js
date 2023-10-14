@@ -103,11 +103,11 @@ class MyContents {
         this.rightLightTarget.position.set(-lightPos.x, 0, lightPos.z);
         this.rightLight.target = this.rightLightTarget;
 
-        this.dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        this.dirLight = new THREE.DirectionalLight(0xF4E99B, 0.2);
         this.dirLight.position.set(0, 10, 0);
         this.app.scene.add(this.dirLight);
 
-        this.app.scene.fog = new THREE.FogExp2(0x222222, 0.01);
+        // this.app.scene.fog = new THREE.FogExp2(0x222222, 0.01);
         
         const planeTexture = new THREE.TextureLoader().load("textures/dryfalls.jpg")
         const planeMaterial = new THREE.MeshBasicMaterial( {
