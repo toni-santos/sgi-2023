@@ -5,13 +5,13 @@ import { MyShelf } from "./MyShelf.js";
 import { MyPlate } from "./MyPlate.js";
 import { MyCompanionCube } from "./MyCompanionCube.js";
 import { MyFrame } from "./MyFrame.js";
-import { MyWindow } from "./MyWindow.js";
 import { MyBezierPainting } from "./MyBezierPainting.js";
 import { MySpring } from "./MySpring.js";
 import { MyBlueprint } from "./MyBlueprint.js";
 import { MyJar } from "./MyJar.js";
 import { MyFlower } from "./MyFlower.js";
 import { MyCardboardBox } from "./MyCardboardBox.js";
+import { MyWallWindow } from "./MyWallWindow.js";
 
 class MyRoom extends THREE.Object3D {
     /**
@@ -48,7 +48,7 @@ class MyRoom extends THREE.Object3D {
             5,
             0.5,
             0.3,
-            0xA1662F,
+            0x45270a,
             0xf0f0f0,
             this.plate,
             this.tableFrame
@@ -57,21 +57,22 @@ class MyRoom extends THREE.Object3D {
         this.shelf = new MyShelf(this);
         this.cube = new MyCompanionCube(this, 3);
         this.frame = new MyFrame(this, 2, 2.5, 10, 0xffffff, new THREE.TextureLoader().load('textures/cavecarol.jpg'));
-        this.window = new MyWindow(this, wallEdge / 2, wallEdge / 3, 0xffffff, new THREE.TextureLoader().load('textures/landscape.jpg'))
         this.bezierPainting = new MyBezierPainting(this, 23, 10, 10, 0xffffff);
         this.spring = new MySpring(this);
         this.blueprint = new MyBlueprint(this);
         this.jar = new MyJar(this);
         this.flower = new MyFlower(this, 3);
         this.box = new MyCardboardBox(this, 5);
-        this.floorShininess = 2;
+        this.floorShininess = 1;
         this.wallShininess = 2;
         this.floorDelta = floorEdge / 2;
         this.wallDelta = wallEdge / 2;
+        this.floorTexture = new THREE.TextureLoader().load('textures/concrete.jpg');
+        this.floorTexture.wrapS = THREE.RepeatWrapping;
+        this.floorTexture.wrapT = THREE.RepeatWrapping;
         this.floorMaterial = new THREE.MeshPhongMaterial({
             color: floorColor,
-            specular: "#ffffff",
-            emissive: "#000000",
+            map: this.floorTexture,
             shininess: this.floorShininess,
             side: THREE.DoubleSide
         });
@@ -106,12 +107,16 @@ class MyRoom extends THREE.Object3D {
             [-1, 0, 0],
             this.floorDelta
         );
-        this.frontWallMesh = this.createPlaneMesh(
-            this.wall,
-            this.wallMaterial,
-            [0, 0, -1],
-            this.floorDelta
+        this.frontWallMesh = new MyWallWindow(
+            this.app,
+            floorEdge,
+            wallEdge,
+            4,
+            0xffffff,
+            {right: 0.225, left: 0.225, top: 0.2, bot: 0.2},
+            this
         );
+        this.frontWallMesh.translateZ(this.floorDelta);
         this.backWallMesh = this.createPlaneMesh(
             this.wall,
             this.wallMaterial,
@@ -191,8 +196,6 @@ class MyRoom extends THREE.Object3D {
         );
         this.frame.position.set(this.table.width / 2, -this.wallDelta + this.frame.height/2, this.table.legDelta[2] + this.table.legsRadius + this.frame.height/2 * Math.sin(Math.PI/10));
         this.frame.rotateX(-Math.PI/10);
-        this.window.position.set(this.floorDelta - 0.01, this.wallDelta / 3, this.floorDelta / 3);
-        this.window.rotateY(-Math.PI / 2);
         this.bezierPainting.scale.set(0.2, 0.2, 0.2);
         this.blueprint.rotateX(Math.PI/2);
         this.box.position.set(0, -this.wallDelta + this.box.wallDelta + 0.01, 0);
@@ -202,7 +205,6 @@ class MyRoom extends THREE.Object3D {
         this.add(this.table);
         this.add(this.shelf);
         this.add(this.frame);
-        this.add(this.window);
         this.add(this.cube);
         this.add(this.box);
         for (const mesh of this.meshes) {

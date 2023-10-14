@@ -19,7 +19,7 @@ class MyCompanionCube extends THREE.Object3D {
         this.heartColor = heartColor;
         this.baseColor = 0x555555;
         this.accentColor = 0xdddddd;
-        this.accentMaterial = new THREE.MeshPhongMaterial({color: this.accentColor})
+        this.accentMaterial = new THREE.MeshPhongMaterial({shininess: 100, color: this.accentColor})
         this.heartMaterial = new THREE.MeshPhongMaterial({color: this.heartColor});
 
         this.cube = new THREE.BoxGeometry(this.edge, this.edge, this.edge);

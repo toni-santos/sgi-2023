@@ -42,7 +42,7 @@ class MyCandle extends THREE.Object3D {
 
         this.light = new THREE.PointLight(
             0xfff9d8,
-            0.5,
+            0.05,
             3,
             2
         );

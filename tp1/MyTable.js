@@ -68,8 +68,9 @@ class MyTable extends THREE.Object3D {
 
         this.topMaterial = new THREE.MeshPhongMaterial({
             color: this.topColor,
-            specular: "#ffffff",
-            emissive: "#000000",
+            specular: this.topColor,
+            emissive: this.topColor,
+            emissiveIntensity: 0.1,
             map: this.woodTexture,
             shininess: this.topShininess,
             side: THREE.DoubleSide
@@ -80,12 +81,10 @@ class MyTable extends THREE.Object3D {
         this.metallicTexture.wrapS = THREE.RepeatWrapping;
         this.metallicTexture.wrapT = THREE.RepeatWrapping;
 
-        this.legsMaterial = new THREE.MeshPhongMaterial({
+        this.legsMaterial = new THREE.MeshBasicMaterial({
             color: this.legsColor,
-            specular: "#555555",
-            emissive: "#000000",
             map: this.metallicTexture,
-            shininess: this.legsShininess
+            shininess: 100
         });
         this.topMesh = new THREE.Mesh(this.top, this.topMaterial);
         this.frLegMesh = this.createLegMesh(

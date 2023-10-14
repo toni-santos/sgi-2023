@@ -49,11 +49,11 @@ class MyPersonalityCore extends THREE.Object3D {
 
         this.coreMaterial = new THREE.MeshPhongMaterial({
             color: 0xd4cfc1,
-            specular: "#ffffff",
+            specular: "#d4cfc1",
             emissive: "#808080",
-            emissiveIntensity: 0.2,
+            emissiveIntensity: 0,
             map: this.metallicTexture,
-            shininess: 1,
+            shininess: 10,
             side: THREE.DoubleSide
         });
 

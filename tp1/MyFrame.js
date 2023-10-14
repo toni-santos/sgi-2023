@@ -29,14 +29,8 @@ class MyFrame extends THREE.Object3D {
             side: THREE.DoubleSide
         });
 
-        this.imageMaterial = new THREE.MeshPhongMaterial({
-            color: 0xefefef,
-            specular: "#ffffff",
-            emissive: "#000000",
-            emissiveIntensity: 0,
+        this.imageMaterial = new THREE.MeshBasicMaterial({
             map: this.imageTexture ?? null,
-            shininess: this.frameShininess,
-            side: THREE.DoubleSide
         });
 
         this.frameBack = new THREE.PlaneGeometry(
@@ -84,7 +78,7 @@ class MyFrame extends THREE.Object3D {
         this.imageMesh = new THREE.Mesh(this.image, this.imageMaterial);
         this.backMesh.position.set(0, 0, 0)
         this.imageMesh.position.set(0, 0, this.depth * 0.9);
-        this.backMesh.add(this.imageMesh);
+        this.add(this.imageMesh);
         this.add(this.topMesh);
         this.add(this.botMesh);
         this.add(this.leftMesh);
