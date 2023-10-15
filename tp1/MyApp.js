@@ -41,6 +41,8 @@ class MyApp {
         this.stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
         document.body.appendChild(this.stats.dom);
 
+        this.clock = new THREE.Clock();
+
         this.initCameras();
         this.setActiveCamera("Perspective");
 
@@ -48,6 +50,8 @@ class MyApp {
         this.renderer = new THREE.WebGLRenderer({ antialias: true });
         this.renderer.setPixelRatio(window.devicePixelRatio);
         this.renderer.setClearColor("#000000");
+        this.renderer.shadowMap.type = THREE.PCFSoftShadowMap; 
+        this.renderer.shadowMap.enabled = true;
 
         // Configure renderer size
         this.renderer.setSize(window.innerWidth, window.innerHeight);
@@ -242,7 +246,7 @@ class MyApp {
 
         // update the animation if contents were provided
         if (this.activeCamera !== undefined && this.activeCamera !== null) {
-            this.contents.update();
+            this.contents.update(this.clock);
         }
 
         // required if controls.enableDamping or controls.autoRotate are set to true

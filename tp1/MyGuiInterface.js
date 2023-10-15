@@ -87,6 +87,24 @@ class MyGuiInterface {
         const lightFolder = this.datgui.addFolder("Point Light");
         lightFolder.add(this.contents.pointLight, "visible", true).name("enable");
         lightFolder.open()
+
+        const cakeLightFolder = this.datgui.addFolder("Cake Light");
+        cakeLightFolder.add(this.contents.room.cakeLight, "visible", true).name("enable");
+        cakeLightFolder.add(this.contents.room.cakeLight.light, "intensity", 0, 100).name("intensity");
+        cakeLightFolder.add(this.contents.room, "rotationAngle", 0, 2*Math.PI).name("rotation angle").onChange((value) => {
+            this.contents.room.rotateCakeLight(value);
+        });
+        cakeLightFolder.add(this.contents.room, "rotationHeight", -5, 5).name("rotation height").onChange((value) => {
+            this.contents.room.changeCakeHeight(value);
+        });
+        cakeLightFolder.add(this.contents.room, "rotationRadius", 0, 10).name("rotation radius").onChange((value) => {
+            this.contents.room.radiusCakeLight(value);
+        });
+        cakeLightFolder.addColor(this.contents.room.cakeLight, "color").onChange((value) => {
+            this.contents.room.cakeLight.updateColor(value);
+        });
+
+        cakeLightFolder.open();
     }
 }
 

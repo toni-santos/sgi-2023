@@ -12,6 +12,7 @@ import { MyJar } from "./MyJar.js";
 import { MyFlower } from "./MyFlower.js";
 import { MyCardboardBox } from "./MyCardboardBox.js";
 import { MyWallWindow } from "./MyWallWindow.js";
+import { MyCakeLight } from "./MyCakeLight.js";
 
 class MyRoom extends THREE.Object3D {
     /**
@@ -36,11 +37,14 @@ class MyRoom extends THREE.Object3D {
         super();
         this.app = app;
         this.type = "Group";
+        this.rotationAngle = 0;
+        this.rotationHeight = 2;
+        this.rotationRadius = 3;
 
         this.floor = new THREE.PlaneGeometry(floorEdge, floorEdge);
         this.wall = new THREE.PlaneGeometry(floorEdge, wallEdge);
         this.plate = new MyPlate(this.app, 0.7, 32, 0xffffff);
-        this.tableFrame = new MyFrame(this, 2, 2.5, 10, 0xffffff, new THREE.TextureLoader().load('textures/cavej.jpg'));
+        this.tableFrame = new MyFrame(this, 2, 2.5, 10, 0x80461B, new THREE.TextureLoader().load('textures/cavej.jpg'));
         table ??= new MyTable(
             this,
             10,
@@ -49,14 +53,15 @@ class MyRoom extends THREE.Object3D {
             0.5,
             0.3,
             0x45270a,
-            0x807a7a,
+            0x595857,
             this.plate,
             this.tableFrame
         );
         this.table = table;
+        this.cakeLight = new MyCakeLight(this, this.plate.cake);
         this.shelf = new MyShelf(this);
         this.cube = new MyCompanionCube(this, 3);
-        this.frame = new MyFrame(this, 2, 2.5, 10, 0xffffff, new THREE.TextureLoader().load('textures/cavecarol.jpg'));
+        this.frame = new MyFrame(this, 2, 2.5, 10, 0x80461B, new THREE.TextureLoader().load('textures/cavecarol.jpg'));
         this.bezierPainting = new MyBezierPainting(this, 23, 10, 10, 0xffffff);
         this.spring = new MySpring(this);
         this.blueprint = new MyBlueprint(this);
@@ -67,6 +72,7 @@ class MyRoom extends THREE.Object3D {
         this.wallShininess = 2;
         this.floorDelta = floorEdge / 2;
         this.wallDelta = wallEdge / 2;
+
         this.floorTexture = new THREE.TextureLoader().load('textures/concrete.jpg');
         this.floorTexture.wrapS = THREE.RepeatWrapping;
         this.floorTexture.wrapT = THREE.RepeatWrapping;
@@ -159,6 +165,7 @@ class MyRoom extends THREE.Object3D {
             0
         );
         mesh.position.set(...movementVector);
+        mesh.receiveShadow = True;
         return mesh;
     }
 
@@ -199,18 +206,41 @@ class MyRoom extends THREE.Object3D {
         this.bezierPainting.scale.set(0.2, 0.2, 0.2);
         this.blueprint.rotateX(Math.PI/2);
         this.box.position.set(0, -this.wallDelta + this.box.wallDelta + 0.01, 0);
+        this.positionCakeLight();
     }
 
     addMeshes() {
         this.add(this.table);
         this.add(this.shelf);
         this.add(this.frame);
+        this.add(this.cakeLight);
         this.add(this.cube);
         this.add(this.box);
         for (const mesh of this.meshes) {
             this.add(mesh);
         }
     }
+
+    rotateCakeLight(value){
+        this.rotationAngle = value;
+        this.positionCakeLight();
+    }
+
+    changeCakeHeight(value){
+        this.rotationHeight = value;
+        this.positionCakeLight();
+    }
+    
+    radiusCakeLight(value){
+        this.rotationRadius = value;
+        this.positionCakeLight();
+    }
+
+    positionCakeLight() {
+        this.cakeLight.position.set(this.rotationRadius*Math.cos(this.rotationAngle), this.rotationHeight, this.rotationRadius*Math.sin(this.rotationAngle));
+        this.cakeLight.lookAt(this.plate.position);
+    }
+
 }
 
 MyRoom.prototype.isGroup = true;

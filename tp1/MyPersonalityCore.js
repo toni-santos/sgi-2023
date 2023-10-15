@@ -3,7 +3,7 @@ import { MyApp } from "./MyApp.js";
 import { MyTechStrip } from "./MyTechStrip.js";
 
 class MyPersonalityCore extends THREE.Object3D {
-    constructor(app, radius, segments, color, object) {
+    constructor(app, radius, segments, color, light, lightColor, object) {
         super();
         this.app = app;
         this.type = "Group";
@@ -12,6 +12,8 @@ class MyPersonalityCore extends THREE.Object3D {
         this.color = color;
         this.object = object;
         this.coreShininess = 10;
+        this.coreLight = light;
+        this.lightColor = lightColor;
         
         this.core = new THREE.SphereGeometry(
             this.radius,
@@ -36,11 +38,6 @@ class MyPersonalityCore extends THREE.Object3D {
             this.segments
         );
         this.techStrip = new MyTechStrip(this.app, this.radius, Math.PI/5);
-        this.coreLight = new THREE.PointLight(
-            0xe38b27,
-            1,
-            100
-        );
 
         this.metallicTexture =
             new THREE.TextureLoader().load('textures/metallic_sheen.jpg');
@@ -59,16 +56,19 @@ class MyPersonalityCore extends THREE.Object3D {
 
         this.bulbMaterial = new THREE.MeshPhongMaterial({
             color: this.color,
-            specular: "#e38b27",
-            emissive: "#e38b27",
+            specular: this.lightColor,
+            emissive: this.lightColor,
             emissiveIntensity: 1,
             shininess: this.coreShininess,
             side: THREE.DoubleSide
         });
 
         this.coreMesh = new THREE.Mesh(this.core, this.coreMaterial);
+        this.coreMesh.castShadow = true;
         this.coreBulbMesh = new THREE.Mesh(this.coreBulb, this.bulbMaterial);
+        this.coreBulbMesh.castShadow = true;
         this.planeMesh = new THREE.Mesh(this.plane, this.coreMaterial);
+        this.planeMesh.castShadow = true;
         this.planeMesh.rotation.x = Math.PI / 2;
         this.planeMesh.position.y = Math.cos(Math.PI/5) * this.radius ;
         this.coreLight.position.y = Math.cos(Math.PI/5) * this.radius ;

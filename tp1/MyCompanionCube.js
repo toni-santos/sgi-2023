@@ -19,15 +19,17 @@ class MyCompanionCube extends THREE.Object3D {
         this.heartColor = heartColor;
         this.baseColor = 0x555555;
         this.accentColor = 0xdddddd;
-        this.accentMaterial = new THREE.MeshPhongMaterial({shininess: 100, color: this.accentColor})
-        this.heartMaterial = new THREE.MeshPhongMaterial({color: this.heartColor});
+        this.accentMaterial = new THREE.MeshPhongMaterial({shininess: 100, color: this.accentColor, side: THREE.FrontSide})
+        this.heartMaterial = new THREE.MeshPhongMaterial({color: this.heartColor, side: THREE.FrontSide});
 
         this.cube = new THREE.BoxGeometry(this.edge, this.edge, this.edge);
 
         this.cubeMesh = new THREE.Mesh(
             this.cube,
-            new THREE.MeshPhongMaterial({ color: 0x555555 })
+            new THREE.MeshPhongMaterial({ color: 0x555555, side: THREE.FrontSide })
         );
+        this.cubeMesh.castShadow = true;
+        this.cubeMesh.receiveShadow = true;
 
         this.extrudeSettings = { depth: 0.05, bevelEnabled: true, bevelSegments: 2, steps: 2, bevelSize: 0.3, bevelThickness: 0.1 * this.edge / 4 };
         this.addHeartSlots();
@@ -42,6 +44,8 @@ class MyCompanionCube extends THREE.Object3D {
             circleSlot,
             this.accentMaterial
         );
+        slotMesh.castShadow=true;
+        slotMesh.receiveShadow=true;
         // Top / Bottom
         this.addSlot(slotMesh);
         // Front / Back
@@ -67,6 +71,8 @@ class MyCompanionCube extends THREE.Object3D {
             lineHole,
             this.heartMaterial
         );
+        lineMesh.castShadow = true;
+        lineMesh.receiveShadow = true;
 
         this.addLinePair(lineMesh, slot, [1, 1, 0]);
         this.addLinePair(lineMesh.clone(), slot, [1, 0, 1]);
@@ -122,6 +128,9 @@ class MyCompanionCube extends THREE.Object3D {
 
         const armor = new THREE.BoxGeometry(...boxSize);
         const armorMesh = new THREE.Mesh(armor, this.accentMaterial);
+        armorMesh.castShadow = true;
+        armorMesh.receiveShadow = true;
+
         armorMesh.position.set(...arrayMult(delta, Array(3).fill(this.edge / 2)));
 
         this.add(armorMesh);
@@ -130,6 +139,8 @@ class MyCompanionCube extends THREE.Object3D {
     positionCorner(isZRotation, xSign, yzSign, dx, dy, dz) {
         const corner = new THREE.CylinderGeometry(this.edge / 10, Math.sqrt(2) * this.edge / 5, this.edge / 5, 3);
         this.cornerMesh = new THREE.Mesh(corner, this.accentMaterial);
+        this.cornerMesh.castShadow = true;
+        this.cornerMesh.receiveShadow = true;
         this.cornerMesh.rotateX(xSign * Math.PI / 2 + Math.PI / 2);
 
         if (isZRotation) {
@@ -147,6 +158,9 @@ class MyCompanionCube extends THREE.Object3D {
 
     positionHeart(sign, slot) {
         const heart = this.drawHeart(-25, -40);
+        heart.castShadow = true;
+        heart.receiveShadow = true;
+
         heart.scale.set(this.edge/300, this.edge/300);
         heart.rotateX(Math.PI / 2);
         heart.position.y = (sign * this.edge + this.extrudeSettings.depth) / 2;

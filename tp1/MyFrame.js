@@ -22,14 +22,15 @@ class MyFrame extends THREE.Object3D {
 
         this.frameMaterial = new THREE.MeshPhongMaterial({
             color: this.color,
-            specular: "#ffffff",
-            emissive: "#000000",
+            specular: this.color,
+            emissive: this.color,
+            emissiveIntensity: 0,
             map: this.woodTexture,
             shininess: this.frameShininess,
-            side: THREE.DoubleSide
+            side: THREE.FrontSide
         });
 
-        this.imageMaterial = new THREE.MeshBasicMaterial({
+        this.imageMaterial = new THREE.MeshPhongMaterial({
             map: this.imageTexture ?? null,
         });
 
@@ -76,7 +77,22 @@ class MyFrame extends THREE.Object3D {
         this.leftMesh = new THREE.Mesh(this.frameLeft, this.frameMaterial);
         this.rightMesh = new THREE.Mesh(this.frameRight, this.frameMaterial);
         this.imageMesh = new THREE.Mesh(this.image, this.imageMaterial);
-        this.backMesh.position.set(0, 0, 0)
+        this.backMesh.castShadow = true;
+        this.backMesh.receiveShadow = true;
+        this.backMesh.receiveShadow = true;
+        this.topMesh.castShadow = true;
+        this.topMesh.receiveShadow = true;
+        this.botMesh.castShadow = true;
+        this.botMesh.receiveShadow = true;
+        this.leftMesh.castShadow = true;
+        this.leftMesh.receiveShadow = true;
+        this.rightMesh.castShadow = true;
+        this.rightMesh.receiveShadow = true;
+        this.imageMesh.castShadow = true;
+        this.imageMesh.receiveShadow = true;
+        
+        this.backMesh.position.set(0, 0, -0.01)
+        this.backMesh.rotateY(Math.PI);
         this.imageMesh.position.set(0, 0, this.depth * 0.9);
         this.add(this.imageMesh);
         this.add(this.topMesh);
