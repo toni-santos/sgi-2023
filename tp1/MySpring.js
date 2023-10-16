@@ -15,8 +15,8 @@ class MySpring extends THREE.Object3D {
 
         this.curve = new THREE.CatmullRomCurve3(this.points);
         this.curveGeometry = new THREE.BufferGeometry().setFromPoints(this.curve.getPoints(this.height));
-        this.lineMaterial = new THREE.LineBasicMaterial( { color: 0xffffff } )
-        this.lineObj = new THREE.Line( this.curveGeometry, this.lineMaterial )
+        this.lineMaterial = new THREE.LineBasicMaterial({ color: 0xffffff });
+        this.lineObj = new THREE.Line( this.curveGeometry, this.lineMaterial );
         this.add( this.lineObj );
     }
 }

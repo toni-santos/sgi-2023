@@ -27,7 +27,7 @@ class MyContents {
         // plane related attributes
         this.diffusePlaneColor = "#00ffff";
         this.specularPlaneColor = "#777777";
-        this.floorColor = 0x3c3d40;
+        this.floorColor = 0x58595c;
         this.wallColor = 0xced2d9;
         this.planeShininess = 30;
         this.planeMaterial = new THREE.MeshPhongMaterial({
@@ -75,7 +75,7 @@ class MyContents {
         if (this.room === null) {
             this.room = new MyRoom(
                 this,
-                100,
+                70,
                 12,
                 this.floorColor,
                 this.wallColor
@@ -86,34 +86,46 @@ class MyContents {
         // add a point light on top of the model
         this.pointLight = new THREE.PointLight(0xffffff, 0, 0);
         this.pointLight.position.set(3, 10, 6);
-        this.app.scene.add(this.pointLight);
+        // this.app.scene.add(this.pointLight);
 
         const lightPos = new THREE.Vector3(-10, 10, 0);
-        this.leftLight = new THREE.SpotLight(0xffffff, 0.6, 0, Math.PI, 1, 0.8);
+        this.leftLight = new THREE.SpotLight(0xc6c9f5, 10, 20, Math.PI, 0, 1);
         this.leftLight.position.set(lightPos.x, lightPos.y, lightPos.z);
+        this.leftLight.castShadow = true;
         this.app.scene.add(this.leftLight);
         this.leftLightTarget = new THREE.Object3D();
         this.leftLightTarget.position.set(lightPos.x, 0, lightPos.z);
         this.leftLight.target = this.leftLightTarget;
+        this.app.scene.add(this.leftLightTarget);
 
-        this.leftLightHelper = new THREE.SpotLightHelper(this.leftLight);
-        this.app.scene.add(this.leftLightHelper);
-
-        this.rightLight = new THREE.SpotLight(0xffffff, 0.6, 0, Math.PI, 1, 0.8);
+        this.rightLight = new THREE.SpotLight(0xc6c9f5, 10, 20, Math.PI, 0, 1);
         this.rightLight.position.set(-lightPos.x, lightPos.y, lightPos.z);
+        this.rightLight.castShadow = true;
         this.app.scene.add(this.rightLight);
         this.rightLightTarget = new THREE.Object3D();
         this.rightLightTarget.position.set(-lightPos.x, 0, lightPos.z);
         this.rightLight.target = this.rightLightTarget;
+        this.app.scene.add(this.rightLightTarget);
 
-        this.rightLightHelper = new THREE.SpotLightHelper(this.rightLight);
-        this.app.scene.add(this.rightLightHelper);
+        this.dirLight = new THREE.DirectionalLight(0xF4E99B, 0.1);
+        this.dirLight.position.set(0, 10, 0);
+        this.app.scene.add(this.dirLight);
 
-        this.app.scene.fog = new THREE.Fog(0x999999, 0.015, 150);
+        // this.app.scene.fog = new THREE.FogExp2(0x222222, 0.01);
+        
+        const planeTexture = new THREE.TextureLoader().load("textures/dryfalls.jpg")
+        const planeMaterial = new THREE.MeshBasicMaterial( {
+            map: planeTexture,
+            side: THREE.BackSide
+        } );
 
+        this.farPlane = new THREE.PlaneGeometry(200, 200);
+        this.plane = new THREE.Mesh(this.farPlane, planeMaterial);
+        this.plane.position.set(0, -23, 80);
+        this.app.scene.add(this.plane);
         // add an ambient light
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.01);
-        this.app.scene.add(ambientLight);
+        this.ambientLight = new THREE.AmbientLight(0xffffff, 0);
+        this.app.scene.add(this.ambientLight);
 
         this.buildBox();
 
@@ -179,7 +191,7 @@ class MyContents {
      * this method is called from the render method of the app
      *
      */
-    update() {
+    update(t) {
         // check if box mesh needs to be updated
         this.updateBoxIfRequired();
 
@@ -187,6 +199,10 @@ class MyContents {
         this.boxMesh.position.x = this.boxDisplacement.x;
         this.boxMesh.position.y = this.boxDisplacement.y;
         this.boxMesh.position.z = this.boxDisplacement.z;
+
+        for (const candle of this.room.table.plate.cake.candlesArray) {
+            candle.update(t);
+        }
     }
 }
 

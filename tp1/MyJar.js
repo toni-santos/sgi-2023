@@ -74,6 +74,10 @@ class MyJar extends THREE.Object3D {
         backMesh.rotateY(Math.PI);
         lidMesh.position.y = 0.55;
 
+        frontMesh.receiveShadow = true;
+        backMesh.receiveShadow = true;
+        lidMesh.receiveShadow = true;
+
         this.add(frontMesh);
         this.add(backMesh);
         this.add(lidMesh);

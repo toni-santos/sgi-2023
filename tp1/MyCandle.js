@@ -12,6 +12,7 @@ class MyCandle extends THREE.Object3D {
         this.color = color;
         this.object = object;
         this.candleShininess = 10;
+        this.offset = Math.random();
 
         this.stick = new THREE.CylinderGeometry(
             this.radius,
@@ -42,16 +43,16 @@ class MyCandle extends THREE.Object3D {
 
         this.light = new THREE.PointLight(
             0xfff9d8,
-            0.5,
-            3,
-            2
+            1,
+            0.25,
+            0.5
         );
 
         this.stickMaterial = new THREE.MeshPhongMaterial({
             color: this.color,
             specular: "#ff0000",
             emissive: "#ff0000",
-            emissiveIntensity: 0.3,
+            emissiveIntensity: 0,
             shininess: this.candleShininess,
             side: THREE.FrontSide
         });
@@ -65,6 +66,8 @@ class MyCandle extends THREE.Object3D {
         });
 
         this.candleMesh = new THREE.Mesh(this.stick, this.stickMaterial);
+        this.candleMesh.castShadow = true;
+        
         this.flameMesh = new THREE.Mesh(this.flame, this.flameMaterial);
         this.bottomFlameMesh = new THREE.Mesh(this.bottomFlame, this.flameMaterial);
         this.flameMesh.position.y =  2 * (this.radius * 1.5) / 2 + this.height/2;
@@ -75,6 +78,14 @@ class MyCandle extends THREE.Object3D {
         this.candleMesh.add(this.bottomFlameMesh);
         this.add(this.light);
         this.add(this.candleMesh);
+    }
+
+    update(t) {
+        t = t.getElapsedTime()/10 % 1
+
+        this.light.intensity = Math.abs(Math.sin(3*Math.PI * t + this.offset*Math.PI));
+        this.light.distance = Math.abs(Math.sin(3*Math.PI * t + this.offset*Math.PI));
+        this.light.decay = Math.abs(Math.sin(3*Math.PI * t + this.offset*Math.PI));
     }
 }
 
