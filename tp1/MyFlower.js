@@ -2,11 +2,13 @@ import * as THREE from "three";
 import { MyNurbsBuilder } from "./MyNurbsBuilder.js";
 
 class MyFlower extends THREE.Object3D {
-    constructor(app, petalCount=8, petalColor=0x4444ff) {
+    constructor(app, stemHeight=2, petalCount=8, petalColor=0x4444ff) {
         super();
         this.app = app;
         this.type = "Group";
         this.builder = new MyNurbsBuilder(this);
+
+        this.stemHeight = stemHeight;
         this.petalCount = petalCount;
         this.petalColor = petalColor;
 
@@ -31,10 +33,11 @@ class MyFlower extends THREE.Object3D {
         // Stem
         const stemPoints = [
             new THREE.Vector3(0, 0, 0),
-            new THREE.Vector3(0, 1, -1),
-            new THREE.Vector3(0, 2, 0),
+            new THREE.Vector3(0, this.stemHeight/2, 0),
+            new THREE.Vector3(0, this.stemHeight/2, -1),
+            new THREE.Vector3(0, this.stemHeight, 0),
         ];
-        this.stemCurve = new THREE.QuadraticBezierCurve3(...stemPoints);
+        this.stemCurve = new THREE.CubicBezierCurve3(...stemPoints);
         this.stem = new THREE.TubeGeometry(this.stemCurve, 32, 0.1);
         this.stemMesh = new THREE.Mesh(this.stem, this.stemMaterial);
 
@@ -77,7 +80,7 @@ class MyFlower extends THREE.Object3D {
     transformMeshes() {
         this.pollenMesh.scale.set(1, 1, 0.5);
         this.pollenMesh.rotateX(-Math.PI/4);
-        this.stemMesh.position.y = -2;
+        this.stemMesh.position.y = -this.stemHeight;
     }
 
     addMeshes() {

@@ -1,7 +1,6 @@
 import * as THREE from "three";
 import { MyApp } from "./MyApp.js";
 import { MyPlate } from "./MyPlate.js";
-import { MyCake } from "./MyCake.js";
 import { arrayMult } from "./MyUtils.js";
 import { MyFrame } from "./MyFrame.js";
 
@@ -17,7 +16,7 @@ class MyTable extends THREE.Object3D {
      * @param {number} topColor the color of the table top
      * @param {number} legsColor the color of the table legs
      * @param {THREE.Object3D | undefined} plate the plate object (Optional)
-     * @param {THREE.Object3D | undefined} cake the cake object (Optional)
+     * @param {THREE.Object3D | undefined} frame the frame object (Optional)
      */
     constructor(
         app,

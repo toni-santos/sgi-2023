@@ -11,6 +11,7 @@ import { MySpring } from "./MySpring.js";
 import { MyBlueprint } from "./MyBlueprint.js";
 import { MyJar } from "./MyJar.js";
 import { MyFlower } from "./MyFlower.js";
+import { MyCardboardBox } from "./MyCardboardBox.js";
 
 class MyRoom extends THREE.Object3D {
     /**
@@ -58,9 +59,11 @@ class MyRoom extends THREE.Object3D {
         this.frame = new MyFrame(this, 2, 2.5, 10, 0xffffff, new THREE.TextureLoader().load('textures/cavecarol.jpg'));
         this.window = new MyWindow(this, wallEdge / 2, wallEdge / 3, 0xffffff, new THREE.TextureLoader().load('textures/landscape.jpg'))
         this.bezierPainting = new MyBezierPainting(this, 23, 10, 10, 0xffffff);
+        this.spring = new MySpring(this);
         this.blueprint = new MyBlueprint(this);
         this.jar = new MyJar(this);
-        this.flower = new MyFlower(this);
+        this.flower = new MyFlower(this, 3);
+        this.box = new MyCardboardBox(this, 5);
         this.floorShininess = 2;
         this.wallShininess = 2;
         this.floorDelta = floorEdge / 2;
@@ -123,23 +126,53 @@ class MyRoom extends THREE.Object3D {
             this.backWallMesh,
             this.roofMesh
         ];
+        this.items = [
+            this.bezierPainting,
+            this.spring,
+            this.blueprint,
+            this.jar,
+            this.flower
+        ];
+        for (const item of this.items) {
+            this.box.add(item);
+        }
+
+        this.placeItemsInBox();
         this.transformMeshes();
         this.addMeshes();
     }
 
     createPlaneMesh(plane, material, normalVector, displacement) {
-        this.movementVector = normalVector.map(
+        const movementVector = normalVector.map(
             (x) => Math.abs(x) * displacement
         );
-        this.mesh = new THREE.Mesh(plane, material);
-        this.mesh.rotation.set(
+        const mesh = new THREE.Mesh(plane, material);
+        mesh.rotation.set(
             (normalVector[1] * Math.PI) / 2,
             normalVector[0] * (Math.PI / 2) +
                 normalVector[2] * (1 - normalVector[2]) * (Math.PI / 2),
             0
         );
-        this.mesh.position.set(...this.movementVector);
-        return this.mesh;
+        mesh.position.set(...movementVector);
+        return mesh;
+    }
+
+    placeItemsInBox() {
+        // painting
+        this.bezierPainting.rotateX(-Math.PI/8);
+        this.bezierPainting.position.set(0, -this.box.wallDelta + this.bezierPainting.height/10 - 0.05, -this.box.floorDelta + 0.39 );
+
+        // spring
+        this.spring.position.set(this.box.floorDelta * 0.7, -this.box.wallDelta, this.box.floorDelta * 0.7);
+
+        // blueprint
+        this.blueprint.position.set(-this.box.floorDelta * 0.2, -this.box.wallDelta - this.blueprint.height/2, this.box.floorDelta * 0.4);
+
+        // jar
+        this.jar.position.set(this.box.floorDelta * 0.7, -this.box.wallDelta + 0.51, this.box.floorDelta * 0.2);
+
+        //flower
+        this.flower.position.set(this.box.floorDelta * 0.5, -this.box.wallDelta + this.flower.stemHeight, -this.box.floorDelta * 0.4);
     }
 
     transformMeshes() {
@@ -161,9 +194,8 @@ class MyRoom extends THREE.Object3D {
         this.window.position.set(this.floorDelta - 0.01, this.wallDelta / 3, this.floorDelta / 3);
         this.window.rotateY(-Math.PI / 2);
         this.bezierPainting.scale.set(0.2, 0.2, 0.2);
-        this.bezierPainting.position.y = 3;
         this.blueprint.rotateX(Math.PI/2);
-        this.flower.position.set(3, 2, 0);
+        this.box.position.set(0, -this.wallDelta + this.box.wallDelta + 0.01, 0);
     }
 
     addMeshes() {
@@ -171,12 +203,8 @@ class MyRoom extends THREE.Object3D {
         this.add(this.shelf);
         this.add(this.frame);
         this.add(this.window);
-        this.add(this.bezierPainting);
-        this.add(new MySpring(this));
-        this.add(this.blueprint);
-        this.add(this.jar);
         this.add(this.cube);
-        this.add(this.flower);
+        this.add(this.box);
         for (const mesh of this.meshes) {
             this.add(mesh);
         }

@@ -72,7 +72,7 @@ class MyJar extends THREE.Object3D {
         const lidMesh = new THREE.Mesh(this.lid, this.lidMaterial);
         
         backMesh.rotateY(Math.PI);
-        lidMesh.position.y = 0.5;
+        lidMesh.position.y = 0.55;
 
         this.add(frontMesh);
         this.add(backMesh);
