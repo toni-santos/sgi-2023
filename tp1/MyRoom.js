@@ -6,6 +6,11 @@ import { MyPlate } from "./MyPlate.js";
 import { MyCompanionCube } from "./MyCompanionCube.js";
 import { MyFrame } from "./MyFrame.js";
 import { MyWindow } from "./MyWindow.js";
+import { MyBezierPainting } from "./MyBezierPainting.js";
+import { MySpring } from "./MySpring.js";
+import { MyBlueprint } from "./MyBlueprint.js";
+import { MyJar } from "./MyJar.js";
+import { MyFlower } from "./MyFlower.js";
 
 class MyRoom extends THREE.Object3D {
     /**
@@ -52,6 +57,10 @@ class MyRoom extends THREE.Object3D {
         this.cube = new MyCompanionCube(this, 3);
         this.frame = new MyFrame(this, 2, 2.5, 10, 0xffffff, new THREE.TextureLoader().load('textures/cavecarol.jpg'));
         this.window = new MyWindow(this, wallEdge / 2, wallEdge / 3, 0xffffff, new THREE.TextureLoader().load('textures/landscape.jpg'))
+        this.bezierPainting = new MyBezierPainting(this, 23, 10, 10, 0xffffff);
+        this.blueprint = new MyBlueprint(this);
+        this.jar = new MyJar(this);
+        this.flower = new MyFlower(this);
         this.floorShininess = 2;
         this.wallShininess = 2;
         this.floorDelta = floorEdge / 2;
@@ -151,6 +160,10 @@ class MyRoom extends THREE.Object3D {
         this.frame.rotateX(-Math.PI/10);
         this.window.position.set(this.floorDelta - 0.01, this.wallDelta / 3, this.floorDelta / 3);
         this.window.rotateY(-Math.PI / 2);
+        this.bezierPainting.scale.set(0.2, 0.2, 0.2);
+        this.bezierPainting.position.y = 3;
+        this.blueprint.rotateX(Math.PI/2);
+        this.flower.position.set(3, 2, 0);
     }
 
     addMeshes() {
@@ -158,7 +171,12 @@ class MyRoom extends THREE.Object3D {
         this.add(this.shelf);
         this.add(this.frame);
         this.add(this.window);
+        this.add(this.bezierPainting);
+        this.add(new MySpring(this));
+        this.add(this.blueprint);
+        this.add(this.jar);
         this.add(this.cube);
+        this.add(this.flower);
         for (const mesh of this.meshes) {
             this.add(mesh);
         }

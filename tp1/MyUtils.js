@@ -1,3 +1,5 @@
+import * as THREE from 'three'
+
 function arrayMult(arr1, arr2) {
     if (arr1.length !== arr2.length)
         throw new Error(
@@ -18,5 +20,12 @@ function randomInteger(min, max) {
     return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
+function drawHull(position, points) {
+    const geometry = new THREE.BufferGeometry().setFromPoints(points);
+    const line = new THREE.Line(geometry, this.hullMaterial);
 
-export { arrayMult, randomInteger };
+    line.position.set(position.x, position.y, position.z);
+    this.app.scene.add(line);
+  }
+
+export { arrayMult, randomInteger, drawHull };

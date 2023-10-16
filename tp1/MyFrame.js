@@ -12,7 +12,7 @@ class MyFrame extends THREE.Object3D {
         this.color = color;
         this.imageTexture = imageTexture;
         this.object = object;
-        this.frameShininness = 2;
+        this.frameShininess = 2;
         this.depth = 0.2;
 
         this.woodTexture =
@@ -25,7 +25,7 @@ class MyFrame extends THREE.Object3D {
             specular: "#ffffff",
             emissive: "#000000",
             map: this.woodTexture,
-            shininess: this.frameShininness,
+            shininess: this.frameShininess,
             side: THREE.DoubleSide
         });
 
@@ -34,8 +34,8 @@ class MyFrame extends THREE.Object3D {
             specular: "#ffffff",
             emissive: "#000000",
             emissiveIntensity: 0,
-            map: this.imageTexture,
-            shininess: this.frameShininness,
+            map: this.imageTexture ?? null,
+            shininess: this.frameShininess,
             side: THREE.DoubleSide
         });
 
@@ -99,5 +99,7 @@ class MyFrame extends THREE.Object3D {
 
     }
 }
+
+MyFrame.prototype.isGroup = true;
 
 export { MyFrame };
