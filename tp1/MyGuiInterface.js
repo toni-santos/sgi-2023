@@ -28,26 +28,6 @@ class MyGuiInterface {
      * Initialize the gui interface
      */
     init() {
-        // add a folder to the gui interface for the box
-        const boxFolder = this.datgui.addFolder("Box");
-        // note that we are using a property from the contents object
-        boxFolder
-            .add(this.contents, "boxMeshSize", 0, 10)
-            .name("size")
-            .onChange(() => {
-                this.contents.rebuildBox();
-            });
-        boxFolder.add(this.contents, "boxEnabled", true).name("enabled");
-        boxFolder.add(this.contents.boxDisplacement, "x", -5, 5);
-        boxFolder.add(this.contents.boxDisplacement, "y", -5, 5);
-        boxFolder.add(this.contents.boxDisplacement, "z", -5, 5);
-        boxFolder.open();
-
-        const data = {
-            "diffuse color": this.contents.diffusePlaneColor,
-            "specular color": this.contents.specularPlaneColor
-        };
-
         const planeFolder = this.datgui.addFolder("Plane");
         planeFolder.add(this.contents.room.roofMesh, "visible", true).name("enable roof");
         planeFolder.open();
@@ -66,14 +46,10 @@ class MyGuiInterface {
                 "Back"
             ])
             .name("active camera");
-        // note that we are using a property from the app
-        cameraFolder
-            .add(this.app.activeCamera.position, "x", 0, 10)
-            .name("x coord");
+
         cameraFolder.open();
 
         const lightFolder = this.datgui.addFolder("Standard Lights");
-        lightFolder.add(this.contents.pointLight, "visible", true).name("enable point light");
         lightFolder.add(this.contents.ambientLight, "intensity", 0, 1).name("ambient light intensity");
         lightFolder.open();
 
