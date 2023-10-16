@@ -42,6 +42,7 @@ class MyBlueprint extends THREE.Object3D {
         
         const mesh = new THREE.Mesh(surfaceData, this.material);
         mesh.rotateX(Math.PI);
+        mesh.receiveShadow = true;
         this.add(mesh);
     }
 

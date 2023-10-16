@@ -48,20 +48,8 @@ class MyGuiInterface {
             "specular color": this.contents.specularPlaneColor
         };
 
-        // adds a folder to the gui interface for the plane
         const planeFolder = this.datgui.addFolder("Plane");
-        planeFolder.addColor(data, "diffuse color").onChange((value) => {
-            this.contents.updateDiffusePlaneColor(value);
-        });
-        planeFolder.addColor(data, "specular color").onChange((value) => {
-            this.contents.updateSpecularPlaneColor(value);
-        });
-        planeFolder
-            .add(this.contents, "planeShininess", 0, 1000)
-            .name("shininess")
-            .onChange((value) => {
-                this.contents.updatePlaneShininess(value);
-            });
+        planeFolder.add(this.contents.room.roofMesh, "visible", true).name("enable roof");
         planeFolder.open();
 
         // adds a folder to the gui interface for the camera
@@ -69,7 +57,7 @@ class MyGuiInterface {
         cameraFolder
             .add(this.app, "activeCameraName", [
                 "Perspective",
-                "New Perspective",
+                "Wide Perspective",
                 "Left",
                 "Right",
                 "Top",
@@ -84,9 +72,10 @@ class MyGuiInterface {
             .name("x coord");
         cameraFolder.open();
 
-        const lightFolder = this.datgui.addFolder("Point Light");
-        lightFolder.add(this.contents.pointLight, "visible", true).name("enable");
-        lightFolder.open()
+        const lightFolder = this.datgui.addFolder("Standard Lights");
+        lightFolder.add(this.contents.pointLight, "visible", true).name("enable point light");
+        lightFolder.add(this.contents.ambientLight, "intensity", 0, 1).name("ambient light intensity");
+        lightFolder.open();
 
         const cakeLightFolder = this.datgui.addFolder("Cake Light");
         cakeLightFolder.add(this.contents.room.cakeLight, "visible", true).name("enable");

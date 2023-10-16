@@ -76,15 +76,15 @@ class MyApp {
 
         const perspective = new THREE.PerspectiveCamera(150, aspect, 0.1, 1000);
         perspective.position.set(6, 3, 1);
-        this.cameras["New Perspective"] = perspective;
+        this.cameras["Wide Perspective"] = perspective;
 
         // defines the frustum size for the orthographic cameras
         const left = (-this.frustumSize / 2) * aspect;
         const right = (this.frustumSize / 2) * aspect;
         const top = this.frustumSize / 2;
         const bottom = -this.frustumSize / 2;
-        const near = -this.frustumSize / 2;
-        const far = this.frustumSize;
+        const near = -this.frustumSize / 6;
+        const far = this.frustumSize * 3;
 
         // create a left view orthographic camera
         const orthoLeft = new THREE.OrthographicCamera(
@@ -96,7 +96,7 @@ class MyApp {
             far
         );
         orthoLeft.up = new THREE.Vector3(0, 1, 0);
-        orthoLeft.position.set(-this.frustumSize / 4, 0, 0);
+        orthoLeft.position.set(-this.frustumSize, 0, 0);
         orthoLeft.lookAt(new THREE.Vector3(0, 0, 0));
         this.cameras["Left"] = orthoLeft;
 
@@ -110,7 +110,7 @@ class MyApp {
             far
         );
         orthoRight.up = new THREE.Vector3(0, 1, 0);
-        orthoRight.position.set(this.frustumSize / 4, 0, 0);
+        orthoRight.position.set(this.frustumSize, 0, 0);
         orthoRight.lookAt(new THREE.Vector3(0, 0, 0));
         this.cameras["Right"] = orthoRight;
 
@@ -123,8 +123,8 @@ class MyApp {
             near,
             far
         );
-        orthoTop.up = new THREE.Vector3(0, 0, 1);
-        orthoTop.position.set(0, this.frustumSize / 4, 0);
+        orthoTop.up = new THREE.Vector3(0, 0, -1);
+        orthoTop.position.set(0, this.frustumSize, 0);
         orthoTop.lookAt(new THREE.Vector3(0, 0, 0));
         this.cameras["Top"] = orthoTop;
 
@@ -138,7 +138,7 @@ class MyApp {
             far
         );
         orthoBottom.up = new THREE.Vector3(0, 0, 1);
-        orthoBottom.position.set(0, -this.frustumSize / 4, 0);
+        orthoBottom.position.set(0, -this.frustumSize, 0);
         orthoBottom.lookAt(new THREE.Vector3(0, 0, 0));
         this.cameras["Bottom"] = orthoBottom;
 
@@ -152,7 +152,7 @@ class MyApp {
             far
         );
         orthoFront.up = new THREE.Vector3(0, 1, 0);
-        orthoFront.position.set(0, 0, this.frustumSize / 4);
+        orthoFront.position.set(0, 0, this.frustumSize);
         orthoFront.lookAt(new THREE.Vector3(0, 0, 0));
         this.cameras["Front"] = orthoFront;
 

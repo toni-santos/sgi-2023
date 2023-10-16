@@ -73,6 +73,8 @@ class MyCardboardBox extends THREE.Object3D {
             0
         );
         mesh.position.set(...movementVector);
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
         return mesh;
     }
 }

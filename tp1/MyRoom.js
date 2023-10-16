@@ -66,7 +66,7 @@ class MyRoom extends THREE.Object3D {
         this.spring = new MySpring(this);
         this.blueprint = new MyBlueprint(this);
         this.jar = new MyJar(this);
-        this.flower = new MyFlower(this, 3);
+        this.flower = new MyFlower(this, 2);
         this.box = new MyCardboardBox(this, 5);
         this.floorShininess = 1;
         this.wallShininess = 2;
@@ -165,7 +165,7 @@ class MyRoom extends THREE.Object3D {
             0
         );
         mesh.position.set(...movementVector);
-        mesh.receiveShadow = True;
+        mesh.receiveShadow = true;
         return mesh;
     }
 

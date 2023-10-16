@@ -80,6 +80,7 @@ class MyTable extends THREE.Object3D {
             new THREE.TextureLoader().load('textures/metallic_sheen.jpg');
         this.metallicTexture.wrapS = THREE.RepeatWrapping;
         this.metallicTexture.wrapT = THREE.RepeatWrapping;
+        this.metallicTexture.repeat.set(5, 10);
 
         this.legsMaterial = new THREE.MeshPhongMaterial({
             color: this.legsColor,

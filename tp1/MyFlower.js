@@ -29,6 +29,7 @@ class MyFlower extends THREE.Object3D {
         // Central disk (pollen)
         this.pollen = new THREE.SphereGeometry(0.5);
         this.pollenMesh = new THREE.Mesh(this.pollen, this.pollenMaterial);
+        this.pollenMesh.receiveShadow = true;
 
         // Stem
         const stemPoints = [
@@ -40,6 +41,7 @@ class MyFlower extends THREE.Object3D {
         this.stemCurve = new THREE.CubicBezierCurve3(...stemPoints);
         this.stem = new THREE.TubeGeometry(this.stemCurve, 32, 0.1);
         this.stemMesh = new THREE.Mesh(this.stem, this.stemMaterial);
+        this.stemMesh.receiveShadow = true;
 
         // Petals
         this.petalMeshes = [];
@@ -73,6 +75,7 @@ class MyFlower extends THREE.Object3D {
             petalMesh = new THREE.Mesh(this.petal, this.petalMaterial);
             petalMesh.rotateZ(-Math.PI/2 + i * offset);
             petalMesh.position.set(0.7 * Math.cos(i * offset), 0.7 * Math.sin(i * offset), 0);
+            petalMesh.receiveShadow = true;
             this.petalMeshes.push(petalMesh);
         }
     }

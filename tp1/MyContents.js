@@ -124,8 +124,8 @@ class MyContents {
         this.plane.position.set(0, -23, 80);
         this.app.scene.add(this.plane);
         // add an ambient light
-        // const ambientLight = new THREE.AmbientLight(0xffffff, 0.01);
-        // this.app.scene.add(ambientLight);
+        this.ambientLight = new THREE.AmbientLight(0xffffff, 0);
+        this.app.scene.add(this.ambientLight);
 
         this.buildBox();
 
