@@ -2,6 +2,16 @@ import * as THREE from "three";
 import { MyApp } from "./MyApp.js";
 
 class MyFrame extends THREE.Object3D {
+    /**
+     * 
+     * @param {MyApp} app 
+     * @param {number} width 
+     * @param {number} height 
+     * @param {number} segments 
+     * @param {number} color 
+     * @param {THREE.Texture | undefined} imageTexture 
+     * @param {THREE.Object3D | undefined} object 
+     */
     constructor(app, width, height, segments, color, imageTexture, object) {
         super();
         this.app = app;
@@ -10,7 +20,7 @@ class MyFrame extends THREE.Object3D {
         this.height = height;
         this.segments = segments;
         this.color = color;
-        this.imageTexture = imageTexture;
+        this.imageTexture = imageTexture ?? null;
         this.object = object;
         this.frameShininess = 2;
         this.depth = 0.2;

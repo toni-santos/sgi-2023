@@ -3,6 +3,15 @@ import { MyApp } from "./MyApp.js";
 import { MyCandle } from "./MyCandle.js";
 
 class MyCake extends THREE.Object3D {
+    /**
+     * 
+     * @param {MyApp} app 
+     * @param {number} radius 
+     * @param {number} height 
+     * @param {number} segments 
+     * @param {number} color 
+     * @param {number} candles 
+     */
     constructor(app, radius, height, segments, color, candles) {
         super();
         this.app = app;

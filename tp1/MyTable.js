@@ -27,8 +27,8 @@ class MyTable extends THREE.Object3D {
         legsRadius = 0.5,
         topColor = 0xffffff,
         legsColor = 0xffffff,
-        plate = null,
-        frame = null
+        plate,
+        frame
     ) {
         super();
         this.app = app;

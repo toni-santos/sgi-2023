@@ -2,7 +2,16 @@ import * as THREE from "three";
 import { MyApp } from "./MyApp.js";
 
 class MyWallWindow extends THREE.Object3D {
-    constructor(app, width, height, segments, color, holeMeasures, object) {
+    /**
+     * 
+     * @param {MyApp} app 
+     * @param {number} width 
+     * @param {number} height 
+     * @param {number} segments 
+     * @param {number} color 
+     * @param {number} holeMeasures 
+     */
+    constructor(app, width, height, segments, color, holeMeasures) {
         super();
         this.app = app;
         this.type = "Group";
@@ -11,7 +20,6 @@ class MyWallWindow extends THREE.Object3D {
         this.segments = segments;
         this.color = color;
         this.holeMeasures = holeMeasures;
-        this.object = object;
         this.depth = 0.2;
 
         this.wallMaterial = new THREE.MeshPhongMaterial({

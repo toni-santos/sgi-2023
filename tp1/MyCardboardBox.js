@@ -6,6 +6,11 @@ import { MyJar } from "./MyJar.js";
 import { MyFlower } from "./MyFlower.js";
 
 class MyCardboardBox extends THREE.Object3D {
+    /**
+     * 
+     * @param {MyApp} app 
+     * @param {number} edge 
+     */
     constructor(app, edge = 1, renderItems) {
         super();
         this.app = app;
