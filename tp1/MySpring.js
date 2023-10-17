@@ -4,8 +4,8 @@ import { MyApp } from "./MyApp.js";
 class MySpring extends THREE.Object3D {
     /**
      * 
-     * @param {MyApp} app 
-     * @param {number} height 
+     * @param {MyApp} app the application object
+     * @param {number} height the height of the spring
      */
     constructor(app, height = 1) {
         super();

@@ -5,7 +5,7 @@ import { MyNurbsBuilder } from "./MyNurbsBuilder.js";
 class MyJar extends THREE.Object3D {
     /**
      * 
-     * @param {MyApp} app 
+     * @param {MyApp} app the application object
      */
     constructor(app) {
         super();

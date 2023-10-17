@@ -5,10 +5,10 @@ import { MyApp } from "./MyApp.js";
 class MyFlower extends THREE.Object3D {
     /**
      * 
-     * @param {MyApp} app 
-     * @param {number} stemHeight 
-     * @param {number} petalCount 
-     * @param {number} petalColor 
+     * @param {MyApp} app the application object
+     * @param {number} stemHeight the height of the flower's stem
+     * @param {number} petalCount the amount of petals in the flower
+     * @param {number} petalColor the color of the flower's petals
      */
     constructor(app, stemHeight = 2, petalCount = 8, petalColor = 0x4444ff) {
         super();

@@ -4,15 +4,14 @@ import { MyApp } from "./MyApp.js";
 class MyFrame extends THREE.Object3D {
     /**
      * 
-     * @param {MyApp} app 
-     * @param {number} width 
-     * @param {number} height 
-     * @param {number} segments 
-     * @param {number} color 
-     * @param {THREE.Texture | undefined} imageTexture 
-     * @param {THREE.Object3D | undefined} object 
+     * @param {MyApp} app the application object
+     * @param {number} width the width of the frame
+     * @param {number} height the height of the frame
+     * @param {number} segments the segments of the plane in the back of the frame
+     * @param {number} color the color of the painting
+     * @param {THREE.Texture | undefined} imageTexture the image representing the painting
      */
-    constructor(app, width, height, segments, color, imageTexture, object) {
+    constructor(app, width, height, segments, color, imageTexture) {
         super();
         this.app = app;
         this.type = "Group";
@@ -21,7 +20,6 @@ class MyFrame extends THREE.Object3D {
         this.segments = segments;
         this.color = color;
         this.imageTexture = imageTexture ?? null;
-        this.object = object;
         this.frameShininess = 2;
         this.depth = 0.2;
 

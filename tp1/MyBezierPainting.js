@@ -4,11 +4,11 @@ import { MyApp } from "./MyApp.js";
 
 class MyBezierPainting extends MyFrame {
     /**
-     * @param {MyApp} app 
-     * @param {number} width 
-     * @param {number} height 
-     * @param {number} segments 
-     * @param {number} color 
+     * @param {MyApp} app the application object
+     * @param {number} width the width of the frame
+     * @param {number} height the height of the frame
+     * @param {number} segments the segments of the plane in the back of the frame
+     * @param {number} color the color of the painting
      */
     constructor(app, width, height, segments, color) {
         super(app, width, height, segments, 0x000000, new THREE.TextureLoader().load("textures/blueprint.png"));

@@ -5,8 +5,8 @@ import { MyNurbsBuilder } from "./MyNurbsBuilder.js";
 class MyBlueprint extends THREE.Object3D {
     /**
      * 
-     * @param {MyApp} app 
-     * @param {number} height 
+     * @param {MyApp} app the application object
+     * @param {number} height the height of the blueprint (by bending in the middle).
      */
     constructor(app, height = 1.5) {
         super();

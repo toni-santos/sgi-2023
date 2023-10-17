@@ -5,22 +5,20 @@ import { MyTechStrip } from "./MyTechStrip.js";
 class MyPersonalityCore extends THREE.Object3D {
     /**
      * 
-     * @param {MyApp} app 
-     * @param {number} radius 
-     * @param {number} segments 
-     * @param {number} color 
-     * @param {THREE.SpotLight} light 
-     * @param {number} lightColor 
-     * @param {number} object 
+     * @param {MyApp} app the application object
+     * @param {number} radius the radius of the core sphere
+     * @param {number} segments the radial segments of the core sphere
+     * @param {number} color the color of the core bulb
+     * @param {THREE.SpotLight} light the radius of the core sphere
+     * @param {number} lightColor the color of the core bulb
      */
-    constructor(app, radius, segments, color, light, lightColor, object) {
+    constructor(app, radius, segments, color, light, lightColor) {
         super();
         this.app = app;
         this.type = "Group";
         this.radius = radius;
         this.segments = segments;
         this.color = color;
-        this.object = object;
         this.coreShininess = 10;
         this.coreLight = light;
         this.lightColor = lightColor;

@@ -8,8 +8,8 @@ import { MyFlower } from "./MyFlower.js";
 class MyCardboardBox extends THREE.Object3D {
     /**
      * 
-     * @param {MyApp} app 
-     * @param {number} edge 
+     * @param {MyApp} app the application object
+     * @param {number} edge the edge length of the box
      */
     constructor(app, edge = 1, renderItems) {
         super();

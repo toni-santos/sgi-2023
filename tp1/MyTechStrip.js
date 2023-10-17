@@ -4,9 +4,9 @@ import { MyApp } from "./MyApp.js";
 class MyTechStrip extends THREE.Object3D {
     /**
      * 
-     * @param {MyApp} app 
-     * @param {number} radius 
-     * @param {number} angle 
+     * @param {MyApp} app the application object
+     * @param {number} radius the radius of the tech strip (cylinder)
+     * @param {number} angle the angle of the tech strip's missing cylinder part
      */
     constructor(app, radius, angle) {
         super();
