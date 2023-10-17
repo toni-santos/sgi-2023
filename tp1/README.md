@@ -27,5 +27,5 @@ Turning around, a very wide glass pane **window** is displayed, revealing a beau
 
 ## Issues/Problems
 
--   Performance is definitely something that could be improved. Shadows and fog are toggleable in the GUI, but more work could have been done, for example, by preloading textures.
+-   Performance is definitely something that could be improved. Fog is toggleable in the GUI, but more work could have been done, for example, by preloading textures and toggling shadows.
 -   The structure of the code is not perfect. Some parts are a bit all over the place and certain repeated procedures could have been simplified in methods.
