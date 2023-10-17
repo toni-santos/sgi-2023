@@ -52,25 +52,6 @@ class MyContents {
             this.app.scene.add(this.room);
         }
 
-        const lightPos = new THREE.Vector3(-10, 10, 0);
-        this.leftLight = new THREE.SpotLight(0xc6c9f5, 10, 20, Math.PI, 0, 1);
-        this.leftLight.position.set(lightPos.x, lightPos.y, lightPos.z);
-        this.leftLight.castShadow = true;
-        this.app.scene.add(this.leftLight);
-        this.leftLightTarget = new THREE.Object3D();
-        this.leftLightTarget.position.set(lightPos.x, 0, lightPos.z);
-        this.leftLight.target = this.leftLightTarget;
-        this.app.scene.add(this.leftLightTarget);
-
-        this.rightLight = new THREE.SpotLight(0xc6c9f5, 10, 20, Math.PI, 0, 1);
-        this.rightLight.position.set(-lightPos.x, lightPos.y, lightPos.z);
-        this.rightLight.castShadow = true;
-        this.app.scene.add(this.rightLight);
-        this.rightLightTarget = new THREE.Object3D();
-        this.rightLightTarget.position.set(-lightPos.x, 0, lightPos.z);
-        this.rightLight.target = this.rightLightTarget;
-        this.app.scene.add(this.rightLightTarget);
-
         this.dirLight = new THREE.DirectionalLight(0xf4e99b, 0.1);
         this.dirLight.position.set(0, 10, 0);
         this.app.scene.add(this.dirLight);
@@ -123,7 +104,7 @@ class MyContents {
      */
     update(t) {
         if (this.room.table.plate.object instanceof MyCake) {
-            for (const candle of this.room.table.plate.object.candlesArray) {
+            for (const candle of this.room.cake.candlesArray) {
                 candle.update(t);
             }
         }

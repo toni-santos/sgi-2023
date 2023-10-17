@@ -3,7 +3,7 @@ import { MyFrame } from "./MyFrame.js";
 
 class MyBezierPainting extends MyFrame {
     constructor(app, width, height, segments, color) {
-        super(app, width, height, segments, color);
+        super(app, width, height, segments, 0x000000, new THREE.TextureLoader().load("textures/blueprint.png"));
         this.drawing = this.drawCurves();
         this.curveGeometry = new THREE.BufferGeometry().setFromPoints(
             this.drawing.extractPoints(100).shape

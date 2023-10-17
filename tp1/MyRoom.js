@@ -5,11 +5,6 @@ import { MyShelf } from "./MyShelf.js";
 import { MyPlate } from "./MyPlate.js";
 import { MyCompanionCube } from "./MyCompanionCube.js";
 import { MyFrame } from "./MyFrame.js";
-import { MyBezierPainting } from "./MyBezierPainting.js";
-import { MySpring } from "./MySpring.js";
-import { MyBlueprint } from "./MyBlueprint.js";
-import { MyJar } from "./MyJar.js";
-import { MyFlower } from "./MyFlower.js";
 import { MyCardboardBox } from "./MyCardboardBox.js";
 import { MyWallWindow } from "./MyWallWindow.js";
 import { MyCakeLight } from "./MyCakeLight.js";
@@ -82,12 +77,7 @@ class MyRoom extends THREE.Object3D {
             0x80461b,
             new THREE.TextureLoader().load("textures/cavecarol.jpg")
         );
-        this.bezierPainting = new MyBezierPainting(this, 23, 10, 10, 0xffffff);
-        this.spring = new MySpring(this);
-        this.blueprint = new MyBlueprint(this);
-        this.jar = new MyJar(this);
-        this.flower = new MyFlower(this, 2);
-        this.box = new MyCardboardBox(this, 5);
+        this.box = new MyCardboardBox(this, 5, true);
         this.floorShininess = 1;
         this.wallShininess = 2;
         this.floorDelta = floorEdge / 2;
@@ -159,20 +149,33 @@ class MyRoom extends THREE.Object3D {
             this.backWallMesh,
             this.roofMesh
         ];
-        this.items = [
-            this.bezierPainting,
-            this.spring,
-            this.blueprint,
-            this.jar,
-            this.flower
-        ];
-        for (const item of this.items) {
-            this.box.add(item);
-        }
 
-        this.placeItemsInBox();
+        // this.placeItemsInBox();
         this.transformMeshes();
         this.addMeshes();
+        this.addLights();
+    }
+
+    addLights() {
+        const lightPos = new THREE.Vector3(-10, 10, 0);
+        
+        this.leftLight = new THREE.SpotLight(0xc6c9f5, 10, 20, Math.PI, 0, 1);
+        this.leftLight.position.set(lightPos.x, lightPos.y, lightPos.z);
+        this.leftLight.castShadow = true;
+        this.add(this.leftLight);
+        this.leftLightTarget = new THREE.Object3D();
+        this.leftLightTarget.position.set(lightPos.x, 0, lightPos.z);
+        this.leftLight.target = this.leftLightTarget;
+        this.add(this.leftLightTarget);
+
+        this.rightLight = new THREE.SpotLight(0xc6c9f5, 10, 20, Math.PI, 0, 1);
+        this.rightLight.position.set(-lightPos.x, lightPos.y, lightPos.z);
+        this.rightLight.castShadow = true;
+        this.add(this.rightLight);
+        this.rightLightTarget = new THREE.Object3D();
+        this.rightLightTarget.position.set(-lightPos.x, 0, lightPos.z);
+        this.rightLight.target = this.rightLightTarget;
+        this.add(this.rightLightTarget);
     }
 
     createPlaneMesh(plane, material, normalVector, displacement) {
@@ -189,44 +192,6 @@ class MyRoom extends THREE.Object3D {
         mesh.position.set(...movementVector);
         mesh.receiveShadow = true;
         return mesh;
-    }
-
-    placeItemsInBox() {
-        // painting
-        this.bezierPainting.rotateX(-Math.PI / 8);
-        this.bezierPainting.position.set(
-            0,
-            -this.box.wallDelta + this.bezierPainting.height / 10 - 0.05,
-            -this.box.floorDelta + 0.39
-        );
-
-        // spring
-        this.spring.position.set(
-            this.box.floorDelta * 0.7,
-            -this.box.wallDelta,
-            this.box.floorDelta * 0.7
-        );
-
-        // blueprint
-        this.blueprint.position.set(
-            -this.box.floorDelta * 0.2,
-            -this.box.wallDelta - this.blueprint.height / 2,
-            this.box.floorDelta * 0.4
-        );
-
-        // jar
-        this.jar.position.set(
-            this.box.floorDelta * 0.7,
-            -this.box.wallDelta + 0.51,
-            this.box.floorDelta * 0.2
-        );
-
-        //flower
-        this.flower.position.set(
-            this.box.floorDelta * 0.5,
-            -this.box.wallDelta + this.flower.stemHeight,
-            -this.box.floorDelta * 0.4
-        );
     }
 
     transformMeshes() {
@@ -251,8 +216,6 @@ class MyRoom extends THREE.Object3D {
                 (this.frame.height / 2) * Math.sin(Math.PI / 10)
         );
         this.frame.rotateX(-Math.PI / 10);
-        this.bezierPainting.scale.set(0.2, 0.2, 0.2);
-        this.blueprint.rotateX(Math.PI / 2);
         this.box.position.set(
             0,
             -this.wallDelta + this.box.wallDelta + 0.01,
