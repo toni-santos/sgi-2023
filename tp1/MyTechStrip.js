@@ -3,14 +3,10 @@ import { MyApp } from "./MyApp.js";
 
 class MyTechStrip extends THREE.Object3D {
     /**
-     *
-     * @param {MyApp} app the application object
-     * @param {number} width the width of each shelf section
-     * @param {number} height the height of each shelf section
-     * @param {number} topHeight the height of each shelf section
-     * @param {number} depth the depth of each shelf section
-     * @param {number} rows the number of rows on the shelf
-     * @param {number} cols the number of columns on the shelf
+     * 
+     * @param {MyApp} app 
+     * @param {number} radius 
+     * @param {number} angle 
      */
     constructor(app, radius, angle) {
         super();

@@ -1,7 +1,15 @@
 import * as THREE from "three";
 import { MyFrame } from "./MyFrame.js";
+import { MyApp } from "./MyApp.js";
 
 class MyBezierPainting extends MyFrame {
+    /**
+     * @param {MyApp} app 
+     * @param {number} width 
+     * @param {number} height 
+     * @param {number} segments 
+     * @param {number} color 
+     */
     constructor(app, width, height, segments, color) {
         super(app, width, height, segments, color);
         this.drawing = this.drawCurves();

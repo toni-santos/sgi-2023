@@ -2,6 +2,11 @@ import * as THREE from "three";
 import { MyApp } from "./MyApp.js";
 
 class MySpring extends THREE.Object3D {
+    /**
+     * 
+     * @param {MyApp} app 
+     * @param {number} height 
+     */
     constructor(app, height = 1) {
         super();
         this.app = app;

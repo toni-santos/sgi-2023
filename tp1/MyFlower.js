@@ -1,7 +1,15 @@
 import * as THREE from "three";
 import { MyNurbsBuilder } from "./MyNurbsBuilder.js";
+import { MyApp } from "./MyApp.js";
 
 class MyFlower extends THREE.Object3D {
+    /**
+     * 
+     * @param {MyApp} app 
+     * @param {number} stemHeight 
+     * @param {number} petalCount 
+     * @param {number} petalColor 
+     */
     constructor(app, stemHeight = 2, petalCount = 8, petalColor = 0x4444ff) {
         super();
         this.app = app;

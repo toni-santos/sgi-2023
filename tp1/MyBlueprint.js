@@ -3,6 +3,11 @@ import { MyApp } from "./MyApp.js";
 import { MyNurbsBuilder } from "./MyNurbsBuilder.js";
 
 class MyBlueprint extends THREE.Object3D {
+    /**
+     * 
+     * @param {MyApp} app 
+     * @param {number} height 
+     */
     constructor(app, height = 1.5) {
         super();
         this.app = app;

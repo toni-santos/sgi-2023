@@ -3,6 +3,16 @@ import { MyApp } from "./MyApp.js";
 import { MyTechStrip } from "./MyTechStrip.js";
 
 class MyPersonalityCore extends THREE.Object3D {
+    /**
+     * 
+     * @param {MyApp} app 
+     * @param {number} radius 
+     * @param {number} segments 
+     * @param {number} color 
+     * @param {THREE.SpotLight} light 
+     * @param {number} lightColor 
+     * @param {number} object 
+     */
     constructor(app, radius, segments, color, light, lightColor, object) {
         super();
         this.app = app;

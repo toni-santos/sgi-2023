@@ -2,7 +2,6 @@ import * as THREE from "three";
 import { MyApp } from "./MyApp.js";
 import { MyTable } from "./MyTable.js";
 import { MyPersonalityCore } from "./MyPersonalityCore.js";
-import { randomInteger } from "./MyUtils.js";
 
 class MyShelf extends THREE.Object3D {
     /**
@@ -10,7 +9,6 @@ class MyShelf extends THREE.Object3D {
      * @param {MyApp} app the application object
      * @param {number} width the width of each shelf section
      * @param {number} height the height of each shelf section
-     * @param {number} topHeight the height of each shelf section
      * @param {number} depth the depth of each shelf section
      * @param {number} rows the number of rows on the shelf
      * @param {number} cols the number of columns on the shelf

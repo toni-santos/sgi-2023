@@ -2,6 +2,14 @@ import * as THREE from "three";
 import { MyApp } from "./MyApp.js";
 
 class MyCandle extends THREE.Object3D {
+    /**
+     * 
+     * @param {MyApp} app 
+     * @param {number} radius 
+     * @param {number} height 
+     * @param {number} segments 
+     * @param {number} color 
+     */
     constructor(app, radius, height, segments, color) {
         super();
         this.app = app;

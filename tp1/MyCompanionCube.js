@@ -1,15 +1,13 @@
 import * as THREE from "three";
 import { MyApp } from "./MyApp.js";
-import { MyAxis } from "./MyAxis.js";
 import { arrayMult } from "./MyUtils.js";
 
 class MyCompanionCube extends THREE.Object3D {
     /**
      *
      * @param {MyApp} app the application object
-     * @param {number} radius the radius of the ball
-     * @param {number} baseColor the hexadecimal representation of the of the ball base color
-     * @param {number} accentColor the hexadecimal representation of the ball accent color
+     * @param {number} edge the edge length of the cube
+     * @param {number} heartColor the hexadecimal representation of the heart color
      */
     constructor(app, edge = 5, heartColor = 0xff88ff) {
         super();

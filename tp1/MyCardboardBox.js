@@ -1,6 +1,12 @@
 import * as THREE from "three";
+import { MyApp } from "./MyApp.js";
 
 class MyCardboardBox extends THREE.Object3D {
+    /**
+     * 
+     * @param {MyApp} app 
+     * @param {number} edge 
+     */
     constructor(app, edge = 1) {
         super();
         this.app = app;
