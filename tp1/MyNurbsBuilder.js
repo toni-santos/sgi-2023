@@ -13,7 +13,7 @@ import { ParametricGeometry } from "three/addons/geometries/ParametricGeometry.j
  */
 
 class MyNurbsBuilder {
-  /**
+    /**
 
        constructs the object
 
@@ -21,81 +21,81 @@ class MyNurbsBuilder {
 
     */
 
-  constructor(app) {
-    this.app = app;
-  }
-
-  build(controlPoints, degree1, degree2, samples1, samples2, material) {
-    const knots1 = [];
-
-    const knots2 = [];
-
-    // build knots1 = [ 0, 0, 0, 1, 1, 1 ];
-
-    for (var i = 0; i <= degree1; i++) {
-      knots1.push(0);
+    constructor(app) {
+        this.app = app;
     }
 
-    for (var i = 0; i <= degree1; i++) {
-      knots1.push(1);
-    }
+    build(controlPoints, degree1, degree2, samples1, samples2, material) {
+        const knots1 = [];
 
-    // build knots2 = [ 0, 0, 0, 0, 1, 1, 1, 1 ];
+        const knots2 = [];
 
-    for (var i = 0; i <= degree2; i++) {
-      knots2.push(0);
-    }
+        // build knots1 = [ 0, 0, 0, 1, 1, 1 ];
 
-    for (var i = 0; i <= degree2; i++) {
-      knots2.push(1);
-    }
+        for (var i = 0; i <= degree1; i++) {
+            knots1.push(0);
+        }
 
-    let stackedPoints = [];
+        for (var i = 0; i <= degree1; i++) {
+            knots1.push(1);
+        }
 
-    for (var i = 0; i < controlPoints.length; i++) {
-      let row = controlPoints[i];
+        // build knots2 = [ 0, 0, 0, 0, 1, 1, 1, 1 ];
 
-      let newRow = [];
+        for (var i = 0; i <= degree2; i++) {
+            knots2.push(0);
+        }
 
-      for (var j = 0; j < row.length; j++) {
-        let item = row[j];
+        for (var i = 0; i <= degree2; i++) {
+            knots2.push(1);
+        }
 
-        newRow.push(
-          new THREE.Vector4(
-            item[0],
+        let stackedPoints = [];
 
-            item[1],
-            item[2],
-            item[3],
-          ),
+        for (var i = 0; i < controlPoints.length; i++) {
+            let row = controlPoints[i];
+
+            let newRow = [];
+
+            for (var j = 0; j < row.length; j++) {
+                let item = row[j];
+
+                newRow.push(
+                    new THREE.Vector4(
+                        item[0],
+
+                        item[1],
+                        item[2],
+                        item[3]
+                    )
+                );
+            }
+
+            stackedPoints[i] = newRow;
+        }
+
+        const nurbsSurface = new NURBSSurface(
+            degree1,
+            degree2,
+
+            knots1,
+            knots2,
+            stackedPoints
         );
-      }
 
-      stackedPoints[i] = newRow;
+        const geometry = new ParametricGeometry(
+            getSurfacePoint,
+
+            samples1,
+            samples2
+        );
+
+        return geometry;
+
+        function getSurfacePoint(u, v, target) {
+            return nurbsSurface.getPoint(u, v, target);
+        }
     }
-
-    const nurbsSurface = new NURBSSurface(
-      degree1,
-      degree2,
-
-      knots1,
-      knots2,
-      stackedPoints,
-    );
-
-    const geometry = new ParametricGeometry(
-      getSurfacePoint,
-
-      samples1,
-      samples2,
-    );
-
-    return geometry;
-
-    function getSurfacePoint(u, v, target) {
-      return nurbsSurface.getPoint(u, v, target);
-    }
-  }
 }
 
 export { MyNurbsBuilder };

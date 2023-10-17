@@ -10,7 +10,7 @@ class MyWallWindow extends THREE.Object3D {
         this.height = height;
         this.segments = segments;
         this.color = color;
-        this.holeMeasures = holeMeasures; 
+        this.holeMeasures = holeMeasures;
         this.object = object;
         this.depth = 0.2;
 
@@ -26,15 +26,15 @@ class MyWallWindow extends THREE.Object3D {
             color: 0x1f2021,
             specular: "#1f2021",
             emissive: "#000000",
-            emissiveIntensity: 0,
+            emissiveIntensity: 0
         });
 
         this.glassMaterial = new THREE.MeshPhysicalMaterial({
             color: 0xd1d1d1,
-            roughness: 0,  
+            roughness: 0,
             transmission: 1,
             thickness: 0.2,
-            side: THREE.DoubleSide,
+            side: THREE.DoubleSide
         });
 
         this.leftOffset = this.width * this.holeMeasures.left;
@@ -42,17 +42,16 @@ class MyWallWindow extends THREE.Object3D {
         this.topOffset = this.height * this.holeMeasures.top;
         this.botOffset = this.height * this.holeMeasures.bot;
 
-
         this.windowSillVer = new THREE.BoxGeometry(
             this.depth * 0.2,
             this.height - (this.topOffset + this.botOffset),
-            this.depth * 1.2,
+            this.depth * 1.2
         );
 
         this.windowSillHor = new THREE.BoxGeometry(
             this.width - (this.leftOffset + this.rightOffset),
             this.depth * 0.2,
-            this.depth * 1.2,
+            this.depth * 1.2
         );
 
         this.glass = new THREE.PlaneGeometry(
@@ -65,13 +64,13 @@ class MyWallWindow extends THREE.Object3D {
         this.horizontal = new THREE.BoxGeometry(
             this.width - (this.leftOffset + this.rightOffset),
             this.topOffset,
-            this.depth,
+            this.depth
         );
 
         this.vertical = new THREE.BoxGeometry(
             this.rightOffset,
             this.height,
-            this.depth,
+            this.depth
         );
 
         this.leftMesh = new THREE.Mesh(this.vertical, this.wallMaterial);
@@ -83,29 +82,69 @@ class MyWallWindow extends THREE.Object3D {
         this.topMesh.receiveShadow = true;
         this.botMesh.receiveShadow = true;
 
-        this.leftMesh.position.set(-width/2 + this.leftOffset/2, 0, 0);
-        this.rightMesh.position.set(width/2 - this.rightOffset/2, 0, 0);
-        this.botMesh.position.set((this.leftOffset - this.rightOffset)/2, -height/2 + this.botOffset/2, 0);
-        this.topMesh.position.set((this.leftOffset - this.rightOffset)/2, height/2 - this.topOffset/2, 0);
-        
-        this.sillLeftMesh = new THREE.Mesh(this.windowSillVer, this.sillMaterial);
-        this.sillRightMesh = new THREE.Mesh(this.windowSillVer, this.sillMaterial);
-        this.sillTopMesh = new THREE.Mesh(this.windowSillHor, this.sillMaterial);
-        this.sillBotMesh = new THREE.Mesh(this.windowSillHor, this.sillMaterial);
+        this.leftMesh.position.set(-width / 2 + this.leftOffset / 2, 0, 0);
+        this.rightMesh.position.set(width / 2 - this.rightOffset / 2, 0, 0);
+        this.botMesh.position.set(
+            (this.leftOffset - this.rightOffset) / 2,
+            -height / 2 + this.botOffset / 2,
+            0
+        );
+        this.topMesh.position.set(
+            (this.leftOffset - this.rightOffset) / 2,
+            height / 2 - this.topOffset / 2,
+            0
+        );
+
+        this.sillLeftMesh = new THREE.Mesh(
+            this.windowSillVer,
+            this.sillMaterial
+        );
+        this.sillRightMesh = new THREE.Mesh(
+            this.windowSillVer,
+            this.sillMaterial
+        );
+        this.sillTopMesh = new THREE.Mesh(
+            this.windowSillHor,
+            this.sillMaterial
+        );
+        this.sillBotMesh = new THREE.Mesh(
+            this.windowSillHor,
+            this.sillMaterial
+        );
 
         this.sillLeftMesh.receiveShadow = true;
         this.sillRightMesh.receiveShadow = true;
         this.sillTopMesh.receiveShadow = true;
         this.sillBotMesh.receiveShadow = true;
 
-        this.sillBotMesh.position.set((this.leftOffset - this.rightOffset), -height/2 + this.botOffset, 0);
-        this.sillTopMesh.position.set((this.leftOffset - this.rightOffset), height/2 - this.topOffset, 0);
-        this.sillRightMesh.position.set(width/2 - this.rightOffset, (this.topOffset - this.botOffset), 0);
-        this.sillLeftMesh.position.set(-width/2 + this.leftOffset, (this.topOffset - this.botOffset), 0);
-        
+        this.sillBotMesh.position.set(
+            this.leftOffset - this.rightOffset,
+            -height / 2 + this.botOffset,
+            0
+        );
+        this.sillTopMesh.position.set(
+            this.leftOffset - this.rightOffset,
+            height / 2 - this.topOffset,
+            0
+        );
+        this.sillRightMesh.position.set(
+            width / 2 - this.rightOffset,
+            this.topOffset - this.botOffset,
+            0
+        );
+        this.sillLeftMesh.position.set(
+            -width / 2 + this.leftOffset,
+            this.topOffset - this.botOffset,
+            0
+        );
+
         this.glassMesh = new THREE.Mesh(this.glass, this.glassMaterial);
 
-        this.glassMesh.position.set((this.leftOffset - this.rightOffset)/2, (this.topOffset - this.botOffset)/2, 0);
+        this.glassMesh.position.set(
+            (this.leftOffset - this.rightOffset) / 2,
+            (this.topOffset - this.botOffset) / 2,
+            0
+        );
 
         this.add(this.leftMesh);
         this.add(this.rightMesh);
@@ -118,7 +157,6 @@ class MyWallWindow extends THREE.Object3D {
         this.add(this.sillRightMesh);
 
         this.add(this.glassMesh);
-
     }
 }
 

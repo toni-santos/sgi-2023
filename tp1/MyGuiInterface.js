@@ -28,8 +28,14 @@ class MyGuiInterface {
      * Initialize the gui interface
      */
     init() {
+        const axisFolder = this.datgui.addFolder("Axis");
+        axisFolder.add(this.contents.axis, "visible", false).name("enable");
+        axisFolder.open();
+
         const planeFolder = this.datgui.addFolder("Plane");
-        planeFolder.add(this.contents.room.roofMesh, "visible", true).name("enable roof");
+        planeFolder
+            .add(this.contents.room.roofMesh, "visible", true)
+            .name("enable roof");
         planeFolder.open();
 
         // adds a folder to the gui interface for the camera
@@ -46,30 +52,69 @@ class MyGuiInterface {
                 "Back"
             ])
             .name("active camera");
+        cameraFolder
+            .add(this.contents, "activeCameraTarget", [
+                "Origin",
+                "Frame 1",
+                "Frame 2",
+                "Box",
+                "Shelf",
+                "Companion Cube"
+            ])
+            .name("active target")
+            .onChange((value) => {
+                this.contents.changeControlsTarget(value);
+            });
 
         cameraFolder.open();
 
         const lightFolder = this.datgui.addFolder("Standard Lights");
-        lightFolder.add(this.contents.ambientLight, "intensity", 0, 1).name("ambient light intensity");
+        lightFolder
+            .add(this.contents.ambientLight, "intensity", 0, 1)
+            .name("ambient light intensity");
         lightFolder.open();
 
         const cakeLightFolder = this.datgui.addFolder("Cake Light");
-        cakeLightFolder.add(this.contents.room.cakeLight, "visible", true).name("enable");
-        cakeLightFolder.add(this.contents.room.cakeLight.light, "intensity", 0, 100).name("intensity");
-        cakeLightFolder.add(this.contents.room, "rotationAngle", 0, 2*Math.PI).name("rotation angle").onChange((value) => {
-            this.contents.room.rotateCakeLight(value);
-        });
-        cakeLightFolder.add(this.contents.room, "rotationHeight", -5, 5).name("rotation height").onChange((value) => {
-            this.contents.room.changeCakeHeight(value);
-        });
-        cakeLightFolder.add(this.contents.room, "rotationRadius", 0, 10).name("rotation radius").onChange((value) => {
-            this.contents.room.radiusCakeLight(value);
-        });
-        cakeLightFolder.addColor(this.contents.room.cakeLight, "color").onChange((value) => {
-            this.contents.room.cakeLight.updateColor(value);
-        });
+        cakeLightFolder
+            .add(this.contents.room.cakeLight, "visible", true)
+            .name("enable");
+        cakeLightFolder
+            .add(this.contents.room.cakeLight.light, "intensity", 0, 100)
+            .name("intensity");
+        cakeLightFolder
+            .add(this.contents.room, "rotationAngle", 0, 2 * Math.PI)
+            .name("rotation angle")
+            .onChange((value) => {
+                this.contents.room.rotateCakeLight(value);
+            });
+        cakeLightFolder
+            .add(this.contents.room, "rotationHeight", -5, 5)
+            .name("rotation height")
+            .onChange((value) => {
+                this.contents.room.changeCakeHeight(value);
+            });
+        cakeLightFolder
+            .add(this.contents.room, "rotationRadius", 0, 10)
+            .name("rotation radius")
+            .onChange((value) => {
+                this.contents.room.radiusCakeLight(value);
+            });
+        cakeLightFolder
+            .addColor(this.contents.room.cakeLight, "color")
+            .onChange((value) => {
+                this.contents.room.cakeLight.updateColor(value);
+            });
 
         cakeLightFolder.open();
+
+        const customFolder = this.datgui.addFolder("Performance manipulation");
+        customFolder
+            .add(this.contents, "hasFog", false)
+            .name("enable fog")
+            .onChange(() => {
+                this.contents.toggleFog();
+            });
+        customFolder.open();
     }
 }
 

@@ -1,18 +1,18 @@
-import * as THREE from 'three';
+import * as THREE from "three";
 
 class MyCardboardBox extends THREE.Object3D {
-    constructor(app, edge=1) {
+    constructor(app, edge = 1) {
         super();
         this.app = app;
-        this.type = 'Group';
+        this.type = "Group";
         this.edge = edge;
 
         this.floorDelta = this.edge / 2;
-        this.wallDelta = 3/2;
+        this.wallDelta = 3 / 2;
         this.material = new THREE.MeshPhongMaterial({
             color: 0xffffff,
-            map: new THREE.TextureLoader().load('textures/cardboard.png'),
-            side: THREE.DoubleSide,
+            map: new THREE.TextureLoader().load("textures/cardboard.png"),
+            side: THREE.DoubleSide
         });
 
         this.floorPlane = new THREE.PlaneGeometry(this.edge, this.edge);
@@ -53,7 +53,7 @@ class MyCardboardBox extends THREE.Object3D {
             this.leftWallMesh,
             this.rightWallMesh,
             this.frontWallMesh,
-            this.backWallMesh,
+            this.backWallMesh
         ];
 
         for (const mesh of this.meshes) {
@@ -79,4 +79,4 @@ class MyCardboardBox extends THREE.Object3D {
     }
 }
 
-export {MyCardboardBox};
+export { MyCardboardBox };

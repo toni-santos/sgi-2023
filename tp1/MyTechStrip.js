@@ -28,7 +28,7 @@ class MyTechStrip extends THREE.Object3D {
             1,
             false,
             0,
-            2*Math.PI - this.angle
+            2 * Math.PI - this.angle
         );
         this.techStripMaterial = new THREE.MeshPhongMaterial({
             color: "#000000",
@@ -39,15 +39,36 @@ class MyTechStrip extends THREE.Object3D {
             side: THREE.DoubleSide
         });
 
-        this.insidePlaneL = new THREE.PlaneGeometry(this.radius * 1.05, this.radius * 0.2, 1, 1);
-        this.insidePlaneR = new THREE.PlaneGeometry(this.radius * 1.05, this.radius * 0.2, 1, 1);
+        this.insidePlaneL = new THREE.PlaneGeometry(
+            this.radius * 1.05,
+            this.radius * 0.2,
+            1,
+            1
+        );
+        this.insidePlaneR = new THREE.PlaneGeometry(
+            this.radius * 1.05,
+            this.radius * 0.2,
+            1,
+            1
+        );
 
-        this.techStripMesh = new THREE.Mesh(this.techStrip, this.techStripMaterial);
-        this.insidePlaneLMesh = new THREE.Mesh(this.insidePlaneL, this.techStripMaterial);
-        this.insidePlaneRMesh = new THREE.Mesh(this.insidePlaneR, this.techStripMaterial);
-        this.insidePlaneLMesh.position.z = Math.cos(this.angle) * (this.radius/2);
-        this.insidePlaneLMesh.position.x = Math.sin(this.angle) * (this.radius/2);
-        this.insidePlaneRMesh.position.z = this.radius/2;
+        this.techStripMesh = new THREE.Mesh(
+            this.techStrip,
+            this.techStripMaterial
+        );
+        this.insidePlaneLMesh = new THREE.Mesh(
+            this.insidePlaneL,
+            this.techStripMaterial
+        );
+        this.insidePlaneRMesh = new THREE.Mesh(
+            this.insidePlaneR,
+            this.techStripMaterial
+        );
+        this.insidePlaneLMesh.position.z =
+            Math.cos(this.angle) * (this.radius / 2);
+        this.insidePlaneLMesh.position.x =
+            Math.sin(this.angle) * (this.radius / 2);
+        this.insidePlaneRMesh.position.z = this.radius / 2;
         this.insidePlaneLMesh.rotateY(Math.PI / 2 + this.angle);
         this.insidePlaneRMesh.rotateY(Math.PI / 2);
 

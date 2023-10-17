@@ -50,7 +50,7 @@ class MyApp {
         this.renderer = new THREE.WebGLRenderer({ antialias: true });
         this.renderer.setPixelRatio(window.devicePixelRatio);
         this.renderer.setClearColor("#000000");
-        this.renderer.shadowMap.type = THREE.PCFSoftShadowMap; 
+        this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         this.renderer.shadowMap.enabled = true;
 
         // Configure renderer size

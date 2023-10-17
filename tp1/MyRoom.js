@@ -13,6 +13,7 @@ import { MyFlower } from "./MyFlower.js";
 import { MyCardboardBox } from "./MyCardboardBox.js";
 import { MyWallWindow } from "./MyWallWindow.js";
 import { MyCakeLight } from "./MyCakeLight.js";
+import { MyCake } from "./MyCake.js";
 
 class MyRoom extends THREE.Object3D {
     /**
@@ -30,9 +31,7 @@ class MyRoom extends THREE.Object3D {
         wallEdge = 5,
         floorColor = 0xffffff,
         wallColor = 0xffffff,
-        table,
-        plate,
-        cake
+        table
     ) {
         super();
         this.app = app;
@@ -43,8 +42,22 @@ class MyRoom extends THREE.Object3D {
 
         this.floor = new THREE.PlaneGeometry(floorEdge, floorEdge);
         this.wall = new THREE.PlaneGeometry(floorEdge, wallEdge);
-        this.plate = new MyPlate(this.app, 0.7, 32, 0xffffff);
-        this.tableFrame = new MyFrame(this, 2, 2.5, 10, 0x80461B, new THREE.TextureLoader().load('textures/cavej.jpg'));
+        this.cake = new MyCake(this.app, 0.7, 0.5, 32, 0x80461b, 10);
+        this.plate = new MyPlate(
+            this.app,
+            this.cake.radius,
+            32,
+            0xffffff,
+            this.cake
+        );
+        this.tableFrame = new MyFrame(
+            this,
+            2,
+            2.5,
+            10,
+            0x80461b,
+            new THREE.TextureLoader().load("textures/cavej.jpg")
+        );
         table ??= new MyTable(
             this,
             10,
@@ -58,10 +71,17 @@ class MyRoom extends THREE.Object3D {
             this.tableFrame
         );
         this.table = table;
-        this.cakeLight = new MyCakeLight(this, this.plate.cake);
+        this.cakeLight = new MyCakeLight(this, this.plate.object);
         this.shelf = new MyShelf(this);
         this.cube = new MyCompanionCube(this, 3);
-        this.frame = new MyFrame(this, 2, 2.5, 10, 0x80461B, new THREE.TextureLoader().load('textures/cavecarol.jpg'));
+        this.frame = new MyFrame(
+            this,
+            2,
+            2.5,
+            10,
+            0x80461b,
+            new THREE.TextureLoader().load("textures/cavecarol.jpg")
+        );
         this.bezierPainting = new MyBezierPainting(this, 23, 10, 10, 0xffffff);
         this.spring = new MySpring(this);
         this.blueprint = new MyBlueprint(this);
@@ -73,7 +93,9 @@ class MyRoom extends THREE.Object3D {
         this.floorDelta = floorEdge / 2;
         this.wallDelta = wallEdge / 2;
 
-        this.floorTexture = new THREE.TextureLoader().load('textures/concrete.jpg');
+        this.floorTexture = new THREE.TextureLoader().load(
+            "textures/concrete.jpg"
+        );
         this.floorTexture.wrapS = THREE.RepeatWrapping;
         this.floorTexture.wrapT = THREE.RepeatWrapping;
         this.floorMaterial = new THREE.MeshPhongMaterial({
@@ -119,7 +141,7 @@ class MyRoom extends THREE.Object3D {
             wallEdge,
             4,
             0xffffff,
-            {right: 0.225, left: 0.225, top: 0.2, bot: 0.2},
+            { right: 0.225, left: 0.225, top: 0.2, bot: 0.2 },
             this
         );
         this.frontWallMesh.translateZ(this.floorDelta);
@@ -171,20 +193,40 @@ class MyRoom extends THREE.Object3D {
 
     placeItemsInBox() {
         // painting
-        this.bezierPainting.rotateX(-Math.PI/8);
-        this.bezierPainting.position.set(0, -this.box.wallDelta + this.bezierPainting.height/10 - 0.05, -this.box.floorDelta + 0.39 );
+        this.bezierPainting.rotateX(-Math.PI / 8);
+        this.bezierPainting.position.set(
+            0,
+            -this.box.wallDelta + this.bezierPainting.height / 10 - 0.05,
+            -this.box.floorDelta + 0.39
+        );
 
         // spring
-        this.spring.position.set(this.box.floorDelta * 0.7, -this.box.wallDelta, this.box.floorDelta * 0.7);
+        this.spring.position.set(
+            this.box.floorDelta * 0.7,
+            -this.box.wallDelta,
+            this.box.floorDelta * 0.7
+        );
 
         // blueprint
-        this.blueprint.position.set(-this.box.floorDelta * 0.2, -this.box.wallDelta - this.blueprint.height/2, this.box.floorDelta * 0.4);
+        this.blueprint.position.set(
+            -this.box.floorDelta * 0.2,
+            -this.box.wallDelta - this.blueprint.height / 2,
+            this.box.floorDelta * 0.4
+        );
 
         // jar
-        this.jar.position.set(this.box.floorDelta * 0.7, -this.box.wallDelta + 0.51, this.box.floorDelta * 0.2);
+        this.jar.position.set(
+            this.box.floorDelta * 0.7,
+            -this.box.wallDelta + 0.51,
+            this.box.floorDelta * 0.2
+        );
 
         //flower
-        this.flower.position.set(this.box.floorDelta * 0.5, -this.box.wallDelta + this.flower.stemHeight, -this.box.floorDelta * 0.4);
+        this.flower.position.set(
+            this.box.floorDelta * 0.5,
+            -this.box.wallDelta + this.flower.stemHeight,
+            -this.box.floorDelta * 0.4
+        );
     }
 
     transformMeshes() {
@@ -198,14 +240,24 @@ class MyRoom extends THREE.Object3D {
         this.cube.rotateY(Math.PI / 4);
         this.cube.position.set(
             -10,
-            -this.wallDelta + this.cube.edge * 1.1 / 2,
+            -this.wallDelta + (this.cube.edge * 1.1) / 2,
             0
         );
-        this.frame.position.set(this.table.width / 2, -this.wallDelta + this.frame.height/2, this.table.legDelta[2] + this.table.legsRadius + this.frame.height/2 * Math.sin(Math.PI/10));
-        this.frame.rotateX(-Math.PI/10);
+        this.frame.position.set(
+            this.table.width / 2,
+            -this.wallDelta + this.frame.height / 2,
+            this.table.legDelta[2] +
+                this.table.legsRadius +
+                (this.frame.height / 2) * Math.sin(Math.PI / 10)
+        );
+        this.frame.rotateX(-Math.PI / 10);
         this.bezierPainting.scale.set(0.2, 0.2, 0.2);
-        this.blueprint.rotateX(Math.PI/2);
-        this.box.position.set(0, -this.wallDelta + this.box.wallDelta + 0.01, 0);
+        this.blueprint.rotateX(Math.PI / 2);
+        this.box.position.set(
+            0,
+            -this.wallDelta + this.box.wallDelta + 0.01,
+            0
+        );
         this.positionCakeLight();
     }
 
@@ -221,26 +273,29 @@ class MyRoom extends THREE.Object3D {
         }
     }
 
-    rotateCakeLight(value){
+    rotateCakeLight(value) {
         this.rotationAngle = value;
         this.positionCakeLight();
     }
 
-    changeCakeHeight(value){
+    changeCakeHeight(value) {
         this.rotationHeight = value;
         this.positionCakeLight();
     }
-    
-    radiusCakeLight(value){
+
+    radiusCakeLight(value) {
         this.rotationRadius = value;
         this.positionCakeLight();
     }
 
     positionCakeLight() {
-        this.cakeLight.position.set(this.rotationRadius*Math.cos(this.rotationAngle), this.rotationHeight, this.rotationRadius*Math.sin(this.rotationAngle));
+        this.cakeLight.position.set(
+            this.rotationRadius * Math.cos(this.rotationAngle),
+            this.rotationHeight,
+            this.rotationRadius * Math.sin(this.rotationAngle)
+        );
         this.cakeLight.lookAt(this.plate.position);
     }
-
 }
 
 MyRoom.prototype.isGroup = true;

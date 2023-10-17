@@ -65,13 +65,22 @@ class MyShelf extends THREE.Object3D {
         for (let i = 0; i < 3; i++) {
             const value = Math.round(Math.random());
             if (value) {
-                const coreLight = new THREE.PointLight(
-                    0xe38b27,
-                    1,
-                    100
+                const coreLight = new THREE.PointLight(0xe38b27, 1, 100);
+                this.core = new MyPersonalityCore(
+                    this,
+                    1.5,
+                    32,
+                    0xffffff,
+                    coreLight,
+                    "#e38b27"
                 );
-                this.core = new MyPersonalityCore(this, 1.5, 32, 0xffffff, coreLight, "#e38b27");
-                this.core.position.set(i*this.core.radius * 2 - 2*this.core.radius + Math.random(), -this.core.radius*1.01, value ? Math.random() : -Math.random());
+                this.core.position.set(
+                    i * this.core.radius * 2 -
+                        2 * this.core.radius +
+                        Math.random(),
+                    -this.core.radius * 1.01,
+                    value ? Math.random() : -Math.random()
+                );
                 this.core.rotateX(Math.PI * Math.random());
                 this.core.rotateY(Math.PI * Math.random());
                 this.core.rotateZ(Math.PI * Math.random());

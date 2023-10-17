@@ -3,11 +3,7 @@ import { MyApp } from "./MyApp.js";
 import { MyCandle } from "./MyCandle.js";
 
 class MyCake extends THREE.Object3D {
-    constructor(app, radius, height, segments, color, candles, object) {
-        /** Passar como argumento nº de velas:
-         * colocadas circularmente em redor do bolo
-         */
-
+    constructor(app, radius, height, segments, color, candles) {
         super();
         this.app = app;
         this.type = "Group";
@@ -15,10 +11,9 @@ class MyCake extends THREE.Object3D {
         this.height = height;
         this.segments = segments;
         this.color = color;
-        this.object = object;
         this.candles = candles;
         this.cakeShininess = 10;
-        this.angle = 2*Math.PI - (Math.PI / 10);
+        this.angle = 2 * Math.PI - Math.PI / 10;
         this.candlesArray = [];
 
         // Cake
@@ -44,28 +39,52 @@ class MyCake extends THREE.Object3D {
         );
 
         // Inside of the cake
-        this.insidePlaneL = new THREE.PlaneGeometry(this.radius, this.height, 1, 1);
-        this.insidePlaneR = new THREE.PlaneGeometry(this.radius, this.height, 1, 1);
-        
-        this.fillingPlaneL = new THREE.PlaneGeometry(this.radius* 1.01, this.height*0.1, 1, 1);
-        this.fillingPlaneR = new THREE.PlaneGeometry(this.radius* 1.01, this.height*0.1, 1, 1);
+        this.insidePlaneL = new THREE.PlaneGeometry(
+            this.radius,
+            this.height,
+            1,
+            1
+        );
+        this.insidePlaneR = new THREE.PlaneGeometry(
+            this.radius,
+            this.height,
+            1,
+            1
+        );
 
+        this.fillingPlaneL = new THREE.PlaneGeometry(
+            this.radius * 1.01,
+            this.height * 0.1,
+            1,
+            1
+        );
+        this.fillingPlaneR = new THREE.PlaneGeometry(
+            this.radius * 1.01,
+            this.height * 0.1,
+            1,
+            1
+        );
 
         // Create candles
-        let candleAngleDelta = (this.angle - Math.PI/10) / this.candles;
+        let candleAngleDelta = (this.angle - Math.PI / 10) / this.candles;
         let candleAngle = this.angle - candleAngleDelta;
 
         for (let i = 0; i < this.candles; i++) {
-            let candle = new MyCandle(this.app, this.radius/25, this.radius/3, 32, 0xff0000);
-            candle.position.x = Math.sin(candleAngle) * (this.radius/2 + 0.1);
-            candle.position.z = Math.cos(candleAngle) * (this.radius/2 + 0.1);
+            let candle = new MyCandle(
+                this.app,
+                this.radius / 25,
+                this.radius / 3,
+                32,
+                0xff0000
+            );
+            candle.position.x = Math.sin(candleAngle) * (this.radius / 2 + 0.1);
+            candle.position.z = Math.cos(candleAngle) * (this.radius / 2 + 0.1);
             candle.position.y = candle.height;
             candle.rotateY(Math.PI / 2 + candleAngle);
             this.add(candle);
             this.candlesArray.push(candle);
             candleAngle -= candleAngleDelta;
         }
-        console.log(this.candles);
 
         this.cakeMaterial = new THREE.MeshPhongMaterial({
             color: this.color,
@@ -88,43 +107,62 @@ class MyCake extends THREE.Object3D {
         this.cakeMesh.castShadow = true;
         this.cakeMesh.receiveShadow = true;
 
-        this.insidePlaneLMesh = new THREE.Mesh(this.insidePlaneL, this.cakeMaterial);
+        this.insidePlaneLMesh = new THREE.Mesh(
+            this.insidePlaneL,
+            this.cakeMaterial
+        );
         this.insidePlaneLMesh.castShadow = true;
         this.insidePlaneLMesh.receiveShadow = true;
 
-        this.insidePlaneRMesh = new THREE.Mesh(this.insidePlaneR, this.cakeMaterial);
+        this.insidePlaneRMesh = new THREE.Mesh(
+            this.insidePlaneR,
+            this.cakeMaterial
+        );
         this.insidePlaneRMesh.castShadow = true;
         this.insidePlaneRMesh.receiveShadow = true;
 
-        this.insidePlaneLMesh.position.z = Math.cos(this.angle) * (this.radius/2);
-        this.insidePlaneLMesh.position.x = Math.sin(this.angle) * (this.radius/2);
-        this.insidePlaneRMesh.position.z = this.radius/2;
+        this.insidePlaneLMesh.position.z =
+            Math.cos(this.angle) * (this.radius / 2);
+        this.insidePlaneLMesh.position.x =
+            Math.sin(this.angle) * (this.radius / 2);
+        this.insidePlaneRMesh.position.z = this.radius / 2;
         this.insidePlaneLMesh.rotateY(Math.PI / 2 + this.angle);
         this.insidePlaneRMesh.rotateY(-Math.PI / 2);
         this.cakeMesh.add(this.insidePlaneLMesh);
         this.cakeMesh.add(this.insidePlaneRMesh);
-        
-        this.cakeFillingMesh = new THREE.Mesh(this.cakeFilling, this.cakeFillingMaterial);
+
+        this.cakeFillingMesh = new THREE.Mesh(
+            this.cakeFilling,
+            this.cakeFillingMaterial
+        );
         this.cakeFillingMesh.castShadow = true;
         this.cakeFillingMesh.receiveShadow = true;
 
         this.insidePlaneL.height = this.height * 0.1;
         this.insidePlaneR.height = this.height * 0.1;
 
-        this.insideFillingPlaneLMesh = new THREE.Mesh(this.fillingPlaneL, this.cakeFillingMaterial);
+        this.insideFillingPlaneLMesh = new THREE.Mesh(
+            this.fillingPlaneL,
+            this.cakeFillingMaterial
+        );
         this.insideFillingPlaneLMesh.castShadow = true;
         this.insideFillingPlaneLMesh.receiveShadow = true;
 
-        this.insideFillingPlaneRMesh = new THREE.Mesh(this.fillingPlaneR, this.cakeFillingMaterial);
+        this.insideFillingPlaneRMesh = new THREE.Mesh(
+            this.fillingPlaneR,
+            this.cakeFillingMaterial
+        );
         this.insideFillingPlaneRMesh.castShadow = true;
         this.insideFillingPlaneRMesh.receiveShadow = true;
 
-        this.insideFillingPlaneLMesh.position.z = Math.cos(this.angle) * (this.radius/2);
-        this.insideFillingPlaneLMesh.position.x = Math.sin(this.angle) * (this.radius/2) * 0.999;
-        this.insideFillingPlaneRMesh.position.z = this.radius/2;
+        this.insideFillingPlaneLMesh.position.z =
+            Math.cos(this.angle) * (this.radius / 2);
+        this.insideFillingPlaneLMesh.position.x =
+            Math.sin(this.angle) * (this.radius / 2) * 0.999;
+        this.insideFillingPlaneRMesh.position.z = this.radius / 2;
         this.insideFillingPlaneRMesh.position.x = -0.001;
-        this.insideFillingPlaneLMesh.rotateY(Math.PI /2 + this.angle);
-        this.insideFillingPlaneRMesh.rotateY(-Math.PI / 2 );
+        this.insideFillingPlaneLMesh.rotateY(Math.PI / 2 + this.angle);
+        this.insideFillingPlaneRMesh.rotateY(-Math.PI / 2);
         this.cakeMesh.add(this.insideFillingPlaneLMesh);
         this.cakeMesh.add(this.insideFillingPlaneRMesh);
 

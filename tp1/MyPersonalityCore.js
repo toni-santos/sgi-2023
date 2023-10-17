@@ -14,14 +14,14 @@ class MyPersonalityCore extends THREE.Object3D {
         this.coreShininess = 10;
         this.coreLight = light;
         this.lightColor = lightColor;
-        
+
         this.core = new THREE.SphereGeometry(
             this.radius,
             this.segments,
             this.segments,
             0,
             Math.PI * 2,
-            Math.PI/5,
+            Math.PI / 5,
             2.57610597594363
         );
         this.coreBulb = new THREE.SphereGeometry(
@@ -31,16 +31,17 @@ class MyPersonalityCore extends THREE.Object3D {
             0,
             Math.PI * 2,
             0,
-            Math.PI/5
+            Math.PI / 5
         );
         this.plane = new THREE.CircleGeometry(
-            Math.sin(Math.PI/5) * this.radius,
+            Math.sin(Math.PI / 5) * this.radius,
             this.segments
         );
-        this.techStrip = new MyTechStrip(this.app, this.radius, Math.PI/5);
+        this.techStrip = new MyTechStrip(this.app, this.radius, Math.PI / 5);
 
-        this.metallicTexture =
-            new THREE.TextureLoader().load('textures/metallic_sheen.jpg');
+        this.metallicTexture = new THREE.TextureLoader().load(
+            "textures/metallic_sheen.jpg"
+        );
         this.metallicTexture.wrapS = THREE.RepeatWrapping;
         this.metallicTexture.wrapT = THREE.RepeatWrapping;
 
@@ -70,8 +71,8 @@ class MyPersonalityCore extends THREE.Object3D {
         this.planeMesh = new THREE.Mesh(this.plane, this.coreMaterial);
         this.planeMesh.castShadow = true;
         this.planeMesh.rotation.x = Math.PI / 2;
-        this.planeMesh.position.y = Math.cos(Math.PI/5) * this.radius ;
-        this.coreLight.position.y = Math.cos(Math.PI/5) * this.radius ;
+        this.planeMesh.position.y = Math.cos(Math.PI / 5) * this.radius;
+        this.coreLight.position.y = Math.cos(Math.PI / 5) * this.radius;
         this.techStrip.rotateX(-Math.PI / 2);
         this.techStrip.rotateY(Math.PI / 5);
         this.coreMesh.add(this.coreLight);

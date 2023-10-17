@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { MyApp } from "./MyApp.js";
 
 class MyCandle extends THREE.Object3D {
-    constructor(app, radius, height, segments, color, object) {
+    constructor(app, radius, height, segments, color) {
         super();
         this.app = app;
         this.type = "Group";
@@ -10,7 +10,6 @@ class MyCandle extends THREE.Object3D {
         this.height = height;
         this.segments = segments;
         this.color = color;
-        this.object = object;
         this.candleShininess = 10;
         this.offset = Math.random();
 
@@ -20,7 +19,7 @@ class MyCandle extends THREE.Object3D {
             this.height,
             this.segments,
             1,
-            false,
+            false
         );
 
         this.flame = new THREE.ConeGeometry(
@@ -36,17 +35,12 @@ class MyCandle extends THREE.Object3D {
             this.segments,
             this.segments,
             0,
-            Math.PI*2,
-            Math.PI/2,
-            Math.PI/2,
+            Math.PI * 2,
+            Math.PI / 2,
+            Math.PI / 2
         );
 
-        this.light = new THREE.PointLight(
-            0xfff9d8,
-            1,
-            0.25,
-            0.5
-        );
+        this.light = new THREE.PointLight(0xfff9d8, 1, 0.25, 0.5);
 
         this.stickMaterial = new THREE.MeshPhongMaterial({
             color: this.color,
@@ -62,18 +56,23 @@ class MyCandle extends THREE.Object3D {
             specular: "#2b2b2b",
             emissive: "#FFA500",
             shininess: this.candleShininess,
-            side: THREE.FrontSide,
+            side: THREE.FrontSide
         });
 
         this.candleMesh = new THREE.Mesh(this.stick, this.stickMaterial);
         this.candleMesh.castShadow = true;
-        
+
         this.flameMesh = new THREE.Mesh(this.flame, this.flameMaterial);
-        this.bottomFlameMesh = new THREE.Mesh(this.bottomFlame, this.flameMaterial);
-        this.flameMesh.position.y =  2 * (this.radius * 1.5) / 2 + this.height/2;
-        this.bottomFlameMesh.position.y = (this.radius * 1.5) / 2 + this.height/2;
-        this.light.position.y = 2 * (this.radius * 1.5) + this.height/2;
-        
+        this.bottomFlameMesh = new THREE.Mesh(
+            this.bottomFlame,
+            this.flameMaterial
+        );
+        this.flameMesh.position.y =
+            (2 * (this.radius * 1.5)) / 2 + this.height / 2;
+        this.bottomFlameMesh.position.y =
+            (this.radius * 1.5) / 2 + this.height / 2;
+        this.light.position.y = 2 * (this.radius * 1.5) + this.height / 2;
+
         this.candleMesh.add(this.flameMesh);
         this.candleMesh.add(this.bottomFlameMesh);
         this.add(this.light);
@@ -81,11 +80,17 @@ class MyCandle extends THREE.Object3D {
     }
 
     update(t) {
-        t = t.getElapsedTime()/10 % 1
+        t = (t.getElapsedTime() / 10) % 1;
 
-        this.light.intensity = Math.abs(Math.sin(3*Math.PI * t + this.offset*Math.PI));
-        this.light.distance = Math.abs(Math.sin(3*Math.PI * t + this.offset*Math.PI));
-        this.light.decay = Math.abs(Math.sin(3*Math.PI * t + this.offset*Math.PI));
+        this.light.intensity = Math.abs(
+            Math.sin(3 * Math.PI * t + this.offset * Math.PI)
+        );
+        this.light.distance = Math.abs(
+            Math.sin(3 * Math.PI * t + this.offset * Math.PI)
+        );
+        this.light.decay = Math.abs(
+            Math.sin(3 * Math.PI * t + this.offset * Math.PI)
+        );
     }
 }
 

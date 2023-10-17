@@ -16,16 +16,23 @@ class MyCakeLight extends THREE.Object3D {
         this.type = "Group";
         this.target = target;
         this.rotationAngle = 0;
-        this.color = "#ffffff"
+        this.color = "#ffffff";
 
         this.light = new THREE.SpotLight(0xffffff, 100);
         this.light.target = this.target;
         this.light.castShadow = true;
 
-        this.personalityCore = new MyPersonalityCore(this.app, 0.5, 10, 0x000000, this.light, this.color);
-        this.personalityCore.rotateX(Math.PI/2);
+        this.personalityCore = new MyPersonalityCore(
+            this.app,
+            0.5,
+            10,
+            0x000000,
+            this.light,
+            this.color
+        );
+        this.personalityCore.rotateX(Math.PI / 2);
 
-        this.add(this.personalityCore)
+        this.add(this.personalityCore);
     }
 
     updateColor(value) {

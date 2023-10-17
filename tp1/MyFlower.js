@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { MyNurbsBuilder } from "./MyNurbsBuilder.js";
 
 class MyFlower extends THREE.Object3D {
-    constructor(app, stemHeight=2, petalCount=8, petalColor=0x4444ff) {
+    constructor(app, stemHeight = 2, petalCount = 8, petalColor = 0x4444ff) {
         super();
         this.app = app;
         this.type = "Group";
@@ -14,8 +14,8 @@ class MyFlower extends THREE.Object3D {
 
         this.pollenMaterial = new THREE.MeshPhongMaterial({
             color: 0xffffff,
-            map: new THREE.TextureLoader().load('textures/pollen.jpg'),
-            side: THREE.DoubleSide,
+            map: new THREE.TextureLoader().load("textures/pollen.jpg"),
+            side: THREE.DoubleSide
         });
         this.stemMaterial = new THREE.MeshPhongMaterial({
             color: 0x33dd33,
@@ -34,9 +34,9 @@ class MyFlower extends THREE.Object3D {
         // Stem
         const stemPoints = [
             new THREE.Vector3(0, 0, 0),
-            new THREE.Vector3(0, this.stemHeight/2, 0),
-            new THREE.Vector3(0, this.stemHeight/2, -1),
-            new THREE.Vector3(0, this.stemHeight, 0),
+            new THREE.Vector3(0, this.stemHeight / 2, 0),
+            new THREE.Vector3(0, this.stemHeight / 2, -1),
+            new THREE.Vector3(0, this.stemHeight, 0)
         ];
         this.stemCurve = new THREE.CubicBezierCurve3(...stemPoints);
         this.stem = new THREE.TubeGeometry(this.stemCurve, 32, 0.1);
@@ -45,23 +45,30 @@ class MyFlower extends THREE.Object3D {
 
         // Petals
         this.petalMeshes = [];
-        const petalPoints =
-        [   // U = 0
-            [ // V = 0..1;
-                [ -0.2, -0.3, 0.0, 1 ],
-                [ -0.3, 0, 0.0, 1 ],
-                [ 0,  0.3, 0.0, 1 ]
+        const petalPoints = [
+            // U = 0
+            [
+                // V = 0..1;
+                [-0.2, -0.3, 0.0, 1],
+                [-0.3, 0, 0.0, 1],
+                [0, 0.3, 0.0, 1]
             ],
-        // U = 1
-            [ // V = 0..1
-                [ 0.2, -0.3, 0, 1 ],
-                [ 0.3, 0, 0, 1 ],
-                [ 0,  0.3, 0, 1 ]
-            ],
+            // U = 1
+            [
+                // V = 0..1
+                [0.2, -0.3, 0, 1],
+                [0.3, 0, 0, 1],
+                [0, 0.3, 0, 1]
+            ]
         ];
-        this.petal = this.builder.build(petalPoints,
-                      1, 2, 20,
-                      20, this.petalMaterial);
+        this.petal = this.builder.build(
+            petalPoints,
+            1,
+            2,
+            20,
+            20,
+            this.petalMaterial
+        );
 
         this.createPetals();
         this.transformMeshes();
@@ -70,11 +77,15 @@ class MyFlower extends THREE.Object3D {
 
     createPetals() {
         let petalMesh;
-        let offset = Math.PI/(this.petalCount*0.5);
+        let offset = Math.PI / (this.petalCount * 0.5);
         for (let i = 0; i < this.petalCount; i++) {
             petalMesh = new THREE.Mesh(this.petal, this.petalMaterial);
-            petalMesh.rotateZ(-Math.PI/2 + i * offset);
-            petalMesh.position.set(0.7 * Math.cos(i * offset), 0.7 * Math.sin(i * offset), 0);
+            petalMesh.rotateZ(-Math.PI / 2 + i * offset);
+            petalMesh.position.set(
+                0.7 * Math.cos(i * offset),
+                0.7 * Math.sin(i * offset),
+                0
+            );
             petalMesh.receiveShadow = true;
             this.petalMeshes.push(petalMesh);
         }
@@ -82,16 +93,15 @@ class MyFlower extends THREE.Object3D {
 
     transformMeshes() {
         this.pollenMesh.scale.set(1, 1, 0.5);
-        this.pollenMesh.rotateX(-Math.PI/4);
+        this.pollenMesh.rotateX(-Math.PI / 4);
         this.stemMesh.position.y = -this.stemHeight;
     }
 
     addMeshes() {
-        for(let petalMesh of this.petalMeshes) this.pollenMesh.add(petalMesh);
+        for (let petalMesh of this.petalMeshes) this.pollenMesh.add(petalMesh);
         this.add(this.pollenMesh);
         this.add(this.stemMesh);
     }
-
 }
 
-export {MyFlower};
+export { MyFlower };

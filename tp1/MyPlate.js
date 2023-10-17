@@ -7,6 +7,7 @@ class MyPlate extends THREE.Object3D {
      *
      * @param {MyApp} app the application object
      * @param {number} radius the radius of the plate
+     * @param {number} segments the number of cake geometry segments
      * @param {number} color the color of the plate
      * @param {THREE.Object3D | undefined} object the object in the plate (Optional).
      */
@@ -36,16 +37,16 @@ class MyPlate extends THREE.Object3D {
             shininess: this.plateShininess,
             side: THREE.DoubleSide
         });
-        this.cake = new MyCake(this.app, this.radius, 0.5, 32, 0x80461B, 10);
+        this.cake = new MyCake(this.app, this.radius, 0.5, 32, 0x80461b, 10);
 
         this.plateMesh = new THREE.Mesh(this.plate, this.plateMaterial);
         this.plateMesh.castShadow = true;
-        
+
         this.plateBaseMesh = new THREE.Mesh(this.plateBase, this.plateMaterial);
         this.plateBaseMesh.castShadow = true;
 
         this.plateMesh.rotation.x = Math.PI / 2;
-        this.plateMesh.position.z = this.radius/8;
+        this.plateMesh.position.z = this.radius / 8;
         this.cake.rotateX(Math.PI / 2);
         this.cake.position.z = this.cake.height / 1.9;
         this.plateBaseMesh.add(this.plateMesh);

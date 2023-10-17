@@ -1,4 +1,4 @@
-import * as THREE from 'three'
+import * as THREE from "three";
 
 function arrayMult(arr1, arr2) {
     if (arr1.length !== arr2.length)
@@ -26,6 +26,6 @@ function drawHull(position, points) {
 
     line.position.set(position.x, position.y, position.z);
     this.app.scene.add(line);
-  }
+}
 
 export { arrayMult, randomInteger, drawHull };

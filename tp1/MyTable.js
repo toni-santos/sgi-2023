@@ -27,8 +27,8 @@ class MyTable extends THREE.Object3D {
         legsRadius = 0.5,
         topColor = 0xffffff,
         legsColor = 0xffffff,
-        plate,
-        frame
+        plate = null,
+        frame = null
     ) {
         super();
         this.app = app;
@@ -61,8 +61,7 @@ class MyTable extends THREE.Object3D {
         this.plate = plate;
         this.frame = frame;
 
-        this.woodTexture =
-            new THREE.TextureLoader().load('textures/wood.jpg');
+        this.woodTexture = new THREE.TextureLoader().load("textures/wood.jpg");
         this.woodTexture.wrapS = THREE.RepeatWrapping;
         this.woodTexture.wrapT = THREE.RepeatWrapping;
 
@@ -75,9 +74,10 @@ class MyTable extends THREE.Object3D {
             shininess: this.topShininess,
             side: THREE.FrontSide
         });
-        
-        this.metallicTexture =
-            new THREE.TextureLoader().load('textures/metallic_sheen.jpg');
+
+        this.metallicTexture = new THREE.TextureLoader().load(
+            "textures/metallic_sheen.jpg"
+        );
         this.metallicTexture.wrapS = THREE.RepeatWrapping;
         this.metallicTexture.wrapT = THREE.RepeatWrapping;
         this.metallicTexture.repeat.set(5, 10);
@@ -122,9 +122,13 @@ class MyTable extends THREE.Object3D {
             this.plate.position.y = this.topHeight / 1.99;
         }
         if (this.frame) {
-            this.frame.rotateY(Math.PI/9)
-            this.frame.rotateX(-Math.PI/2);
-            this.frame.position.set(-(this.width/2) * 0.5, this.topHeight / 1.99, (this.depth/2) * 0.5 );
+            this.frame.rotateY(Math.PI / 9);
+            this.frame.rotateX(-Math.PI / 2);
+            this.frame.position.set(
+                -(this.width / 2) * 0.5,
+                this.topHeight / 1.99,
+                (this.depth / 2) * 0.5
+            );
         }
     }
 
@@ -138,8 +142,8 @@ class MyTable extends THREE.Object3D {
         for (const mesh of this.legMeshes) {
             this.topMesh.add(mesh);
         }
-        if (this.plate) this.topMesh.add(this.plate);
         this.add(this.topMesh);
+        if (this.plate) this.topMesh.add(this.plate);
         if (this.frame) this.add(this.frame);
     }
 
