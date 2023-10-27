@@ -3,7 +3,7 @@
 
 	<!-- Credits of the original file go to Group 1, class 1 of course LAIG school year 2013/2014, FEUP, University of Porto -->
 	
-    <globals background="0 0 0 1" ambient="0 0 0 1" /> 
+    <globals background="0 0 0 1" ambient="255 255 255 1" /> 
 
     <fog color="1.0 1.0 1.0 1.0" near="0.0" far="100.0" />
 
@@ -17,26 +17,26 @@
 
         <orthogonal id="cam2" 
             near="0.1" 
-            far="1000" 
-            location="0 15 15" 
+            far="1000"
+            location="0 0 15" 
             target="0.0 15 0.0" 
-            left="-5" 
-            right="5" 
-            bottom="-5" 
-            top="-5" /> 
+            left="-20" 
+            right="20" 
+            bottom="-20" 
+            top="20" /> 
     </cameras> 
 
     <!-- bloco de texturas. Este bloco tem de existir mas pode estar vazio, se nao forem usadas texturas --> 
     <textures>        
-        <texture id="leftWallTex" filepath="scenes/t01g01/textures/scratchedWall.jpg" />
-		<texture id="rightWallTex" filepath="scenes/t01g01/textures/bloodyWall.jpg" />
-		<texture id="floorTex" filepath="scenes/t01g01/textures/test1.jpg" />
-		<texture id="tableTex" filepath="scenes/t01g01/textures/table.png" />
-		<texture id="crimeWeaponTex" filepath="scenes/t01g01/textures/bloodyPrints.jpg" />
-		<texture id="tapeTex" filepath="scenes/t01g01/textures/pTape.jpg" />
-		<texture id="tapeSupportTex" filepath="scenes/t01g01/textures/lamp.png" />
-		<texture id="pineTex" filepath="scenes/t01g01/textures/pine.png" />
-		<texture id="vaseTex" filepath="scenes/t01g01/textures/vase.png" />
+        <texture id="leftWallTex" filepath="scenes/demo/textures/scratchedWall.jpg" />
+		<texture id="rightWallTex" filepath="scenes/demo/textures/bloodyWall.jpg" />
+		<texture id="floorTex" filepath="scenes/demo/textures/test1.jpg" />
+		<texture id="tableTex" filepath="scenes/demo/textures/table.png" />
+		<texture id="crimeWeaponTex" filepath="scenes/demo/textures/bloodyPrints.jpg" />
+		<texture id="tapeTex" filepath="scenes/demo/textures/pTape.jpg" />
+		<texture id="tapeSupportTex" filepath="scenes/demo/textures/lamp.png" />
+		<texture id="pineTex" filepath="scenes/demo/textures/pine.png" />
+		<texture id="vaseTex" filepath="scenes/demo/textures/vase.png" />
     </textures> 
 
     <materials> 
