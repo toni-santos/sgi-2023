@@ -128,12 +128,12 @@ class MyContents  {
 
     renderGlobals(opt) {
         if (opt.background !== undefined) {
-            let color = this.createColor(opt.background);
+            let color = opt.background;
             this.app.scene.background = color;
         }
 
         if (opt.ambient !== undefined) {
-            let color = this.createColor(opt.ambient);
+            let color = opt.ambient;
             this.ambient = new THREE.AmbientLight(color);
             this.app.scene.add(this.ambient);
         }
@@ -185,16 +185,16 @@ class MyContents  {
             const material = 
             materialData.specular ?
                 new THREE.MeshPhongMaterial({
-                    color: this.createColor(materialData.color),
-                    specular: this.createColor(materialData.specular),
-                    emissive: this.createColor(materialData.emissive),
+                    color: materialData.color,
+                    specular: materialData.specular,
+                    emissive: materialData.emissive,
                     shininess: materialData.shininess,
                     side: materialData.twosided ? THREE.DoubleSide : THREE.FrontSide,
                     map: this.textures[materialData.textureref]
                 })
                 :
                 new THREE.MeshStandardMaterial({
-                    color: this.createColor(materialData.color),
+                    color: materialData.color,
                     shininess: materialData.shininess,
                     side: materialData.twosided ? THREE.DoubleSide : THREE.FrontSide,
                     wireframe: materialData.wireframe,
@@ -421,10 +421,6 @@ class MyContents  {
         graph.printGraph(this.data.rootId);
         this.sceneGraph = graph;
         console.log(this.sceneGraph);
-    }
-
-    createColor(color) {
-        return new THREE.Color(`rgba(${color.r * 255}, ${color.g * 255}, ${color.b * 255}, 1)`);
     }
 
     displayObjects(objects) {
