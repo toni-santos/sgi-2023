@@ -3,7 +3,7 @@
 
 	<!-- Credits of the original file go to Group 1, class 1 of course LAIG school year 2013/2014, FEUP, University of Porto -->
 	
-    <globals background="0 0 0 1" ambient="255 255 255 1" /> 
+    <globals background="0 0 0 1" ambient="0 0 0 1" /> 
 
     <fog color="1.0 1.0 1.0 1.0" near="0.0" far="100.0" />
 
