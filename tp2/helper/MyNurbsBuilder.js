@@ -24,7 +24,7 @@ class MyNurbsBuilder {
         this.app = app;
     }
 
-    build(controlPoints, degree1, degree2, samples1, samples2, material) {
+    build(controlPoints, degree1, degree2, samples1, samples2) {
         const knots1 = [];
         const knots2 = [];
 
@@ -47,20 +47,27 @@ class MyNurbsBuilder {
 
         let stackedPoints = [];
 
-        for (var i = 0; i < controlPoints.length; i++) {
-            let row = controlPoints[i];
+        for (var i = 0; i < controlPoints.length; i += degree2 + 1) {
+            let row = [];
+            for (let j = i; j <= i + degree2; j++) {
+                console.log("control point ", controlPoints[j]);
+                row.push(controlPoints[j]);
+            }
 
             let newRow = [];
-            
-            console.log(row);
 
-            newRow.push(
-                new THREE.Vector3(
-                    row.xx,
-                    row.yy,
-                    row.zz,
-                )
-            );
+            for (let k = 0; k < row.length; k++) {
+                let item = row[k];
+                console.log("item ", item);
+                newRow.push(
+                    new THREE.Vector3(
+                        item.xx,
+                        item.yy,
+                        item.zz
+                    )
+                );
+            }
+            console.log("newRow: ", newRow);
 
             stackedPoints.push(newRow);
         }

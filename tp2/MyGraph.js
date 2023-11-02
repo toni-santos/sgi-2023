@@ -9,6 +9,10 @@ class MyGraph {
         
     }
 
+    getNode(nodeKey) {
+        return this.nodes[nodeKey];
+    }
+
     getNodes() {
         return Object.keys(this.nodes);
     }

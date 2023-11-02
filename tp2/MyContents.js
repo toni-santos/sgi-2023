@@ -165,6 +165,7 @@ class MyContents  {
     renderTextures(textures) {
         for (const textureKey in textures) {
             const textureData = textures[textureKey];
+            console.log(`the texture id is ${textureData.id} with filepath ${textureData.filepath}`);
             const texture = textureData.isVideo ? 
                 new THREE.VideoTexture(textureData.filepath)
                 :
@@ -180,6 +181,7 @@ class MyContents  {
     renderMaterials(materials) {
         for (const materialKey in materials) {
             const materialData = materials[materialKey];
+            console.log(`the texture id is ${materialData.textureref} for material ${materialData.id}`);
             const material = 
             materialData.specular ?
                 new THREE.MeshPhongMaterial({
@@ -213,51 +215,52 @@ class MyContents  {
         this.renderObject(this.data.rootId, objects, visited);
         console.log("visited: ", visited);
         this.meshes = visited;
-        for (const objectKey in this.sceneGraph) {
-            const objectData = objects[objectKey];
-
-        }
-
     }
 
     renderObject(nodeId, objects, visited, parentData=undefined, idx=0) {
-        let mesh = new THREE.Group();
+        let group = new THREE.Group();
         let childMesh = null;
         let index = idx;
         const nodeData = objects[nodeId];
 
         if (nodeData === undefined) {
+            console.log(`Object ${parentData.id} is applying this materialId: `, parentData.materialIds[0]);
+            if (parentData.children[index].id?.includes("light")) return this.createLight(parentData.children[index]);
             return this.createPrimitive(nodeId, parentData, index);
         }
 
         index = 0;
 
-        for (const childId of this.sceneGraph.nodes[nodeData.id]) {
-            // table -> [top, leg1, leg2, ...] -> leg1 -> cylinder
+        for (const childId of this.sceneGraph.getNode(nodeId)) {
+            console.log("renderObject", nodeData, objects[childId]);
             if (visited[childId] === undefined) {
                 visited[childId] = []
+            }
+            if (nodeId !== this.data.rootId && parentData.materialIds.length !== 0) {
+                nodeData.materialIds = parentData.materialIds;
+                console.log(`Passing ${parentData.materialIds[0]} to ${nodeId}`);
             }
             const createdMesh = this.renderObject(childId, objects, visited, nodeData, index);
             visited[childId].push(createdMesh);
             
             childMesh = createdMesh.clone();
-
-            const material = nodeData.materialIds.map((id) => this.materials[id]) ?? this.mat;
-            // mesh.material = material;
+            console.log(childMesh)
 
             // transform
             if (nodeData.transformations.length > 0) {
-                console.log(nodeData.id, nodeData.transformations);
-                this.transformObject(nodeData.transformations, childMesh);
+                console.log(nodeData.id);
+                const newMatrix = this.transformObject(nodeData.transformations);
+                console.log("newMatrix: ", newMatrix);
+                childMesh.applyMatrix4(newMatrix);
             }
             
 
-            mesh.add(childMesh);
+            group.add(childMesh);
 
             index += 1;
         }
 
-        return mesh;
+        return group;
     }
 
     resetTransformations(mesh) {
@@ -266,44 +269,94 @@ class MyContents  {
         mesh.scale.set(1, 1, 1);
     }
 
-    transformObject(transformations, mesh) {
+    transformObject(transformations) {
+        const matrix = new THREE.Matrix4();
+        console.log("transformations: ", transformations);
         for (const transformation of transformations) {
             switch (transformation.type) {
                 case "T":
-                    mesh.position.set(...transformation.translate);
+                    let transformationMatrix = new THREE.Matrix4().makeTranslation(...transformation.translate);
+                    matrix.multiply(transformationMatrix);
                     break;
                 case "R":
+                    const rotation = transformation.rotation.map((x) => x * Math.PI / 180);
+                    const rotationMatrix = new THREE.Matrix4().makeRotationFromEuler(new THREE.Euler(...rotation), "XYZ");
+                    matrix.multiply(rotationMatrix);
+                    /*
                     const rotation = transformation.rotation.map((x) => x * Math.PI / 180);
                     // mesh.rotation.set(...rotation);
                     mesh.rotation.x = rotation[0];
                     mesh.rotation.y = rotation[1];
                     mesh.rotation.z = rotation[2];
+                    */
                     break;
                 case "S":
-                    mesh.scale.set(...transformation.scale);
+                    const scaleMatrix = new THREE.Matrix4().makeScale(...transformation.scale);
+                    matrix.multiply(scaleMatrix);
                     break;
                 default:
                     console.log("unknown transformation type: ", transformation.type);
                     break;
             }
         }
+        return matrix;
+    }
+
+    createLight(lightNode) {
+        console.log("Creating light ", lightNode);
+        let light;
+        switch (lightNode.type) {
+            case "pointlight":
+                console.log("Point light");
+                light = new THREE.PointLight(lightNode.color, lightNode.intensity, lightNode.distance, lightNode.decay);
+                light.position.set(...lightNode.position);
+                
+                const pointLightHelper = new THREE.PointLightHelper(light);
+                this.app.scene.add(pointLightHelper);
+                
+                break;
+            case "directionallight":
+                console.log("Directional light");
+                light = new THREE.DirectionalLight(lightNode.color, lightNode.intensity);
+                light.position.set(...lightNode.position);
+                light.shadow.camera.top = lightNode.shadowtop;
+                light.shadow.camera.bottom = lightNode.shadowbottom;
+                light.shadow.camera.left = lightNode.shadowleft;
+                light.shadow.camera.right = lightNode.shadowright;
+                break;
+            case "spotlight":
+                console.log("spotlight");
+                light = new THREE.SpotLight(lightNode.color, lightNode.intensity, lightNode.distance, lightNode.angle, lightNode.penumbra, lightNode.decay);
+                light.position.set(...lightNode.position);
+                light.target.position.set(...lightNode.target);
+                break;
+        }
+        light.castShadow = lightNode.castshadow;
+        light.shadow.camera.far = lightNode.shadowfar;
+        light.shadow.mapSize.width = lightNode.shadowmapsize;
+        light.shadow.mapSize.height = lightNode.shadowmapsize;
+
+        return light;
     }
 
     createPrimitive(nodeId, objectData, index) {
         let geometry;
-        // console.log("Creating primitive ", objectData.children[index]);
+        console.log("Creating primitive ", objectData.children[index]);
         const representation = objectData.children[index].representations[0];
-        let width, height, depth;
+        let width, height, depth, center_x, center_y, center_z;
         switch (nodeId) {
             case "rectangle":
                 console.log("it's a rectangle");
-                width = representation.xy2[0] - representation.xy1[0];
-                height = representation.xy2[1] - representation.xy1[1];
+                width = Math.abs(representation.xy2[0] - representation.xy1[0]);
+                height = Math.abs(representation.xy2[1] - representation.xy1[1]);
+                center_x = (representation.xy2[0] + representation.xy1[0]) / 2;
+                center_y = (representation.xy2[1] + representation.xy1[1]) / 2;
                 geometry = new THREE.PlaneGeometry(width, height, representation.parts_x, representation.parts_y);
+                geometry.translate(center_x, center_y, 0);
                 break;
             case "cylinder":
                 console.log("it's a cylinder");
-                geometry = new THREE.CylinderGeometry(representation.top, representation.bottom, representation.height, representation.slices, representation.stacks, representation.capsclose, representation.thetastart, representation.thetalength);
+                geometry = new THREE.CylinderGeometry(representation.top, representation.base, representation.height, representation.slices, representation.stacks, !representation.capsclose, representation.thetastart, representation.thetalength);
                 break;
             case "sphere":
                 console.log("it's a sMesh(plane, materialphere");
@@ -318,7 +371,11 @@ class MyContents  {
                 width = representation.xyz2[0] - representation.xyz1[0];
                 height = representation.xyz2[1] - representation.xyz1[1];
                 depth = representation.xyz2[2] - representation.xyz1[2];
+                center_x = (representation.xyz2[0] + representation.xyz1[0]) / 2;
+                center_y = (representation.xyz2[1] + representation.xyz1[1]) / 2;
+                center_z = (representation.xyz2[2] + representation.xyz1[2]) / 2;
                 geometry = new THREE.BoxGeometry(width, height, depth, representation.parts_x, representation.parts_y, representation.parts_z);
+                geometry.translate(center_x, center_y, center_z);
                 break;  
             case "skybox":
                 console.log("it's a skybox");
@@ -333,31 +390,35 @@ class MyContents  {
                 geometry = new THREE.ObjectLoader().load(representation.filepath);
                 break;
             case "nurbs":
-                // TODO: implement nurbs
                 console.log("it's a nurbs");
                 console.log("nurb rep: ", representation);
-                // const builder = new MyNurbsBuilder(this.app);
-                // geometry = builder.build(representation.controlpoints, representation.degree_u, representation.degree_v, representation.parts_u, representation.parts_v, representation.knots_u, representation.knots_v);
-
+                center_x = (representation.controlpoints[representation.controlpoints.length - 1].xx + representation.controlpoints[0].xx) / 2;
+                center_y = (representation.controlpoints[representation.controlpoints.length - 1].yy + representation.controlpoints[0].yy) / 2;
+                center_z = (representation.controlpoints[representation.controlpoints.length - 1].zz + representation.controlpoints[0].zz) / 2;
+                const builder = new MyNurbsBuilder(this.app);
+                geometry = builder.build(representation.controlpoints, representation.degree_u, representation.degree_v, representation.parts_u, representation.parts_v);
+                geometry.translate(-center_x, -center_y, -center_z);
                 break;
             default:
                 console.log("it's something else");
                 console.log("else", representation);
                 break;
         }
-        const mesh = new THREE.Mesh(geometry);
+        const mesh = new THREE.Mesh(geometry, this.materials[objectData.materialIds[0]]);
         return mesh;
     }
 
     createSceneGraph(objects) {
-        const graph = new MyGraph(Object.keys(objects).concat(this.data.primitiveIds));
+        const rootNodeChildIds = objects[this.data.rootId].children.map((node) => node.id ?? node.subtype);
+        console.log("in the scene: ", rootNodeChildIds);
+        const graph = new MyGraph(Object.keys(objects).concat(this.data.primitiveIds).concat(rootNodeChildIds));
         for (const objectKey in objects) {
             const objectData = objects[objectKey];
             for (const child of objectData.children) {
                 graph.addEdge(objectData.id, child.id ?? child.subtype);
             }
         }
-        graph.printGraph('scene');
+        graph.printGraph(this.data.rootId);
         this.sceneGraph = graph;
         console.log(this.sceneGraph);
     }
@@ -367,24 +428,15 @@ class MyContents  {
     }
 
     displayObjects(objects) {
-        /*
-        const mat = new THREE.MeshPhongMaterial({color: 0x00ff00});
-        console.log(this.materials['crimeWeaponApp']);
-        const cube = new THREE.Mesh(new THREE.BoxGeometry(10, 10, 10), this.materials['floorApp']);
-        const cube2 = new THREE.Mesh(new THREE.BoxGeometry(5, 5, 5), mat);
-        cube2.position.set(0, 10, 0);
-        cube.add(cube2);
-        this.app.scene.add(cube);
-        this.mat = mat;
-        */
 
         for (const key of objects[this.data.rootId].children) {
+            console.log(key);
             const meshes = this.meshes[key.id] ?? [];
             if (meshes.length >= 1) {
                 console.log(key.id);
                 for (const mesh of meshes) {
                     this.app.scene.add(mesh);
-                    console.log("added mesh ", mesh.children[0].rotation);
+                    console.log("added mesh ", mesh);
                 }
             }
         }
