@@ -161,8 +161,8 @@
                     position="7 7 15" />  -->
 
                 <spotlight id="light2" enabled="true" 
-                    color="1 0.5 0.5 1" 
-                    intensity="20"
+                    color="1 0.4 0.4 1" 
+                    intensity="15"
                     castshadow="true"
                     target="7 3 0"
                     angle="45"
@@ -185,7 +185,7 @@
 
                 <pointlight id="light6" enabled="true" 
                     color="1 0 0 1" 
-                    intensity="0.2"
+                    intensity="0.05"
                     position="7.15 7 0.4"/>
             </children>
         </node>
