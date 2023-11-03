@@ -1,0 +1,525 @@
+<?xml version="1.0" encoding="UTF-16" standalone="yes"?>
+<yaf> 
+    <globals background="0 0 0 1" ambient="0 0 0 1" /> 
+
+    <fog color="1.0 1.0 1.0 1.0" near="0.0" far="100.0" />
+
+    <cameras initial="cam1" > 
+        <perspective id="cam1" 
+            angle="60" 
+            near="0.1" 
+            far="1000" 
+            location="15 15 15" 
+            target="0 0.0 0" /> 
+
+        <orthogonal id="cam2" 
+            near="0.1" 
+            far="1000"
+            location="0 0 15" 
+            target="0.0 15 0.0" 
+            left="-20" 
+            right="20" 
+            bottom="-20" 
+            top="20" /> 
+    </cameras> 
+
+    <textures>
+		<texture id="wallTex" filepath="scenes/darkroom/textures/sterile_wall.jpg" />
+		<texture id="floorTex" filepath="scenes/darkroom/textures/floor_tiles.jpg" />
+        <texture id="topTex" filepath="scenes/darkroom/textures/plastic_table.jpg" />
+        <texture id="legTex" filepath="scenes/darkroom/textures/metal.jpg" />
+    </textures> 
+
+    <materials>		
+		<material id="wallMat" 
+            emissive="0.0 0.0 0.0 1" 
+			color="0.8 0.8 0.8 1.0" 
+            specular="0 0 0 0" 
+            shininess="0" 
+            textureref="wallTex" 
+            texlength_s="15" 
+            texlength_t="8" 
+            twosided = "false" />
+
+        <material id="floorMat" 
+            emissive="0.0 0.0 0.0 1" 
+			color="0.8 0.8 0.8 1.0" 
+            specular="0 0 0 0" 
+            shininess="0" 
+            textureref="floorTex" 
+            texlength_s="1" 
+            texlength_t="1" 
+            twosided = "false" />
+
+        <material id="tableLegMat" 
+            emissive="0.0 0.0 0.0 1"
+            color="0.4 0.4 0.4 1.0"
+            specular="0 0 0 0"
+            shininess="20"
+            textureref="legTex"
+            texlength_s="1"
+            texlength_t="1"
+            twosided = "false" />
+
+        <material id="tableTopMat" 
+            emissive="0.0 0.0 0.0 1"
+            color="1 1 1 1.0"
+            specular="0 0 0 0"
+            shininess="5"
+            textureref="topTex"
+            texlength_s="1"
+            texlength_t="1"
+            twosided = "false" />
+
+        <material id="scannerMat" 
+            emissive="0.0 0.0 0.0 1"
+            color="0.4 0.3 0.3 1.0"
+            specular="0 0 0 0"
+            shininess="10"
+            twosided = "false" />
+
+        <material id="scannerBotMat" 
+            emissive="0.0 0.0 0.0 1"
+            color="0.8 0.8 0.8 1.0"
+            specular="0 0 0 0"
+            shininess="10"
+            twosided = "false" />
+
+        <material id="threadMat" 
+            emissive="0.0 0.0 0.0 1"
+            color="0.8 0.4 0.2 1.0"
+            specular="0 0 0 0"
+            shininess="10"
+            twosided = "false" />
+
+        <material id="picMat" 
+            emissive="0.0 0.0 0.0 1"
+            color="0.3 0.3 0.3 1.0"
+            specular="0 0 0 0"
+            shininess="10"
+            twosided = "false" />
+
+
+    </materials> 
+
+    <graph rootid="scene"> 
+        <node id="scene"> 
+            <children>
+                <noderef id="floor" />
+                <noderef id="leftWall" />
+                <noderef id="rightWall" />
+                <noderef id="tableItems1" />
+                <noderef id="tableItems2" />
+                <noderef id="tableItems3" />
+                <noderef id="pictures" />
+
+                <directionallight id="light5" enabled="true" 
+                    color="1 1 1 1" 
+                    intensity="0.2"
+                    castshadow="true"
+                    position="2 2 4" /> 
+
+                <pointlight id="light1" enabled="true" 
+                    color="1 0 0 1" 
+                    intensity="1"
+                    position="2.15 4.2 1.8"/>
+                <pointlight id="light2" enabled="true" 
+                    color="1 0 0 1" 
+                    intensity="1"
+                    position="7.15 4.2 1.8"/>
+                <pointlight id="light3" enabled="true" 
+                    color="1 0 0 1" 
+                    intensity="1"
+                    position="12.15 4.2 1.8"/>
+
+            </children>
+        </node>
+
+		<node id="floor">
+			<transforms>
+				<translate value3="0 0 15" />
+				<rotate value3="-90 0.0 0.0" />
+            </transforms> 
+
+			<materialref id="floorMat" />
+			
+            <children>
+                <primitive>
+                    <rectangle xy1="0 0" xy2="15 15" />
+                </primitive>
+            </children> 
+        </node>
+
+        <node id="leftWall">
+			<transforms>
+				<translate value3="0 0 15" />
+				<rotate value3="0.0 90 0.0" />
+            </transforms> 
+
+			<materialref id="wallMat" />
+			
+            <children>             
+                <primitive>
+                    <rectangle xy1="0 0" xy2="15 8" />
+                </primitive>
+            </children> 
+        </node>
+		
+		<node id="rightWall">
+			<materialref id="wallMat" />
+			
+            <children>             
+                <primitive>
+                    <rectangle xy1="0 0" xy2="15 8" />
+                </primitive>
+            </children> 
+        </node>
+
+		<node id="leg">
+			<transforms>
+				<scale value3="0.06 0.92 0.06" />
+            </transforms> 
+
+            <materialref id="tableLegMat" />
+
+            <children>
+                <primitive>
+                    <box xyz1="-0.5 -0.5 -0.5" xyz2="0.5 0.5 0.5" parts_x="1" parts_y="1" parts_z="1"/>
+                </primitive>
+            </children> 
+        </node>
+		
+		<node id="leg1">
+			<transforms>
+				<translate value3="0.45 0 0.42" />
+            </transforms> 
+
+            <children>             
+                <noderef id="leg" />
+            </children> 
+        </node>
+		
+		<node id="leg2">
+			<transforms>
+				<translate value3="0.45 0 -0.42" />
+            </transforms> 
+
+            <children>             
+                <noderef id="leg" />
+            </children> 
+        </node>
+		
+		<node id="leg3">
+			<transforms>
+				<translate value3="-0.45 0 0.42" />
+            </transforms> 
+
+            <children>             
+                <noderef id="leg" />
+            </children> 
+        </node>
+		
+		<node id="leg4">
+			<transforms>
+				<translate value3="-0.45 0 -0.42" />
+            </transforms> 
+
+            <children>             
+                <noderef id="leg" />
+            </children> 
+        </node>
+		
+		<node id="tableTop">
+			<transforms>
+				<translate value3="0 0.48 0" />
+				<scale value3="1 0.08 1" />
+            </transforms> 
+
+            <materialref id="tableTopMat" />
+
+            <children>             
+                <primitive>
+                    <box xyz1="-0.5 -0.5 -0.5" xyz2="0.5 0.5 0.5" parts_x="1" parts_y="1" parts_z="1"/>
+                </primitive>
+            </children> 
+        </node>
+		
+		<node id="table">
+			<transforms>
+				<translate value3="2.25 0 1.5" />
+				<scale value3="4.5 2.5 3" />
+				<translate value3="0 0.45 0" />
+            </transforms> 
+			
+            <children>
+                <noderef id="tableTop" />
+				<noderef id="leg1" />
+				<noderef id="leg2" />
+				<noderef id="leg3" />
+				<noderef id="leg4" />
+            </children> 
+        </node>
+
+        <node id="tableItems1">
+            <transforms>
+            </transforms>
+            
+            <children>
+                <noderef id="table" />
+                <noderef id="scannerMachine" />
+            </children>
+        </node>
+        
+        <node id="tableItems2">
+            <transforms>
+                <translate value3="5 0 0" />
+            </transforms>
+            
+            <children>
+                <noderef id="table" />
+                <noderef id="scannerMachine" />
+            </children>
+        </node>
+
+        <node id="tableItems3">
+            <transforms>
+                <translate value3="10 0 0" />
+            </transforms>
+            
+            <children>
+                <noderef id="table" />
+                <noderef id="scannerMachine" />
+            </children>
+        </node>
+
+        <node id="scannerMachine">
+            <transforms>
+                <translate value3="2.15 2.5 1" />
+            </transforms>
+
+            <materialref id="scannerMat" />
+
+            <children>
+                <noderef id="scannerTray"/>
+                <noderef id="scannerLens"/>
+                <noderef id="scannerArm"/>
+                <noderef id="scannerHor"/>
+                <noderef id="scannerBase"/>
+            </children>
+        </node>
+
+        <node id="st1">
+            <transforms>
+                <scale value3="1.2 0.2 0.2"/>
+            </transforms>
+
+            <children>
+                <primitive>
+                    <box xyz1="-0.5 -0.5 -0.5" xyz2="0.5 0.5 0.5" parts_x="1" parts_y="1" parts_z="1"/>
+                </primitive>
+            </children>
+        </node>
+
+        <node id="st2">
+            <transforms>
+                <translate value3="0 0 1.2"/>
+                <scale value3="1.2 0.2 0.2"/>
+            </transforms>
+
+            <children>
+                <primitive>
+                    <box xyz1="-0.5 -0.5 -0.5" xyz2="0.5 0.5 0.5" parts_x="1" parts_y="1" parts_z="1"/>
+                </primitive>
+            </children>
+        </node>
+
+        <node id="st3">
+            <transforms>
+                <translate value3="0.5 0 0.6"/>
+                <rotate value3="0 90 0"/>
+                <scale value3="1.2 0.2 0.2"/>
+            </transforms>
+
+            <children>
+                <primitive>
+                    <box xyz1="-0.5 -0.5 -0.5" xyz2="0.5 0.5 0.5" parts_x="1" parts_y="1" parts_z="1"/>
+                </primitive>
+            </children>
+        </node>
+
+        <node id="st4">
+            <transforms>
+                <translate value3="-0.5 0 0.6"/>
+                <rotate value3="0 90 0"/>
+                <scale value3="1.2 0.2 0.2"/>
+            </transforms>
+
+            <children>
+                <primitive>
+                    <box xyz1="-0.5 -0.5 -0.5" xyz2="0.5 0.5 0.5" parts_x="1" parts_y="1" parts_z="1"/>
+                </primitive>
+            </children>
+        </node>
+
+        <node id="scannerTray">
+            <transforms>
+            </transforms>
+
+            <children>
+                <noderef id="st1"/>
+                <noderef id="st2"/>
+                <noderef id="st3"/>
+                <noderef id="st4"/>
+            </children>
+        </node>
+
+        <node id="scannerLens">
+            <transforms>
+                <translate value3="0 1.75 0.7" />
+                <scale value3="0.5 0.7 0.5"/>
+                <rotate value3="0 45 0"/>
+            </transforms>
+
+            <children>
+                <primitive>
+                    <cylinder base="1" top="0.5" height="1" slices="4" stacks="4" capsclose="true"/>
+                </primitive>
+
+                <pointlight id="light" enabled="true" 
+                    color="1 1 1 1" 
+                    intensity="100"
+                    position="0 1.75 0.7" 
+                /> 
+            </children>
+        </node>
+
+        <node id="scannerArm">
+            <transforms>
+                <translate value3="0 1 0" />
+                <scale value3="0.1 2 0.1"/>
+            </transforms>
+
+            <children>
+                <primitive>
+                    <cylinder base="1" top="1" height="1" slices="20" stacks="4" capsclose="true"/>
+                </primitive>
+            </children>
+        </node>
+
+        <node id="scannerHor">
+            <transforms>
+                <translate value3="0 1.9 0.35" />
+                <scale value3="0.1 0.1 0.7"/>
+                <rotate value3="90 0 0"/>
+            </transforms>
+
+            <children>
+                <primitive>
+                    <cylinder base="1" top="1" height="1" slices="20" stacks="4" capsclose="true"/>
+                </primitive>
+            </children>
+        </node>
+
+        <node id="scannerBase">
+            <transforms>
+                <translate value3="0 0 0.6" />
+                <rotate value3="-90 0 0"/>
+            </transforms>
+
+            <children>
+                <primitive>
+                    <rectangle xy1="-0.5 -0.5" xy2="0.5 0.7" parts_x="1" parts_y="1"/>
+                </primitive>
+            </children>
+        </node>
+
+        <node id="pictures">
+            <transforms>
+            </transforms>
+
+            <children>
+                <noderef id="picLine" />
+                <noderef id="pic1" />
+                <noderef id="pic2" />
+                <noderef id="pic3" />
+            </children>
+        </node>
+
+        <node id="pic1">
+            <transforms>
+                <translate value3="1.5 6.9 0.5" />
+                <rotate value3="0 45 0"/>
+                <scale value3="0.5 0.6 0.5"/>
+            </transforms>
+
+            <materialref id="picMat" />
+
+            <children>
+                <primitive>
+                    <rectangle xy1="0 0" xy2="1 1" />
+                </primitive>
+            </children>
+        </node>
+        
+        <node id="pic2">
+            <transforms>
+                <translate value3="0.5 6.9 1.5" />
+                <rotate value3="0 45 0"/>
+                <scale value3="0.5 0.6 0.5"/>
+            </transforms>
+
+            <materialref id="picMat" />
+
+            <children>
+                <primitive>
+                    <rectangle xy1="0 0" xy2="1 1" />
+                </primitive>
+            </children>
+        </node>
+        
+        <node id="pic3">
+            <transforms>
+                <translate value3="1 6.9 1" />
+                <rotate value3="0 45 0"/>
+                <scale value3="0.5 0.6 0.5"/>
+            </transforms>
+
+            <materialref id="picMat" />
+
+            <children>
+                <primitive>
+                    <rectangle xy1="0 0" xy2="1 1" />
+                </primitive>
+            </children>
+        </node>
+
+        <node id="picLine">
+            <transforms>
+                <translate value3="1 7.5 1" />
+                <rotate value3="-90 0 45"/>
+                <scale value3="3.2 1 0.05"/>
+            </transforms>
+
+            <materialref id="threadMat" />
+
+            <children>
+                <primitive>
+                    <nurbs degree_u="1" degree_v="1" parts_u="20" parts_v="20">
+                        <controlpoint xx="0" yy="0" zz="0" />
+                        <controlpoint xx="0" yy="0" zz="1" />
+                        <controlpoint xx="1" yy="0" zz="0" />
+                        <controlpoint xx="1" yy="0" zz="1" />
+                    </nurbs>
+                </primitive>
+            </children>
+        </node>
+
+        <node id="">
+            <transforms>
+            </transforms>
+
+            <children>
+            </children>
+        </node>
+    </graph>
+</yaf>

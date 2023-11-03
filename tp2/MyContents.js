@@ -42,7 +42,7 @@ class MyContents  {
         }
 
         this.reader = new MyFileReader(app, this, this.onSceneLoaded);
-		this.reader.open("scenes/demo/demo.xml");
+		this.reader.open("scenes/darkroom/darkroom.xml");
     }
 
     /**
@@ -359,8 +359,13 @@ class MyContents  {
                 geometry = new THREE.CylinderGeometry(representation.top, representation.base, representation.height, representation.slices, representation.stacks, !representation.capsclose, representation.thetastart, representation.thetalength);
                 break;
             case "sphere":
-                console.log("it's a sMesh(plane, materialphere");
-                geometry = new THREE.SphereGeometry(5, 5, 5);
+                console.log("it's a sphere");
+                const radius = representation.radius * Math.PI / 180;
+                const thetastart = representation.thetastart * Math.PI / 180;
+                const thetalength = representation.thetalength * Math.PI / 180;
+                const phistart = representation.phistart * Math.PI / 180;
+                const philength = representation.philength * Math.PI / 180;
+                geometry = new THREE.SphereGeometry(radius, representation.slices, representation.stacks, phistart, philength, thetastart, thetalength);
                 break;
             case "triangle":
                 console.log("it's a triangle");
