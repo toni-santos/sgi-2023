@@ -219,6 +219,8 @@ class MyContents  {
 
     renderObject(nodeId, objects, visited, parentData=undefined, idx=0) {
         let group = new THREE.Group();
+        group.castShadow = true;
+        group.receiveShadow = true;
         let childMesh = null;
         let index = idx;
         const nodeData = objects[nodeId];
@@ -236,7 +238,7 @@ class MyContents  {
             if (visited[childId] === undefined) {
                 visited[childId] = []
             }
-            if (nodeId !== this.data.rootId && parentData.materialIds.length !== 0) {
+            if (nodeId !== this.data.rootId && parentData.materialIds.length !== 0 && nodeData.materialIds.length === 0) {
                 nodeData.materialIds = parentData.materialIds;
                 console.log(`Passing ${parentData.materialIds[0]} to ${nodeId}`);
             }
@@ -311,8 +313,8 @@ class MyContents  {
                 light = new THREE.PointLight(lightNode.color, lightNode.intensity, lightNode.distance, lightNode.decay);
                 light.position.set(...lightNode.position);
                 
-                const pointLightHelper = new THREE.PointLightHelper(light);
-                this.app.scene.add(pointLightHelper);
+                // const pointLightHelper = new THREE.PointLightHelper(light);
+                // this.app.scene.add(pointLightHelper);
                 
                 break;
             case "directionallight":
@@ -323,12 +325,16 @@ class MyContents  {
                 light.shadow.camera.bottom = lightNode.shadowbottom;
                 light.shadow.camera.left = lightNode.shadowleft;
                 light.shadow.camera.right = lightNode.shadowright;
+
+                // this.app.scene.add(new THREE.CameraHelper(light.shadow.camera));
                 break;
             case "spotlight":
                 console.log("spotlight");
                 light = new THREE.SpotLight(lightNode.color, lightNode.intensity, lightNode.distance, lightNode.angle, lightNode.penumbra, lightNode.decay);
                 light.position.set(...lightNode.position);
                 light.target.position.set(...lightNode.target);
+
+                // this.app.scene.add(new THREE.SpotLightHelper(light));
                 break;
         }
         light.castShadow = lightNode.castshadow;
@@ -410,6 +416,8 @@ class MyContents  {
                 break;
         }
         const mesh = new THREE.Mesh(geometry, this.materials[objectData.materialIds[0]]);
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
         return mesh;
     }
 
