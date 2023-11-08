@@ -17,15 +17,18 @@
 
         <orthogonal id="cam2" 
             near="0.1" 
-            far="1000"
-            location="0 0 15" 
+            far="1000" 
+            location="0 15 15" 
             target="0.0 15 0.0" 
-            left="-20" 
-            right="20" 
-            bottom="-20" 
-            top="20" /> 
+            left="-5" 
+            right="5" 
+            bottom="-5" 
+            top="-5" /> 
     </cameras> 
 
+    <skybox size="100 100 100" center="0 0 0" emissive="1.0 1.0 1.0 1.0" intensity="1" up="scenes/demo/textures/pine.jpg" down="scenes/demo/textures/pine.jpg" left="scenes/demo/textures/pine.jpg" right="scenes/demo/textures/pine.jpg" front="scenes/demo/textures/pine.jpg" back="scenes/demo/textures/pine.jpg"/>
+
+    
     <!-- bloco de texturas. Este bloco tem de existir mas pode estar vazio, se nao forem usadas texturas --> 
     <textures>        
         <texture id="leftWallTex" filepath="scenes/demo/textures/scratchedWall.jpg" />
@@ -37,6 +40,16 @@
 		<texture id="tapeSupportTex" filepath="scenes/demo/textures/lamp.png" />
 		<texture id="pineTex" filepath="scenes/demo/textures/pine.png" />
 		<texture id="vaseTex" filepath="scenes/demo/textures/vase.png" />
+        <!-- <texture id="demo" filepath="scenes/demo/textures/demo.png" 
+            mipmap0="scenes/demo/textures/demo1024.png"
+            mipmap1="scenes/demo/textures/demo512.png"
+            mipmap2="scenes/demo/textures/demo256.png"
+            mipmap3="scenes/demo/textures/demo128.png"
+            mipmap4="scenes/demo/textures/demo64.png"
+            mipmap5="scenes/demo/textures/demo32.png"
+            mipmap6="scenes/demo/textures/demo16.png"
+            mipmap7="scenes/demo/textures/demo8.png"
+        /> -->
     </textures> 
 
     <materials> 
@@ -58,7 +71,10 @@
             textureref="leftWallTex" 
             texlength_s="15" 
             texlength_t="8" 
-            twosided = "true" />
+            twosided = "true"
+            bumpref = "demo"
+            bumpscale = "0.5"
+            specularref = "demo" />
 		
 		<material id="rightWallApp" 
             emissive="0.0 0.0 0.0 1" 
@@ -131,8 +147,14 @@
     </materials> 
 
     <graph rootid="scene"> 
+        <lod id="demo" near="0" far="1000" > 
+            <noderef id="rectangle2" mindist="5" />
+            <noderef id="rectangle2" mindist="10"/>
+            <noderef id="rectangle2" mindist="100"/>
+            <noderef id="rectangle2" mindist="500"/>
+        </lod>
 		
-		<node id="scene"> 
+		<node id="scene" castshadows = "true" receiveshadows="true"> 
             <children> 
                 <noderef id="leftWall" /> 
 				<noderef id="rightWall" /> 
@@ -203,6 +225,7 @@
                 <primitive>          
                     <rectangle xy1="-0.5 -0.5" xy2="0.5 0.5" />
                 </primitive> 
+                <lodref id="demo" />
             </children> 
         </node>
 		
@@ -422,7 +445,7 @@
             </children> 
         </node>
 		
-		<node id="crimeWeapon">
+		<node id="crimeWeapon" castshadows = "true" receiveshadows="true" >
 			<transforms>
 				<translate value3="7 0.5 8" /> 
 				<scale value3="0.5 0.5 5" />
@@ -590,7 +613,7 @@
 				<noderef id="treeSeg2" />
 				<noderef id="treeSeg3" />
                 <primitive>
-                    <nurbs degree_u="1" degree_v="1" parts_u="20" parts_v="20" >
+                    <nurbs degree_u="1" degree_v="1" parts_u="20" parts_v="20" distance="0.0">
                         <controlpoint xx="0" yy="0" zz="0" />
                         <controlpoint xx="0" yy="0" zz="1" />
                         <controlpoint xx="1" yy="0" zz="0" />

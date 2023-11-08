@@ -52,7 +52,7 @@ class MyFileReader  {
 			this.xmlhttp.onload = this.onStateChange;
 			this.xmlhttp.reader = this;
 			this.xmlfilename = xmlfile;
- 			this.xmlhttp.open("GET", xmlfile, true); //  (httpMethod,  URL,  asynchronous)			
+ 			this.xmlhttp.open("GET", xmlfile, false); //  (httpMethod,  URL,  asynchronous)			
 			this.xmlhttp.setRequestHeader("Content-Type", "text/xml");
 			this.xmlhttp.send(null);
 		}
@@ -120,6 +120,7 @@ class MyFileReader  {
 			this.checkForUnknownNodes(rootElement, this.data.primaryNodeIds)
 
 			this.loadGlobals(rootElement);
+			this.loadSkybox(rootElement);
 			this.loadFog(rootElement);
 			this.loadTextures(rootElement);
 			this.loadMaterials(rootElement);
@@ -628,6 +629,15 @@ class MyFileReader  {
 	}
 
 	/*
+	 * Load skybox element
+	 * 
+	 */
+	loadSkybox(rootElement) {
+		let elem = this.getAndCheck(rootElement, 'skybox')
+		this.data.setSkybox(this.loadXmlItem({elem: elem, descriptor: this.data.descriptors["skybox"], extras: [["type", "skybox"]]}))
+	}
+
+	/*
 	 * Load fog element
 	 * 
 	 */
@@ -697,6 +707,8 @@ class MyFileReader  {
 			throw new Error("at least one node is required in the data.")
 		}
 		
+		let lodElements =  graphs[0].getElementsByTagName('lod');
+
 		let graph = graphs[0];
 		let rootId = this.getString(graph, "rootid");
 		
@@ -707,6 +719,14 @@ class MyFileReader  {
 			let nodeElement = nodeElements[i];
 			this.loadNode(nodeElement);
 		}
+
+		// load lod elements if present. There can be no LOD items
+		if (lodElements !== null && lodElements !== undefined) {
+			for (let i=0; i < lodElements.length; i++) {
+				let lodElement = lodElements[i];
+				this.loadLOD(lodElement);
+			}	
+		}
 	}
 	
 	/**
@@ -716,7 +736,7 @@ class MyFileReader  {
 	loadNode(nodeElement) {
 	
 		let id = this.getString(nodeElement, "id");
-		
+
 		// get if node previously added (for instance because it was a child ref in other node)
 		let obj = this.data.getNode(id);
 		if (obj == null) {
@@ -724,6 +744,12 @@ class MyFileReader  {
 			obj = this.data.createEmptyNode(id);			
 		}
 		
+		let castshadows = this.getBoolean(nodeElement, "castshadows", false);
+		let receiveShadows = this.getBoolean(nodeElement, "receiveshadows", false);
+
+		obj.castShadows = castshadows;
+		obj.receiveShadows = receiveShadows;
+
 		// load transformations
 		let transforms =  nodeElement.getElementsByTagName('transforms');
 		if (transforms !== null && transforms.length > 0) {
@@ -826,6 +852,19 @@ class MyFileReader  {
 					// reference it.
 					this.data.addChildToNode(nodeObj, reference)
 				}
+				else
+				if (id == "lodref") {
+					let id = this.getString(child, "id");
+					// add a lod ref: if the lod does not exist
+					// create an empty one and reference it.
+					let reference = this.data.getLOD(id);
+					if (reference === null) {
+						// does not exist, yet. create it!
+						reference = this.data.createEmptyLOD(id);
+					}
+					// reference it.
+					this.data.addChildToNode(nodeObj, reference)
+				}
 				else {
 					throw new Error("unrecognized child type '" + id + "'.");
 				}
@@ -871,6 +910,50 @@ class MyFileReader  {
 			throw new Error ("primitive element has no recognized primitive instances")
 		} 
 		primitiveObj.loaded = true
+	}
+
+	/**
+	 * Load the data for a particular lod elemment
+	 * @param {*} lodElement the xml lod element
+	 */
+	loadLOD(lodElement) {
+	
+		// get the id of the LOD
+		let id = this.getString(lodElement, "id");
+
+		// get if LOD previously added (for instance because it was a  ref in other part of the file)
+		let obj = this.data.getLOD(id);
+		if (obj == null) {
+			// otherwise add a new LOD
+			obj = this.data.createEmptyLOD(id);			
+		}
+
+		// load LOD noderef (children) elements
+		let noderefs = lodElement.getElementsByTagName('noderef');
+		if (noderefs === null || noderefs === undefined) {
+			throw new Error("in LOD " + id + ", a noderef is required");
+		}
+		if (noderefs.length == 0) {
+			throw new Error("in LOD " + id + ", at least one noderef is required");
+		}
+
+		// for each noderef
+		for (let i=0; i < noderefs.length; i++) {
+			let noderef = noderefs[i]
+			let id = this.getString(noderef, "id")
+			let mindist = this.getFloat(noderef, "mindist")
+
+			// find node by id. if not present create a new one
+			let node = this.data.getNode(id)
+			if (node == null) {
+				// otherwise add a new node
+				node = this.data.createEmptyNode(id);			
+			}
+			// store the node as child of this LOD
+			obj.children.push({ node: node, mindist: mindist, type: "lodnoderef" })
+		}
+		// set the LOD as loaded
+		obj.loaded = true;
 	}
 }
 

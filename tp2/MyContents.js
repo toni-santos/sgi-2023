@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { MyAxis } from './MyAxis.js';
 import { MyFileReader } from './parser/MyFileReader.js';
 import { MyGraph } from './MyGraph.js';
@@ -42,7 +43,7 @@ class MyContents  {
         }
 
         this.reader = new MyFileReader(app, this, this.onSceneLoaded);
-		this.reader.open("scenes/darkroom/darkroom.xml");
+		this.reader.open("scenes/demo/demo.xml");
     }
 
     /**
@@ -120,6 +121,7 @@ class MyContents  {
         this.data = data;
         this.renderGlobals(data.options);
         this.renderCameras(data.cameras);
+        this.renderSkybox(data.skyboxes);
         this.renderTextures(data.textures);
         this.renderMaterials(data.materials);
         this.renderObjects(data.nodes);
@@ -160,6 +162,68 @@ class MyContents  {
         };
         this.cameras = this.app.cameras;
         console.log("Cameras: ", this.cameras);
+    }
+
+    renderSkybox(skyboxes) {
+        for (const skyboxId in skyboxes) {
+
+            const skybox = skyboxes[skyboxId];
+            const sky = new THREE.Group();
+
+            const x = skybox.size[0];
+            const y = skybox.size[1];
+            const z = skybox.size[2];
+            
+            const upGeometry = new THREE.PlaneGeometry(x, z, 1, 1);
+            const downGeometry = new THREE.PlaneGeometry(x, z, 1, 1);
+            const leftGeometry = new THREE.PlaneGeometry(x, y, 1, 1);
+            const rightGeometry = new THREE.PlaneGeometry(x, y, 1, 1);
+            const frontGeometry = new THREE.PlaneGeometry(z, y, 1, 1);
+            const backGeometry = new THREE.PlaneGeometry(z, y, 1, 1);
+
+            const texture = new THREE.TextureLoader();
+
+            const material =  new THREE.MeshBasicMaterial({
+                emissive: skybox.emissive,
+                intensity: skybox.intensity,
+            });
+
+            material.map = texture.load(skybox.up);
+            const up = new THREE.Mesh(upGeometry, material);
+            material.map = texture.load(skybox.down)
+            const down = new THREE.Mesh(downGeometry, material);
+            material.map = texture.load(skybox.left)
+            const left = new THREE.Mesh(leftGeometry, material);
+            material.map = texture.load(skybox.right)
+            const right = new THREE.Mesh(rightGeometry, material);
+            material.map = texture.load(skybox.front)
+            const front = new THREE.Mesh(frontGeometry, material);
+            material.map = texture.load(skybox.back)
+            const back = new THREE.Mesh(backGeometry, material);
+    
+            up.position.set(skybox.center[0], y/2 + skybox.center[1], skybox.center[2]);
+            down.position.set(skybox.center[0], -y/2 + skybox.center[1], skybox.center[2]);
+            left.position.set(-x/2 + skybox.center[0], skybox.center[1], skybox.center[2]);
+            right.position.set(x/2 + skybox.center[0], skybox.center[1], skybox.center[2]);
+            front.position.set(skybox.center[0], skybox.center[1], z/2 + skybox.center[2]);
+            back.position.set(skybox.center[0], skybox.center[1], -z/2 + skybox.center[2]);
+
+            up.rotation.set(Math.PI/2, 0, 0);
+            down.rotation.set(-Math.PI/2, 0, 0);
+            left.rotation.set(0, Math.PI/2, 0);
+            right.rotation.set(0, -Math.PI/2, 0);
+            front.rotation.set(0, Math.PI, 0);
+            back.rotation.set(0, 0, 0);
+    
+            sky.add(up);
+            sky.add(down);
+            sky.add(left);
+            sky.add(right);
+            sky.add(front);
+            sky.add(back);
+    
+            this.app.scene.add(sky);
+        }
     }
 
     renderTextures(textures) {
@@ -388,17 +452,47 @@ class MyContents  {
                 geometry = new THREE.BoxGeometry(width, height, depth, representation.parts_x, representation.parts_y, representation.parts_z);
                 geometry.translate(center_x, center_y, center_z);
                 break;  
-            case "skybox":
-                console.log("it's a skybox");
-                width = representation.xyz2[0] - representation.xyz1[0];
-                height = representation.xyz2[1] - representation.xyz1[1];
-                depth = representation.xyz2[2] - representation.xyz1[2];
-                geometry = new THREE.BoxGeometry(width, height, depth, representation.parts_x, representation.parts_y, representation.parts_z);
-                console.log("rep: ", representation);
-                break;
+            // case "skybox":
+                // console.log("it's a skybox");
+                
+                // const x = representation.size[0];
+                // const y = representation.size[1];
+                // const z = representation.size[2];
+                
+                // const top = new THREE.PlaneGeometry(x, z, 1, 1);
+                // const bottom = new THREE.PlaneGeometry(x, z, 1, 1);
+                // const left = new THREE.PlaneGeometry(x, y, 1, 1);
+                // const right = new THREE.PlaneGeometry(x, y, 1, 1);
+                // const front = new THREE.PlaneGeometry(z, y, 1, 1);
+                // const back = new THREE.PlaneGeometry(z, y, 1, 1);
+
+                // const mesh = new THREE.Mesh(geometry, this.materials[objectData.materialIds[0]]);
+                // const originalEm = this.materials[objectData.materialIds[0]].emissive;
+
+                // this.materials[objectData.materialIds[0]].emissive = new THREE.rgba();
+                // console.log("rep: ", representation);
+                // break;
             case "model3d":
                 console.log("it's a model3d");
-                geometry = new THREE.ObjectLoader().load(representation.filepath);
+                const loader = new GLTFLoader();
+                const s = this.app.scene;
+                loader.load(representation.filepath, function (gltf) {
+                    gltf.scene.traverse(function (child) {
+                        if ((child).isMesh) {
+                            const m = child
+                            m.receiveShadow = true
+                            m.castShadow = true
+                        }
+                        if ((child).isLight) {
+                            const l = child
+                            l.castShadow = true
+                            l.shadow.bias = -0.003
+                            l.shadow.mapSize.width = 2048
+                            l.shadow.mapSize.height = 2048
+                        }
+                    })
+                    s.add(gltf.scene)
+                },);
                 break;
             case "nurbs":
                 console.log("it's a nurbs");
@@ -450,6 +544,8 @@ class MyContents  {
             }
         }
         
+
+
     }
 
     update() {
