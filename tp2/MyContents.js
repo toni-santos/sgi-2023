@@ -244,7 +244,7 @@ class MyContents  {
     }
 
     renderMaterials(materials) {
-        this.app.wireframe = true;
+        this.app.wireframe = false;
         this.app.wireframes = [];
         for (const materialKey in materials) {
             const materialData = materials[materialKey];
@@ -497,12 +497,64 @@ class MyContents  {
                 geometry = builder.build(representation.controlpoints, representation.degree_u, representation.degree_v, representation.parts_u, representation.parts_v);
                 geometry.translate(-center_x, -center_y, -center_z);
                 break;
+            case "polygon":
+                console.log("it's a polygon", representation);
+                geometry = new THREE.BufferGeometry();
+                const angle = 2 * Math.PI / representation.slices;
+                let step = representation.radius / representation.stacks;
+                const vertices = [];
+
+                for (let i = 0; i < representation.stacks; i++) {
+                    for (let j = 0; j < representation.slices; j++) {
+                        vertices.push(
+                            Math.cos(angle * j) * (step * i),
+                            Math.sin(angle * j) * (step * i),
+                            0
+                        );
+                    }
+                }
+
+                const indices = [];
+                
+                for (let k = 0; k < representation.stacks; k++) {
+                    for (let l = 0; l < representation.slices; l++) {
+                        // triangle 1
+                        indices.push(l % representation.slices+(k * (representation.slices)));
+                        indices.push(l % representation.slices+(k * (representation.slices))+1);
+                        indices.push(l % representation.slices+((k+1) * (representation.slices)));
+                        // triangle 2
+                        indices.push(l % representation.slices+(k * (representation.slices))+1);
+                        indices.push(l % representation.slices+((k+1) * (representation.slices))+1);
+                        indices.push(l % representation.slices+((k+1) * (representation.slices)));
+                    }
+                }
+
+                const colors = [];
+                const start = representation.color_c;
+                const end = representation.color_p;
+                for (let i = 0; i < representation.stacks; i++) {
+                    for (let j = 0; j < representation.slices; j++) {
+                        console.log("jxckzmxcv",i * step);
+                        const inter = new THREE.Color().lerpColors(start, end, i * step ).toArray();
+                        for(const comp of inter)
+                            colors.push(comp)
+                    }
+                }
+
+                geometry.setIndex( indices );
+                geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+                geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+                const material = new THREE.MeshBasicMaterial( { vertexColors: true, side: THREE.BackSide } );
+                const mesh = new THREE.Mesh( geometry, material );
+                mesh.castShadow = true;
+                mesh.receiveShadow = true;        
+                return mesh;
             default:
                 console.log("it's something else");
                 console.log("else", representation);
                 break;
         }
-        const mesh = new THREE.Mesh(geometry, this.materials[objectData.materialIds[0]]);
+        const mesh = new THREE.Mesh(geometry, this.materials[objectData.materialIds[0]] ?? this.mat);
         mesh.castShadow = true;
         mesh.receiveShadow = true;
         return mesh;
