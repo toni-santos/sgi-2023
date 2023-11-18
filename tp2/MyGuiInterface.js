@@ -37,6 +37,11 @@ class MyGuiInterface  {
             ])
             .name("active camera");
         cameraFolder.open();
+        this.datgui.add(this.app, "wireframe").name("wireframe").onChange((value) => {
+            this.app.wireframes.forEach((wireframe) => {
+                wireframe.wireframe = value;
+            });
+        });
     }
 }
 

@@ -244,6 +244,8 @@ class MyContents  {
     }
 
     renderMaterials(materials) {
+        this.app.wireframe = true;
+        this.app.wireframes = [];
         for (const materialKey in materials) {
             const materialData = materials[materialKey];
             console.log(`the texture id is ${materialData.textureref} for material ${materialData.id}`);
@@ -266,6 +268,10 @@ class MyContents  {
                     flatShading: materialData.shading === 'flat',
                     map: this.textures[materialData.textureref]
                 });
+            if (materialData.wireframe) {
+                this.app.wireframes.push(material);
+                material.wireframe = this.app.wireframe;
+            }
             this.materials[materialData.id] = material;
         };
         console.log("Materials: ", this.materials);
@@ -339,12 +345,6 @@ class MyContents  {
             }
             return lod;
         }
-    }
-
-    resetTransformations(mesh) {
-        mesh.rotation.set(0, 0, 0);
-        mesh.position.set(0, 0, 0);
-        mesh.scale.set(1, 1, 1);
     }
 
     transformObject(transformations) {
@@ -537,9 +537,6 @@ class MyContents  {
                 }
             }
         }
-        
-
-
     }
 
     update() {
