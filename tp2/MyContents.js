@@ -43,7 +43,7 @@ class MyContents  {
         }
 
         this.reader = new MyFileReader(app, this, this.onSceneLoaded);
-		this.reader.open("scenes/demo/demo.xml");
+		this.reader.open("scenes/test/SGI_TP2_XML_T04_G06_v01.xml");
     }
 
     /**
@@ -291,7 +291,7 @@ class MyContents  {
 
         if (nodeData === undefined) {
             console.log(`Object ${parentData.id} is applying this materialId: `, parentData.materialIds[0]);
-            if (parentData.children[index].id?.includes("light")) return this.createLight(parentData.children[index]);
+            if (parentData.children[index].type?.includes("light")) return this.createLight(parentData.children[index]);
             return this.createPrimitive(nodeId, parentData, index);
         }
 
@@ -430,12 +430,13 @@ class MyContents  {
                 break;
             case "sphere":
                 console.log("it's a sphere");
-                const radius = representation.radius * Math.PI / 180;
-                const thetastart = representation.thetastart * Math.PI / 180;
-                const thetalength = representation.thetalength * Math.PI / 180;
-                const phistart = representation.phistart * Math.PI / 180;
-                const philength = representation.philength * Math.PI / 180;
-                geometry = new THREE.SphereGeometry(radius, representation.slices, representation.stacks, phistart, philength, thetastart, thetalength);
+                const radius = representation.radius ?? 1;
+                const thetastart = (representation.thetastart) ?? 0;
+                const thetalength = (representation.thetalength) ?? Math.PI;
+                const phistart = (representation.phistart) ?? 0;
+                const philength = (representation.philength) ?? Math.PI * 2;
+                geometry = new THREE.SphereGeometry(radius, (representation.slices) ?? 32, (representation.stacks) ?? 16, phistart, philength, thetastart, thetalength);
+                console.log("new sphere: ", geometry);
                 break;
             case "triangle":
                 console.log("it's a triangle");
@@ -518,11 +519,12 @@ class MyContents  {
     createSceneGraph(objects) {
         const rootNodeChildIds = objects[this.data.rootId].children.map((node) => node.id ?? node.subtype);
         console.log("in the scene: ", rootNodeChildIds);
-        const graph = new MyGraph(Object.keys(objects).concat(this.data.primitiveIds).concat(rootNodeChildIds));
+        const graph = new MyGraph(Object.keys(objects).concat(this.data.primitiveIds).concat(rootNodeChildIds).concat(["pointlight", "directionallight", "spotlight"]));
         for (const objectKey in objects) {
             const objectData = objects[objectKey];
             for (const child of objectData.children) {
-                graph.addEdge(objectData.id, child.id ?? child.subtype);
+                const id = child.type?.includes("light") ? child.type : child.id ?? child.subtype;
+                graph.addEdge(objectData.id, id);
             }
         }
         graph.printGraph(this.data.rootId);
