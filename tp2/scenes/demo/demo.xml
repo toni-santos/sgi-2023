@@ -146,12 +146,10 @@
 			
     </materials> 
 
-    <graph rootid="scene"> 
+    <graph rootid="scene"> 		
         <lod id="demo" near="0" far="1000" > 
-            <noderef id="rectangle2" mindist="5" />
+            <noderef id="tree" mindist="5" />
             <noderef id="rectangle2" mindist="10"/>
-            <noderef id="rectangle2" mindist="100"/>
-            <noderef id="rectangle2" mindist="500"/>
         </lod>
 		
 		<node id="scene" castshadows = "true" receiveshadows="true"> 
@@ -160,8 +158,9 @@
 				<noderef id="rightWall" /> 
 				<noderef id="floor" /> 
 				<noderef id="table" /> 
+                <lodref id="demo" />
 				 
-				<noderef id="tree" /> 
+				<!-- <noderef id="tree" />  -->
 				<noderef id="policeWarning1" /> 
 				<noderef id="policeWarning2" />
 				<noderef id="crimeWeapon" />
@@ -225,7 +224,6 @@
                 <primitive>          
                     <rectangle xy1="-0.5 -0.5" xy2="0.5 0.5" />
                 </primitive> 
-                <lodref id="demo" />
             </children> 
         </node>
 		
@@ -622,6 +620,7 @@
                 </primitive>
                 <primitive>
                     <box xyz1="-0.5 -0.5 -0.5" xyz2="0.5 0.5 0.5" />
+                    <polygon radius="2.0" slices="12" stacks="3" color_c="1 0 0 1" color_p="1 1 0 1" />
                 </primitive>
 
             </children> 

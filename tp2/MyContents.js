@@ -119,13 +119,14 @@ class MyContents  {
         console.log("---- Render phase ----");
         console.log(data);
         this.data = data;
+        const allObjs = {...data.nodes, ...data.lods};
         this.renderGlobals(data.options);
         this.renderCameras(data.cameras);
         this.renderSkybox(data.skyboxes);
         this.renderTextures(data.textures);
         this.renderMaterials(data.materials);
-        this.renderObjects(data.nodes);
-        this.displayObjects(data.nodes);
+        this.renderObjects(allObjs);
+        this.displayObjects(allObjs);
     }
 
     renderGlobals(opt) {
@@ -282,51 +283,62 @@ class MyContents  {
     }
 
     renderObject(nodeId, objects, visited, parentData=undefined, idx=0) {
-        let group = new THREE.Group();
-        group.castShadow = true;
-        group.receiveShadow = true;
-        let childMesh = null;
-        let index = idx;
         const nodeData = objects[nodeId];
 
-        if (nodeData === undefined) {
-            console.log(`Object ${parentData.id} is applying this materialId: `, parentData.materialIds[0]);
-            if (parentData.children[index].type?.includes("light")) return this.createLight(parentData.children[index]);
-            return this.createPrimitive(nodeId, parentData, index);
+        if (nodeData?.type !== "lod" ) {
+            let group = new THREE.Group();
+            group.castShadow = true;
+            group.receiveShadow = true;
+            let childMesh = null;
+            let index = idx;
+    
+            if (nodeData === undefined) {
+                console.log(`Object ${parentData.id} is applying this materialId: `, parentData.materialIds[0]);
+                if (parentData.children[index].type?.includes("light")) return this.createLight(parentData.children[index]);
+                return this.createPrimitive(nodeId, parentData, index);
+            }
+    
+            index = 0;
+    
+            for (const childId of this.sceneGraph.getNode(nodeId)) {
+                console.log("renderObject", nodeData, objects[childId]);
+                if (visited[childId] === undefined) {
+                    visited[childId] = []
+                }
+                if (nodeId !== this.data.rootId && parentData.materialIds?.length !== 0 && nodeData.materialIds?.length === 0) {
+                    nodeData.materialIds = parentData.materialIds;
+                    console.log(`Passing ${parentData.materialIds[0]} to ${nodeId}`);
+                }
+                const createdMesh = this.renderObject(childId, objects, visited, nodeData, index);
+                visited[childId].push(createdMesh);
+                
+                childMesh = createdMesh.clone();
+                console.log(childMesh)
+    
+                // transform
+                if (nodeData.transformations.length > 0) {
+                    console.log(nodeData.id);
+                    const newMatrix = this.transformObject(nodeData.transformations);
+                    console.log("newMatrix: ", newMatrix);
+                    childMesh.applyMatrix4(newMatrix);
+                }
+                
+    
+                group.add(childMesh);
+    
+                index += 1;
+            }
+    
+            return group;    
+        } else {
+            const lod = new THREE.LOD();
+            for (const child of nodeData.children) {
+                console.log(child);
+                const mesh = this.renderObject(child.node.id, objects, visited, parentData);
+                lod.addLevel(mesh, child.mindist);
+            }
+            return lod;
         }
-
-        index = 0;
-
-        for (const childId of this.sceneGraph.getNode(nodeId)) {
-            console.log("renderObject", nodeData, objects[childId]);
-            if (visited[childId] === undefined) {
-                visited[childId] = []
-            }
-            if (nodeId !== this.data.rootId && parentData.materialIds.length !== 0 && nodeData.materialIds.length === 0) {
-                nodeData.materialIds = parentData.materialIds;
-                console.log(`Passing ${parentData.materialIds[0]} to ${nodeId}`);
-            }
-            const createdMesh = this.renderObject(childId, objects, visited, nodeData, index);
-            visited[childId].push(createdMesh);
-            
-            childMesh = createdMesh.clone();
-            console.log(childMesh)
-
-            // transform
-            if (nodeData.transformations.length > 0) {
-                console.log(nodeData.id);
-                const newMatrix = this.transformObject(nodeData.transformations);
-                console.log("newMatrix: ", newMatrix);
-                childMesh.applyMatrix4(newMatrix);
-            }
-            
-
-            group.add(childMesh);
-
-            index += 1;
-        }
-
-        return group;
     }
 
     resetTransformations(mesh) {
@@ -453,26 +465,6 @@ class MyContents  {
                 geometry = new THREE.BoxGeometry(width, height, depth, representation.parts_x, representation.parts_y, representation.parts_z);
                 geometry.translate(center_x, center_y, center_z);
                 break;  
-            // case "skybox":
-                // console.log("it's a skybox");
-                
-                // const x = representation.size[0];
-                // const y = representation.size[1];
-                // const z = representation.size[2];
-                
-                // const top = new THREE.PlaneGeometry(x, z, 1, 1);
-                // const bottom = new THREE.PlaneGeometry(x, z, 1, 1);
-                // const left = new THREE.PlaneGeometry(x, y, 1, 1);
-                // const right = new THREE.PlaneGeometry(x, y, 1, 1);
-                // const front = new THREE.PlaneGeometry(z, y, 1, 1);
-                // const back = new THREE.PlaneGeometry(z, y, 1, 1);
-
-                // const mesh = new THREE.Mesh(geometry, this.materials[objectData.materialIds[0]]);
-                // const originalEm = this.materials[objectData.materialIds[0]].emissive;
-
-                // this.materials[objectData.materialIds[0]].emissive = new THREE.rgba();
-                // console.log("rep: ", representation);
-                // break;
             case "model3d":
                 console.log("it's a model3d");
                 const loader = new GLTFLoader();
