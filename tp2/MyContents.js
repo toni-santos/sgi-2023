@@ -533,12 +533,12 @@ class MyContents  {
     }
 
     displayObjects(objects) {
-
+        console.log("meshes: ", this.meshes);
         for (const key of objects[this.data.rootId].children) {
-            console.log(key);
-            const meshes = this.meshes[key.id] ?? [];
+            console.log("key: ", key);
+            const meshes = this.meshes[key.id] ?? this.meshes[key.type] ?? [];
             if (meshes.length >= 1) {
-                console.log(key.id);
+                console.log("key.id: ", key.id);
                 for (const mesh of meshes) {
                     this.app.scene.add(mesh);
                     console.log("added mesh ", mesh);
