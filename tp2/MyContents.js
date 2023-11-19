@@ -238,9 +238,27 @@ class MyContents  {
             texture.anisotropy = textureData.anisotropy;
             texture.magFilter = eval(`THREE.${textureData.magFilter}`);
             texture.minFilter = eval(`THREE.${textureData.minFilter}`);
+            if (textureData.mipmaps) {
+                texture.generateMipmaps = false;
+
+                if (textureData.mipmap0) this.loadMipmap(texture, textureData.mipmap0, 0);
+                if (textureData.mipmap1) this.loadMipmap(texture, textureData.mipmap1, 1);
+                if (textureData.mipmap2) this.loadMipmap(texture, textureData.mipmap2, 2);
+                if (textureData.mipmap3) this.loadMipmap(texture, textureData.mipmap3, 3);
+                if (textureData.mipmap4) this.loadMipmap(texture, textureData.mipmap4, 4);
+                if (textureData.mipmap5) this.loadMipmap(texture, textureData.mipmap5, 5);
+                if (textureData.mipmap6) this.loadMipmap(texture, textureData.mipmap6, 6);
+                if (textureData.mipmap7) this.loadMipmap(texture, textureData.mipmap7, 7);
+            }
             this.textures[textureData.id] = texture;
         };
         console.log("Textures: ", this.textures);
+    }
+
+    loadMipmap(parent, texture, level) {
+        const image = new THREE.TextureLoader().load(texture, (texture) => {
+            parent.mipmaps[level] = image.image;
+        });
     }
 
     renderMaterials(materials) {
@@ -534,7 +552,6 @@ class MyContents  {
                 const end = representation.color_p;
                 for (let i = 0; i < representation.stacks; i++) {
                     for (let j = 0; j < representation.slices; j++) {
-                        console.log("jxckzmxcv",i * step);
                         const inter = new THREE.Color().lerpColors(start, end, i * step ).toArray();
                         for(const comp of inter)
                             colors.push(comp)
