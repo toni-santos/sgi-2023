@@ -151,17 +151,17 @@ class MyContents  {
                     const perspective = new THREE.PerspectiveCamera(camera.angle, 1, camera.near, camera.far);
                     perspective.position.set(...camera.location);
                     perspective.lookAt(camera.target);
-                    this.app.cameras[camera.id] = perspective;
+                    this.cameras[camera.id] = perspective;
                     break;
                 case "orthogonal":
                     const orthogonal = new THREE.OrthographicCamera(camera.left, camera.right, camera.top, camera.bottom, camera.near, camera.far);
                     orthogonal.position.set(...camera.location);
                     orthogonal.lookAt(camera.target);
-                    this.app.cameras[camera.id] = orthogonal;
+                    this.cameras[camera.id] = orthogonal;
                     break;
             }
         };
-        this.cameras = this.app.cameras;
+        this.app.cameras = this.cameras;
         console.log("Cameras: ", this.cameras);
     }
 
@@ -256,6 +256,7 @@ class MyContents  {
                 if (textureData.mipmap7) this.loadMipmap(texture, textureData.mipmap7, 7);
             }
             else {
+                texture.generateMipmaps = true;
                 texture.magFilter = eval(`THREE.${textureData.magFilter}`);
                 texture.minFilter = eval(`THREE.${textureData.minFilter}`);
             }
