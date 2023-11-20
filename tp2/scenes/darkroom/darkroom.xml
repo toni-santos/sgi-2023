@@ -29,6 +29,7 @@
         <texture id="topTex" filepath="scenes/darkroom/textures/plastic_table.jpg" />
         <texture id="legTex" filepath="scenes/darkroom/textures/metal.jpg" />
         <texture id="carpetTex" filepath="scenes/darkroom/textures/carpet.jpg" />
+        <texture id="filmTex" filepath="scenes/darkroom/textures/film.jpg" />
     </textures> 
 
     <skybox size="100 100 100"
@@ -112,7 +113,24 @@
             color="0.8 0.4 0.2 1.0"
             specular="0 0 0 0"
             shininess="10"
+            twosided = "true" />
+
+        <material id="rollMat"
+            emissive="0.0 0.0 0.0 1"
+            color="0.89 0.816 0.086 1.0"
+            specular="0 0 0 0"
+            shininess="5"
             twosided = "false" />
+
+        <material id="filmMat"
+            emissive="0.0 0.0 0.0 1"
+            color="1 1 1 1.0"
+            specular="0 0 0 0"
+            textureref="filmTex"
+            texlength_s="1"
+            texlength_t="1"
+            shininess="20"
+            twosided = "true" />
 
         <material id="picMat" 
             emissive="0.0 0.0 0.0 1"
@@ -152,6 +170,19 @@
     </materials> 
 
     <graph rootid="scene"> 
+        <lod id="cameraLOD">
+            <!-- <noderef id="camera3D" mindist="10"/> -->
+            <noderef id="camera" mindist="10"/>
+            <noderef id="cameraLP" mindist="20"/>
+        </lod>
+
+        <lod id="crLOD">
+            <noderef id="cameraRollHD" mindist="10"/>
+            <noderef id="cameraRoll" mindist="15"/>
+            <noderef id="cameraRollLP" mindist="20"/>
+        </lod>
+
+
         <node id="scene"> 
             <children>
                 <noderef id="floor" />
@@ -345,7 +376,8 @@
             <children>
                 <noderef id="table" />
                 <noderef id="scannerMachine" />
-                <noderef id="camera" />
+                <lodref id="cameraLOD" />
+                <lodref id="crLOD" />
             </children>
         </node>
         
@@ -689,6 +721,133 @@
                 </primitive>
             </children>
         </node>
+
+        <node id="cameraLP">
+            <transforms>
+                <translate value3="3.15 2.58 1" />
+                <rotate value3="90 0 20"/>
+            </transforms>
+
+            <materialref id="cameraMat" />
+
+            <children>
+                <noderef id="cameraLPLens" />
+                <noderef id="cameraBody" />
+            </children>
+        </node>
+
+        <node id="cameraLPLens">
+            <transforms>
+                <translate value3="0 0.2 0" />
+            </transforms>
+
+            <children>
+                <primitive>
+                    <cylinder base="0.125" top="0.125" height="0.25" slices="20" stacks="2" capsclose="true" />
+                </primitive>
+            </children>
+        </node>
+
+        <node id="cameraRollLP">
+            <transforms>
+                <translate value3="4.15 2.48 1" />
+            </transforms>
+
+            <children>
+                <noderef id="crBody" />
+            </children>
+        </node>
+
+        <node id="cameraRoll">
+            <transforms>
+                <translate value3="4.15 2.58 1" />
+            </transforms>
+
+            <children>
+                <noderef id="crBody" />
+                <noderef id="crRibbon" />
+            </children>
+        </node>
+
+        <node id="crBody">
+
+            <materialref id="rollMat" />
+
+            <children>
+                <primitive>
+                    <cylinder base="0.05" top="0.05" height="0.2" slices="20" stacks="2" capsclose="true" />
+                </primitive>
+            </children>
+        </node>
+
+        <node id="crRibbon">
+            <transforms>
+                <translate value3="0.03 0 0.020" />
+                <scale value3="0.1 1 0.1" />
+                <rotate value3="90 0 90"/>
+            </transforms>
+
+            <materialref id="filmMat" />
+
+            <children>
+                <primitive>
+                    <nurbs degree_u="1" degree_v="2" parts_u="20" parts_v="20">
+                        <controlpoint xx="0" yy="0" zz="0" />
+                        <controlpoint xx="0.5" yy="0" zz="0" />
+                        <controlpoint xx="0.5" yy="1" zz="0" />
+
+                        <controlpoint xx="0" yy="0" zz="0.2" />
+                        <controlpoint xx="0.5" yy="0" zz="0.2" />
+                        <controlpoint xx="0.5" yy="1" zz="0.2" />
+
+                    </nurbs>
+                </primitive>
+            </children>
+        </node>
+
+        <node id="cameraRollHD">
+            <transforms>
+                <translate value3="4.15 2.58 1" />
+            </transforms>
+
+            <children>
+                <noderef id="crBody" />
+                <noderef id="crRibbon" />
+                <noderef id="crBottom" />
+                <noderef id="crTop" />
+            </children>
+        </node>
+
+        <node id="crBottom">
+            <transforms>
+                <translate value3="0 -0.1 0" />
+            </transforms>
+
+            <materialref id="cameraMat" />
+
+            <children>
+                <primitive>
+                    <cylinder base="0.07" top="0.07" height="0.02" slices="20" stacks="2" capsclose="true" />
+                </primitive>
+            </children>
+
+        </node>
+
+        <node id="crTop">
+            <transforms>
+                <translate value3="0 0.1 0" />
+            </transforms>
+
+            <materialref id="cameraMat" />
+
+            <children>
+                <primitive>
+                    <cylinder base="0.07" top="0.07" height="0.02" slices="20" stacks="2" capsclose="true" />
+                </primitive>
+            </children>
+
+        </node>
+
 
         <node id="lightPoint">
             <transforms>
