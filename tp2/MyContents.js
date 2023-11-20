@@ -455,7 +455,7 @@ class MyContents  {
         let geometry;
         console.log("Creating primitive ", objectData.children[index]);
         const representation = objectData.children[index].representations[0];
-        let width, height, depth, center_x, center_y, center_z;
+        let width, height, depth, center_x, center_y, center_z, vertices, indices;
         switch (nodeId) {
             case "rectangle":
                 console.log("it's a rectangle");
@@ -482,7 +482,19 @@ class MyContents  {
                 break;
             case "triangle":
                 console.log("it's a triangle");
-                geometry = new THREE.Triangle(representation.xyz1, representation.xyz2, representation.xyz3);
+                geometry = new THREE.BufferGeometry();
+                vertices = [
+                    representation.xyz1[0], representation.xyz1[1], representation.xyz1[2],
+                    representation.xyz2[0], representation.xyz2[1], representation.xyz2[2],
+                    representation.xyz3[0], representation.xyz3[1], representation.xyz3[2],
+                ];
+
+                indices = [
+                    0, 1, 2,
+                ];
+
+                geometry.setIndex( indices );
+                geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
                 break;
             case "box":
                 console.log("it's a box");
@@ -532,7 +544,7 @@ class MyContents  {
                 geometry = new THREE.BufferGeometry();
                 const angle = 2 * Math.PI / representation.slices;
                 let step = representation.radius / representation.stacks;
-                const vertices = [];
+                vertices = [];
 
                 for (let i = 0; i < representation.stacks; i++) {
                     for (let j = 0; j < representation.slices; j++) {
@@ -544,7 +556,7 @@ class MyContents  {
                     }
                 }
 
-                const indices = [];
+                indices = [];
                 
                 for (let k = 0; k < representation.stacks; k++) {
                     for (let l = 0; l < representation.slices; l++) {
@@ -576,7 +588,7 @@ class MyContents  {
                 const material = new THREE.MeshBasicMaterial( { vertexColors: true, side: THREE.BackSide } );
                 const mesh = new THREE.Mesh( geometry, material );
                 mesh.castShadow = true;
-                mesh.receiveShadow = true;        
+                mesh.receiveShadow = true;
                 return mesh;
             default:
                 console.log("it's something else");
