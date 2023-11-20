@@ -450,7 +450,7 @@ class MyContents  {
                 light.position.set(...lightNode.position);
                 light.target.position.set(...lightNode.target);
 
-                // this.app.scene.add(new THREE.SpotLightHelper(light));
+                this.app.scene.add(new THREE.SpotLightHelper(light));
                 break;
         }
         light.castShadow = lightNode.castshadow;
