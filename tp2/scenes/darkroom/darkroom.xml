@@ -50,8 +50,8 @@
             specular="0 0 0 0" 
             shininess="0" 
             textureref="wallTex" 
-            texlength_s="15" 
-            texlength_t="8" 
+            texlength_s="1" 
+            texlength_t="1" 
             twosided = "false" />
 
         <material id="floorMat" 
@@ -162,7 +162,7 @@
 
         <material id="lightPointMat" 
             emissive="0.2 0.0 0.0 0.2"
-            color="0.2 0.0 0.0 0.2"
+            color="0.2 0.0 0.0 0.7"
             specular="1.0 0.0 0.0 0.2"
             shininess="50"
             twosided = "false" />

@@ -276,6 +276,13 @@ class MyContents  {
         for (const materialKey in materials) {
             const materialData = materials[materialKey];
             console.log(`the texture id is ${materialData.textureref} for material ${materialData.id}`);
+            console.log("color: ", materialData.color);
+            const texture = this.textures[materialData.textureref];
+            if (texture !== undefined) {
+                texture.wrapS = THREE.RepeatWrapping;
+                texture.wrapT = THREE.RepeatWrapping;
+                texture.repeat = new THREE.Vector2(1/materialData.texlength_s, 1/materialData.texlength_t);
+            }
             const material = 
             !materialData.bumpref ?
                 new THREE.MeshPhongMaterial({
@@ -284,7 +291,9 @@ class MyContents  {
                     emissive: materialData.emissive,
                     shininess: materialData.shininess,
                     side: materialData.twosided ? THREE.DoubleSide : THREE.FrontSide,
-                    map: this.textures[materialData.textureref]
+                    transparent: materialData.color.a !== 1.0,
+                    opacity: materialData.color.a,
+                    map: texture
                 })
                 :
                 new THREE.MeshStandardMaterial({
@@ -293,7 +302,7 @@ class MyContents  {
                     side: materialData.twosided ? THREE.DoubleSide : THREE.FrontSide,
                     wireframe: materialData.wireframe,
                     flatShading: materialData.shading === 'flat',
-                    map: this.textures[materialData.textureref],
+                    map: texture,
                     bumpMap: this.textures[materialData.bumpref],
                     bumpScale: materialData.bumpscale,
                     specularMap: this.textures[materialData.specularref]
@@ -302,6 +311,7 @@ class MyContents  {
                 this.app.wireframes.push(material);
                 material.wireframe = this.app.wireframe;
             }
+            
             this.materials[materialData.id] = material;
         };
         console.log("Materials: ", this.materials);
@@ -348,7 +358,7 @@ class MyContents  {
                 const createdMesh = this.renderObject(childId, objects, visited, nodeData, index);
                 visited[childId].push(createdMesh);
                 
-                childMesh = createdMesh.clone();
+                childMesh = createdMesh;
                 console.log(childMesh)
     
                 // transform
@@ -630,6 +640,29 @@ class MyContents  {
                 }
             }
         }
+        this.meshes["scannerLens"].map(obj => console.log(obj));
+    }
+
+    changeLensColor(color) {
+        console.log(color);
+        this.meshes["scannerLens"].map(obj =>
+            obj.children.map(child => {
+                if (child.type === "PointLight") child.color = color;
+            })
+        );
+        this.meshes["scannerLens"].map(obj => console.log(obj));
+    }
+
+    changeTrashColor(color) {
+        this.meshes["bucket"][0].children[0].material.color = color;
+    }
+
+    changeTableTopColor(color) {
+        this.meshes["scannerLens"].map(obj =>
+            obj.children.map(child => {
+                if (child.type === "PointLight") child.color = color;
+            })
+        );
     }
 
     update() {
