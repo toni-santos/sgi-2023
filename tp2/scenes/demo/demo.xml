@@ -73,9 +73,9 @@
             texlength_s="15" 
             texlength_t="8" 
             twosided = "true"
-            bumpref = "demo"
+            bumpref = "demoTex"
             bumpscale = "0.5"
-            specularref = "demo" />
+            specularref = "demoTex" />
 		
 		<material id="rightWallApp" 
             emissive="0.0 0.0 0.0 1" 
@@ -150,7 +150,7 @@
     <graph rootid="scene">
         <lod id="demo" near="0" far="1000" > 
             <noderef id="tree" mindist="5" />
-            <noderef id="rectangle2" mindist="10"/>
+            <noderef id="rectangle2" mindist="25"/>
         </lod>
 		
 		<node id="scene" castshadows = "true" receiveshadows="true"> 

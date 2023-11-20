@@ -231,16 +231,20 @@ class MyContents  {
         for (const textureKey in textures) {
             const textureData = textures[textureKey];
             console.log(`the texture id is ${textureData.id} with filepath ${textureData.filepath}`);
+            const video = document.createElement('video');
+            if (textureData.isVideo) {
+                console.log("new video texture!");
+                video.src = textureData.filepath;
+                video.loop = true;
+                video.load();
+                video.play();
+            }
             const texture = textureData.isVideo ? 
-                new THREE.VideoTexture(textureData.filepath)
+                new THREE.VideoTexture(video)
                 :
                 new THREE.TextureLoader().load(textureData.filepath);
             texture.anisotropy = textureData.anisotropy;
-            texture.magFilter = eval(`THREE.${textureData.magFilter}`);
-            texture.minFilter = eval(`THREE.${textureData.minFilter}`);
             if (textureData.mipmaps) {
-                texture.generateMipmaps = false;
-
                 if (textureData.mipmap0) this.loadMipmap(texture, textureData.mipmap0, 0);
                 if (textureData.mipmap1) this.loadMipmap(texture, textureData.mipmap1, 1);
                 if (textureData.mipmap2) this.loadMipmap(texture, textureData.mipmap2, 2);
@@ -250,13 +254,18 @@ class MyContents  {
                 if (textureData.mipmap6) this.loadMipmap(texture, textureData.mipmap6, 6);
                 if (textureData.mipmap7) this.loadMipmap(texture, textureData.mipmap7, 7);
             }
+            else {
+                texture.magFilter = eval(`THREE.${textureData.magFilter}`);
+                texture.minFilter = eval(`THREE.${textureData.minFilter}`);
+                texture.generateMipmaps = false;
+            }
             this.textures[textureData.id] = texture;
         };
         console.log("Textures: ", this.textures);
     }
 
     loadMipmap(parent, texture, level) {
-        const image = new THREE.TextureLoader().load(texture, (texture) => {
+        const image = new THREE.TextureLoader().load(texture, () => {
             parent.mipmaps[level] = image.image;
         });
     }
@@ -268,7 +277,7 @@ class MyContents  {
             const materialData = materials[materialKey];
             console.log(`the texture id is ${materialData.textureref} for material ${materialData.id}`);
             const material = 
-            materialData.specular ?
+            !materialData.bumpref ?
                 new THREE.MeshPhongMaterial({
                     color: materialData.color,
                     specular: materialData.specular,
@@ -284,7 +293,10 @@ class MyContents  {
                     side: materialData.twosided ? THREE.DoubleSide : THREE.FrontSide,
                     wireframe: materialData.wireframe,
                     flatShading: materialData.shading === 'flat',
-                    map: this.textures[materialData.textureref]
+                    map: this.textures[materialData.textureref],
+                    bumpMap: this.textures[materialData.bumpref],
+                    bumpScale: materialData.bumpscale,
+                    specularMap: this.textures[materialData.specularref]
                 });
             if (materialData.wireframe) {
                 this.app.wireframes.push(material);
