@@ -155,8 +155,10 @@
         <node id="scene"> 
             <children>
                 <noderef id="floor" />
-                <noderef id="leftWall" />
-                <noderef id="rightWall" />
+                <noderef id="nxWall" />
+                <noderef id="nzWall" />
+                <noderef id="pxWall" />
+                <noderef id="pzWall" />
                 <noderef id="tableItems1" />
                 <noderef id="tableItems2" />
                 <noderef id="tableItems3" />
@@ -196,7 +198,7 @@
             </children> 
         </node>
 
-        <node id="leftWall">
+        <node id="nxWall">
 			<transforms>
 				<translate value3="0 0 15" />
 				<rotate value3="0.0 90 0.0" />
@@ -210,8 +212,38 @@
                 </primitive>
             </children> 
         </node>
+
+        <node id="pxWall">
+			<transforms>
+				<translate value3="15 0 15" />
+				<rotate value3="0.0 180 0.0" />
+            </transforms> 
+
+			<materialref id="wallMat" />
+			
+            <children>             
+                <primitive>
+                    <rectangle xy1="0 0" xy2="15 8" />
+                </primitive>
+            </children> 
+        </node>
+
+        <node id="pzWall">
+			<transforms>
+				<translate value3="15 0 0" />
+				<rotate value3="0.0 -90 0.0" />
+            </transforms> 
+
+			<materialref id="wallMat" />
+			
+            <children>             
+                <primitive>
+                    <rectangle xy1="0 0" xy2="15 8" />
+                </primitive>
+            </children> 
+        </node>
 		
-		<node id="rightWall">
+		<node id="nzWall">
 			<materialref id="wallMat" />
 			
             <children>             
