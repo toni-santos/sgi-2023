@@ -39,6 +39,7 @@
         <texture id="knobBump" filepath="scenes/darkroom/textures/knob_bump.jpg" />
         <texture id="knobSpec" filepath="scenes/darkroom/textures/knob_spec.jpg" />
         <texture id="vsTex" filepath="scenes/darkroom/textures/22.jpg" />
+        <texture id="vidTex" isVideo="true" filepath="scenes/darkroom/textures/cat_shower.mp4" />
     </textures> 
 
     <skybox size="100 100 100"
@@ -231,6 +232,16 @@
             shininess="2000"
             twosided = "false" />
 
+        <material id="vidMat"
+            emissive="0.0 0.0 0.0 1" 
+			color="0.8 0.8 0.8 1.0" 
+            specular="0 0 0 0" 
+            shininess="0" 
+            textureref="vidTex" 
+            texlength_s="1" 
+            texlength_t="1" 
+            twosided = "false" />
+
     </materials> 
 
     <graph rootid="scene"> 
@@ -316,6 +327,7 @@
                 <primitive>
                     <rectangle xy1="0 0" xy2="15 8" />
                 </primitive>
+                <noderef id="tv" />
             </children> 
         </node>
 
@@ -1142,6 +1154,78 @@
             <children>
                 <primitive>
                     <cylinder top="0.35" base="0.35" height="0.1" slices="20" stacks="10" capsclose="true" />
+                </primitive>
+            </children>
+        </node>
+
+
+        <node id="tv">
+            <transforms>
+                <translate value3="0.8 7 10"/>
+                <rotate value3="0 100 0" />
+            </transforms>
+
+            <materialref id="cameraMat" />
+
+            <children>
+                <noderef id="tvScreen"/>
+                <noderef id="tvBack"/>
+                <noderef id="tvBase"/>
+            </children>
+        </node>
+
+        <node id="tvBack">
+            <transforms>
+                <translate value3="0 0 -0.4" />
+                <rotate value3="90 45 0" />
+            </transforms>
+
+            <children>
+                <primitive>
+                    <cylinder top="0.8" base="0.4" height="0.4" slices="4" stacks="10" capsclose="true" />
+                </primitive>
+            </children>
+        </node>
+
+
+        <node id="tvScreen">
+            <children>
+                <noderef id="tvVideo"/>
+                <primitive>
+                    <box xyz1="-0.6 -0.6 -0.2" xyz2="0.6 0.6 0.2" />
+                </primitive>
+            </children>
+        </node>
+
+        <node id="tvVideo">
+            <transforms>
+                <translate value3="0 0 0.21" />
+            </transforms>
+
+            <materialref id="vidMat" />
+
+            <children>
+                <primitive>
+                    <rectangle xy1="-0.5 -0.5" xy2="0.5 0.5"/>
+                </primitive>
+
+                <pointlight id="lighttv" enabled="true" 
+                    color="1 1 1 1" 
+                    intensity="0.1"
+                    castshadow="true"
+                    position="0 0 0.21" />
+            </children> 
+        </node>
+
+        <node id="tvBase">
+            <transforms>
+                <translate value3="0 0 -0.6" />
+                <rotate value3="90 0 0" />
+            </transforms>
+            
+            <children>
+                <primitive>
+                    <cylinder top="0.1" base="0.1" height="0.7" slices="20" stacks="10" capsclose="true" />
                 </primitive>
             </children>
         </node>

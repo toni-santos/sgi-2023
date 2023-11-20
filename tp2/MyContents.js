@@ -239,10 +239,14 @@ class MyContents  {
                 video.load();
                 video.play();
             }
-            const texture = textureData.isVideo ? 
-                new THREE.VideoTexture(video)
-                :
-                new THREE.TextureLoader().load(textureData.filepath);
+            let texture;
+            if (textureData.isVideo) {
+                texture = new THREE.VideoTexture(video);
+                this.textures[textureData.id] = texture;
+                break;
+            } else {
+                texture = new THREE.TextureLoader().load(textureData.filepath);
+            } 
             texture.anisotropy = textureData.anisotropy;
             if (!textureData.mipmaps) {
                 texture.generateMipmaps = false;
@@ -256,6 +260,7 @@ class MyContents  {
                 if (textureData.mipmap7) this.loadMipmap(texture, textureData.mipmap7, 7);
             }
             else {
+                texture.generateMipmaps = true;
                 texture.magFilter = eval(`THREE.${textureData.magFilter}`);
                 texture.minFilter = eval(`THREE.${textureData.minFilter}`);
             }
