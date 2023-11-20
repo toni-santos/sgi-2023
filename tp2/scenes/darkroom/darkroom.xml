@@ -31,6 +31,14 @@
         <texture id="carpetTex" filepath="scenes/darkroom/textures/carpet_tex.jpg" />
         <texture id="carpetBump" filepath="scenes/darkroom/textures/carpet_bump.png" />
         <texture id="filmTex" filepath="scenes/darkroom/textures/film.jpg" />
+        <texture id="vpTex" filepath="scenes/darkroom/textures/vp_tex.jpg" />
+        <texture id="vpBump" filepath="scenes/darkroom/textures/vp_bump.jpg" />
+        <texture id="vcTex" filepath="scenes/darkroom/textures/vc_tex.jpg" />
+        <texture id="vcBump" filepath="scenes/darkroom/textures/vc_bump.jpg" />
+        <texture id="knobTex" filepath="scenes/darkroom/textures/knob_tex.jpg" />
+        <texture id="knobBump" filepath="scenes/darkroom/textures/knob_bump.jpg" />
+        <texture id="knobSpec" filepath="scenes/darkroom/textures/knob_spec.jpg" />
+        <texture id="vsTex" filepath="scenes/darkroom/textures/22.jpg" />
     </textures> 
 
     <skybox size="100 100 100"
@@ -61,8 +69,8 @@
             specular="0 0 0 0" 
             shininess="0" 
             textureref="floorTex" 
-            texlength_s="1" 
-            texlength_t="1" 
+            texlength_s="0.25" 
+            texlength_t="0.25" 
             twosided = "false" />
 
         <material id="tableLegMat" 
@@ -156,7 +164,7 @@
 
         <material id="cameraMat" 
             emissive="0.0 0.0 0.0 1"
-            color="0.05 0.1 0.07 1.0"
+            color="0.05 0.05 0.05 1.0"
             specular="0 0 0 0"
             shininess="10"
             wireframe = "true"
@@ -175,6 +183,52 @@
             specular="1.0 0.0 0.0 0.2"
             shininess="50"
             wireframe = "true"
+            twosided = "false" />
+
+        <material id="vsMat" 
+            emissive="0 0.0 0.0 0.2"
+            color="1 1 1 1"
+            specular="0 0.0 0.0 0.2"
+            textureref="vsTex"
+            texlength_s="0.75"
+            texlength_t="0.75"
+            shininess="10"
+            twosided = "true" />
+
+        <material id="vpMat" 
+            emissive="0.2 0.0 0.0 0.2"
+            color="1 1 1 0.2"
+            specular="1.0 0.0 0.0 0.2"
+            textureref="vpTex"
+            bumpref="vpBump"
+            texlength_s="1"
+            texlength_t="1"
+            bumpscale="0.02"
+            shininess="10"
+            twosided = "false" />
+            
+        <material id="vcMat" 
+            emissive="0.2 0.0 0.0 0.2"
+            color="1 1 1 0.2"
+            specular="1.0 0.0 0.0 0.2"
+            textureref="vcTex"
+            bumpref="vcBump"
+            texlength_s="1"
+            texlength_t="1"
+            bumpscale="0.1"
+            shininess="10"
+            twosided = "false" />
+
+        <material id="knobMat" 
+            emissive="0 0 0 1"
+            color="1 1 1 1"
+            specular="1 1 1 1"
+            textureref="knobTex"
+            bumpref="knobBump"
+            texlength_s="1"
+            texlength_t="1"
+            bumpscale="0.01"
+            shininess="2000"
             twosided = "false" />
 
     </materials> 
@@ -206,7 +260,7 @@
                 <noderef id="pictures" />
                 <noderef id="carpet" />
                 <noderef id="bucket" />
-
+                <noderef id="vinylCube" />
                 <!-- <directionallight id="light1" enabled="true" 
                     color="1 1 1 1" 
                     intensity="0.2"
@@ -855,6 +909,205 @@
 
         </node>
 
+        <node id="vinyl">
+            <children>
+                <primitive>
+                    <polygon radius="0.5" stacks="3" slices="25" color_c="0.03 0.03 0.03 1" color_p="0 0 0 0" />
+                </primitive>
+            </children>
+        </node>
+
+        <node id="vpVinyl">
+            <transforms>
+                <translate value3="0.25 0.32 0.7" />
+                <rotate value3="-90 0 0" />
+            </transforms>
+
+            <children>
+                <noderef id="vinyl" />
+            </children>
+        </node>
+
+        <node id="vpBase">
+
+            <materialref id="vpMat" />
+
+            <children>
+                <noderef id="vpBody" />
+                <noderef id="vpKnob" />
+            </children>
+        </node>
+
+        <node id="vpBody">
+            <children>
+                <primitive>
+                    <box xyz1="0 0 0" xyz2="1 0.3 1.2" />
+                </primitive>
+            </children>
+        </node>
+
+        <node id="vpKnob">
+            <transforms>
+                <translate value3="0.9 0.3 1.1" />
+            </transforms>
+
+            <materialref id="knobMat" />
+
+            <children>
+                <primitive>
+                    <cylinder base="0.05" top="0.05" height="0.1" slices="20" stacks="2" capsclose="true" />
+                </primitive>
+            </children>
+        </node>
+
+        <node id="vpArm">
+            <children>
+                <noderef id="vpaBase" />
+                <noderef id="vpaNeedle" />
+            </children>
+        </node>
+
+        <node id="vpaBase">
+            <transforms>
+                <translate value3="0.9 0.3 0.1" />
+            </transforms>
+
+            <materialref id="cameraMat" />
+
+            <children>
+                <primitive>
+                    <cylinder base="0.03" top="0.03" height="0.2" slices="20" stacks="2" capsclose="true" />
+                </primitive>
+            </children>
+        </node>
+
+        <node id="vpaNeedle">
+            <transforms>
+                <translate value3="0.75 0.4 0.28" />
+                <rotate value3="0 50 90" />
+            </transforms>
+
+            <materialref id="knobMat" />
+
+            <children>
+                <primitive>
+                    <cylinder base="0.01" top="0.01" height="0.5" slices="20" stacks="2" capsclose="true" />
+                </primitive>
+            </children>
+        </node>
+
+        <node id="vinylPlayer">
+            <transforms>
+                <translate value3="-0.45 1.65 -0.55" />
+            </transforms>
+
+            <children>
+                <noderef id="vpVinyl" />
+                <noderef id="vpArm" />
+                <noderef id="vpBase" />
+            </children>
+        </node>
+
+        <node id="vinylSleeve">
+            <children>
+                <primitive>
+                    <nurbs degree_u="1" degree_v="4" parts_u="20" parts_v="20">
+                        <controlpoint xx="0" yy="0" zz="0"/>
+                        <controlpoint xx="0.5" yy="0.05" zz="0"/>
+                        <controlpoint xx="1" yy="0" zz="0"/>
+                        <controlpoint xx="0.5" yy="-0.05" zz="0"/>
+                        <controlpoint xx="0" yy="0" zz="0"/>
+
+                        <controlpoint xx="0" yy="0" zz="1.2"/>
+                        <controlpoint xx="0.5" yy="0" zz="1.2"/>
+                        <controlpoint xx="1" yy="0" zz="1.2"/>
+                        <controlpoint xx="0.5" yy="0" zz="1.2"/>
+                        <controlpoint xx="0" yy="0" zz="1.2"/>
+                    </nurbs>
+                </primitive>
+            </children>
+        </node>
+
+        <node id="vinylCube">
+            <transforms>
+                <translate value3="0.75 0 6" />
+                <rotate value3="0 90 0" />
+            </transforms>
+
+            <materialref id="vcMat" />
+
+            <children>
+                <noderef id="vinylPlayer" />
+                <noderef id="vs1" />
+                <noderef id="vcBase" />
+                <noderef id="vcTop" />
+                <noderef id="vcLeft" />
+                <noderef id="vcRight" />
+            </children>
+        </node>
+
+        <node id="vcBase">
+            <transforms>
+                <translate value3="0.0725 0 0" />
+            </transforms>
+
+            <children>
+                <primitive>
+                    <box xyz1="-0.6 0 -0.75" xyz2="0.6 0.15 0.75" />
+                </primitive>
+            </children>
+        </node>
+
+        <node id="vcTop">
+            <transforms>
+                <translate value3="0.0725 1.5 0" />
+            </transforms>
+
+            <children>
+                <primitive>
+                    <box xyz1="-0.6 0 -0.75" xyz2="0.6 0.15 0.75" />
+                </primitive>
+            </children>
+        </node>
+
+        <node id="vcLeft">
+            <transforms>
+                <translate value3="-0.6725 0 0" />
+            </transforms>
+
+            <children>
+                <primitive>
+                    <box xyz1="0 0 -0.75" xyz2="0.15 1.65 0.75" />
+                </primitive>
+            </children>
+        </node>
+
+        <node id="vcRight">
+            <transforms>
+                <translate value3="0.6725 0 0" />
+            </transforms>
+
+            <children>
+                <primitive>
+                    <box xyz1="0 0 -0.75" xyz2="0.15 1.65 0.75" />
+                </primitive>
+            </children>
+        </node>
+
+        <node id="vs1">
+            <transforms>
+                <rotate value3="90 20 90" />
+                <translate value3="-0.6 0.005 -0.825" />
+                <scale value3="2.2 1 1.1" />
+            </transforms>
+
+            <materialref id="vsMat" /> 
+
+            <children>
+                <noderef id="vinylSleeve" />
+            </children>
+        </node>
+
 
         <node id="lightPoint">
             <transforms>
@@ -873,7 +1126,7 @@
 
                 <pointlight id="light" enabled="true" 
                     color="1 0 0 1" 
-                    intensity="5"
+                    intensity="1"
                     position="0 0.2 0"
                 /> 
             </children>

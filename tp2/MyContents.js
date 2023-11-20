@@ -553,49 +553,53 @@ class MyContents  {
                 console.log("it's a polygon", representation);
                 geometry = new THREE.BufferGeometry();
                 const angle = 2 * Math.PI / representation.slices;
+                const start_c = representation.color_c;
+                const end_c = representation.color_p;
                 let step = representation.radius / representation.stacks;
                 vertices = [];
-
-                for (let i = 0; i < representation.stacks; i++) {
-                    for (let j = 0; j < representation.slices; j++) {
-                        vertices.push(
-                            Math.cos(angle * j) * (step * i),
-                            Math.sin(angle * j) * (step * i),
-                            0
-                        );
-                    }
-                }
-
-                indices = [];
-                
-                for (let k = 0; k < representation.stacks; k++) {
-                    for (let l = 0; l < representation.slices; l++) {
-                        // triangle 1
-                        indices.push(l % representation.slices+(k * (representation.slices)));
-                        indices.push(l % representation.slices+(k * (representation.slices))+1);
-                        indices.push(l % representation.slices+((k+1) * (representation.slices)));
-                        // triangle 2
-                        indices.push(l % representation.slices+(k * (representation.slices))+1);
-                        indices.push(l % representation.slices+((k+1) * (representation.slices))+1);
-                        indices.push(l % representation.slices+((k+1) * (representation.slices)));
-                    }
-                }
-
                 const colors = [];
-                const start = representation.color_c;
-                const end = representation.color_p;
-                for (let i = 0; i < representation.stacks; i++) {
-                    for (let j = 0; j < representation.slices; j++) {
-                        const inter = new THREE.Color().lerpColors(start, end, i * step ).toArray();
-                        for(const comp of inter)
-                            colors.push(comp)
+
+                for (let stack = 0; stack <= representation.stacks; stack++) {
+                    for (let slice = 0; slice < representation.slices; slice++) {
+                        const points = [
+                            [                            
+                                Math.cos(angle * slice) * (step * stack),
+                                Math.sin(angle * slice) * (step * stack),
+                                0
+                            ],
+                            [
+                                Math.cos(angle * (slice + 1)) * (step * stack),
+                                Math.sin(angle * (slice + 1)) * (step * stack),
+                                0
+                            ],
+                            [
+                                Math.cos(angle * (slice + 1)) * (step * (stack + 1)),
+                                Math.sin(angle * (slice + 1)) * (step * (stack + 1)),
+                                0
+                            ],
+                            [
+                                Math.cos(angle * slice) * (step * (stack + 1)),
+                                Math.sin(angle * slice) * (step * (stack + 1)),
+                                0
+                            ]
+                        ];
+                        const colors_v = [
+                            new THREE.Color().lerpColors(start_c, end_c, stack * step).toArray(),
+                            new THREE.Color().lerpColors(start_c, end_c, (stack + 1) * step ).toArray(),
+                        ]
+                        vertices.push(...points[0], ...points[3], ...points[2]);
+                        colors.push(...colors_v[0], ...colors_v[1], ...colors_v[1]);
+                        if (stack !== 0) {
+                            vertices.push(...points[0], ...points[1], ...points[2]);
+                            colors.push(...colors_v[0], ...colors_v[0], ...colors_v[1]);
+                        }
                     }
                 }
-
-                geometry.setIndex( indices );
+              
                 geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
                 geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
-                const material = new THREE.MeshBasicMaterial( { vertexColors: true, side: THREE.BackSide } );
+                geometry.computeVertexNormals();
+                const material = new THREE.MeshPhongMaterial( { vertexColors: true, side: THREE.DoubleSide,  } );
                 const mesh = new THREE.Mesh( geometry, material );
                 mesh.castShadow = true;
                 mesh.receiveShadow = true;
