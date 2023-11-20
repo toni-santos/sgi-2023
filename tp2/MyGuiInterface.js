@@ -17,7 +17,7 @@ class MyGuiInterface  {
         this.datgui =  new GUI();
         this.contents = null;
         this.defaultConf = {
-            color: new THREE.Color(1, 1, 1)
+            color: new THREE.Color(1, 0, 0)
         };
     }
 
@@ -27,6 +27,9 @@ class MyGuiInterface  {
      */
     setContents(contents) {
         this.contents = contents
+        this.trashMaterial = this.contents.meshes["bucket"][0].children[0].material
+        this.tableTopMaterial = this.contents.meshes["tableTop"][0].children[0].material
+        this.mainLight = this.contents.meshes["floor"][0].children[1];
     }
 
     /**
@@ -49,12 +52,27 @@ class MyGuiInterface  {
 
         const colorFolder = this.datgui.addFolder("Colors");
         colorFolder.addColor(this.defaultConf, "color").name("Scanner Lens").onChange(() => {
-            this.contents.changeLensColor(this.defaultConf.color);
+            this.contents.changeColor(this.defaultConf.color, "scannerLens", true);
         });
-        colorFolder.addColor(this.defaultConf, "color").name("Trash Can").onChange(() => {
-            this.contents.changeTrashColor(this.defaultConf.color);
+        colorFolder.addColor(this.trashMaterial, "color").name("Trash Can").onChange((value) => {
+            this.contents.changeColor(value, "bucket", false);
+        });
+        colorFolder.addColor(this.tableTopMaterial, "color").name("Table Top").onChange((value) => {
+            this.contents.changeColor(value, "tableTop", false);
         });
         colorFolder.open();
+
+        const lightFolder = this.datgui.addFolder("Lights");
+        lightFolder.add(this.mainLight, "intensity", 0, 100).name("Main Light Intensity")
+
+        const othersFolder = this.datgui.addFolder("Others");
+        othersFolder.add(this.app, "wireframe").name("wireframe").onChange((value) => {
+            this.app.wireframes.forEach((wireframe) => {
+                wireframe.wireframe = value;
+            });
+        });
+        othersFolder.open();
+
     }
 }
 

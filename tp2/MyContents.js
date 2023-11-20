@@ -640,27 +640,12 @@ class MyContents  {
                 }
             }
         }
-        this.meshes["scannerLens"].map(obj => console.log(obj));
     }
 
-    changeLensColor(color) {
-        console.log(color);
-        this.meshes["scannerLens"].map(obj =>
+    changeColor(color, mesh, isLight) {
+        this.meshes[mesh].map(obj =>
             obj.children.map(child => {
-                if (child.type === "PointLight") child.color = color;
-            })
-        );
-        this.meshes["scannerLens"].map(obj => console.log(obj));
-    }
-
-    changeTrashColor(color) {
-        this.meshes["bucket"][0].children[0].material.color = color;
-    }
-
-    changeTableTopColor(color) {
-        this.meshes["scannerLens"].map(obj =>
-            obj.children.map(child => {
-                if (child.type === "PointLight") child.color = color;
+                isLight ? child.type.toLowerCase().includes("light") ? child.color = color : false : child.color = color;
             })
         );
     }
