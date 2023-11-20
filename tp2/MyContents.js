@@ -244,7 +244,8 @@ class MyContents  {
                 :
                 new THREE.TextureLoader().load(textureData.filepath);
             texture.anisotropy = textureData.anisotropy;
-            if (textureData.mipmaps) {
+            if (!textureData.mipmaps) {
+                texture.generateMipmaps = false;
                 if (textureData.mipmap0) this.loadMipmap(texture, textureData.mipmap0, 0);
                 if (textureData.mipmap1) this.loadMipmap(texture, textureData.mipmap1, 1);
                 if (textureData.mipmap2) this.loadMipmap(texture, textureData.mipmap2, 2);
@@ -257,7 +258,6 @@ class MyContents  {
             else {
                 texture.magFilter = eval(`THREE.${textureData.magFilter}`);
                 texture.minFilter = eval(`THREE.${textureData.minFilter}`);
-                texture.generateMipmaps = false;
             }
             this.textures[textureData.id] = texture;
         };
