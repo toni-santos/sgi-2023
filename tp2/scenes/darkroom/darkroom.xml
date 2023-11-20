@@ -31,6 +31,17 @@
         <texture id="carpetTex" filepath="scenes/darkroom/textures/carpet.jpg" />
     </textures> 
 
+    <skybox size="100 100 100"
+        center="0 0 0" 
+        emissive="1.0 1.0 1.0 1.0" 
+        intensity="1" 
+        up="scenes/darkroom/skybox/posy.jpg" 
+        down="scenes/darkroom/skybox/negy.jpg" 
+        left="scenes/darkroom/skybox/posx.jpg" 
+        right="scenes/darkroom/skybox/negx.jpg" 
+        front="scenes/darkroom/skybox/posz.jpg" 
+        back="scenes/darkroom/skybox/negz.jpg"/>
+
     <materials>		
 		<material id="wallMat" 
             emissive="0.0 0.0 0.0 1" 
@@ -167,26 +178,6 @@
                     target="7 3 0"
                     angle="45"
                     position="7 10 15" /> 
-
-                <pointlight id="light3" enabled="true" 
-                    color="1 0 0 1" 
-                    intensity="1"
-                    position="2.15 4.2 1.8"/>
-
-                <pointlight id="light4" enabled="true" 
-                    color="1 0 0 1" 
-                    intensity="1"
-                    position="7.15 4.2 1.8"/>
-
-                <pointlight id="light5" enabled="true" 
-                    color="1 0 0 1" 
-                    intensity="1"
-                    position="12.15 4.2 1.8"/>
-
-                <pointlight id="light6" enabled="true" 
-                    color="1 0 0 1" 
-                    intensity="0.05"
-                    position="7.15 7 0.4"/>
             </children>
         </node>
 
@@ -442,8 +433,8 @@
                 </primitive>
 
                 <pointlight id="light" enabled="true" 
-                    color="1 1 1 1" 
-                    intensity="100"
+                    color="1 0 0 1" 
+                    intensity="1"
                     position="0 1.75 0.7" 
                 /> 
             </children>

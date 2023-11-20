@@ -43,7 +43,7 @@ class MyContents  {
         }
 
         this.reader = new MyFileReader(app, this, this.onSceneLoaded);
-		this.reader.open("scenes/demo/demo.xml");
+		this.reader.open("scenes/darkroom/darkroom.xml");
     }
 
     /**
@@ -190,17 +190,17 @@ class MyContents  {
             });
 
             material.map = texture.load(skybox.up);
-            const up = new THREE.Mesh(upGeometry, material);
+            const up = new THREE.Mesh(upGeometry, material.clone());
             material.map = texture.load(skybox.down)
-            const down = new THREE.Mesh(downGeometry, material);
+            const down = new THREE.Mesh(downGeometry, material.clone());
             material.map = texture.load(skybox.left)
-            const left = new THREE.Mesh(leftGeometry, material);
+            const left = new THREE.Mesh(leftGeometry, material.clone());
             material.map = texture.load(skybox.right)
-            const right = new THREE.Mesh(rightGeometry, material);
+            const right = new THREE.Mesh(rightGeometry, material.clone());
             material.map = texture.load(skybox.front)
-            const front = new THREE.Mesh(frontGeometry, material);
+            const front = new THREE.Mesh(frontGeometry, material.clone());
             material.map = texture.load(skybox.back)
-            const back = new THREE.Mesh(backGeometry, material);
+            const back = new THREE.Mesh(backGeometry, material.clone());
     
             up.position.set(skybox.center[0], y/2 + skybox.center[1], skybox.center[2]);
             down.position.set(skybox.center[0], -y/2 + skybox.center[1], skybox.center[2]);
@@ -209,8 +209,8 @@ class MyContents  {
             front.position.set(skybox.center[0], skybox.center[1], z/2 + skybox.center[2]);
             back.position.set(skybox.center[0], skybox.center[1], -z/2 + skybox.center[2]);
 
-            up.rotation.set(Math.PI/2, 0, 0);
-            down.rotation.set(-Math.PI/2, 0, 0);
+            up.rotation.set(Math.PI/2, 0, Math.PI);
+            down.rotation.set(-Math.PI/2, 0, Math.PI);
             left.rotation.set(0, Math.PI/2, 0);
             right.rotation.set(0, -Math.PI/2, 0);
             front.rotation.set(0, Math.PI, 0);
