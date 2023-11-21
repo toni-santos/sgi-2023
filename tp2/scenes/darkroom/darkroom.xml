@@ -938,7 +938,7 @@
 
         <node id="cameraRollLP">
             <transforms>
-                <translate value3="4.15 2.48 2" />
+                <translate value3="4.15 2.535 2" />
             </transforms>
 
             <children>
@@ -948,7 +948,7 @@
 
         <node id="cameraRoll">
             <transforms>
-                <translate value3="4.15 2.58 2" />
+                <translate value3="4.15 2.535 2" />
             </transforms>
 
             <children>
@@ -959,7 +959,7 @@
 
         <node id="cameraRollHD">
             <transforms>
-                <translate value3="4.15 2.58 2" />
+                <translate value3="4.15 2.535 2" />
             </transforms>
 
             <children>
@@ -972,7 +972,7 @@
 
         <node id="cameraRollLP2">
             <transforms>
-                <translate value3="1.15 2.48 1" />
+                <translate value3="1.15 2.535 1" />
             </transforms>
 
             <children>
@@ -982,7 +982,7 @@
 
         <node id="cameraRollHD2">
             <transforms>
-                <translate value3="1.15 2.58 1" />
+                <translate value3="1.15 2.535 1" />
             </transforms>
 
             <children>
@@ -995,7 +995,7 @@
 
         <node id="cameraRoll2">
             <transforms>
-                <translate value3="1.15 2.58 1" />
+                <translate value3="1.15 2.535 1" />
             </transforms>
 
             <children>
