@@ -21,6 +21,7 @@ class MyContents  {
         this.materials = [];
         this.sceneGraph = null;
         this.meshes = {};
+        this.helpers = [];
         this.controlsTargets = [];
         this.activeCameraTarget = null;
         this.scenePath = "scenes/darkroom/darkroom.xml";
@@ -332,7 +333,7 @@ class MyContents  {
                 const childMesh = this.renderObject(childId, objects, visited, nodeData, index);
                 visited[childId].push(childMesh);
                 
-                childMesh.name = childId;
+                childMesh.name = nodeId + "_" + childId + index;
                 group.add(childMesh);
     
                 index += 1;
@@ -382,6 +383,7 @@ class MyContents  {
                 
                 const pointLightHelper = new THREE.PointLightHelper(light);
                 pointLightHelper.visible = false;
+                this.helpers.push(pointLightHelper);
                 this.app.scene.add(pointLightHelper);
                 
                 break;
@@ -393,14 +395,20 @@ class MyContents  {
                 light.shadow.camera.left = lightNode.shadowleft;
                 light.shadow.camera.right = lightNode.shadowright;
 
-                // this.app.scene.add(new THREE.CameraHelper(light.shadow.camera));
+                const directionalLightHelper = new THREE.DirectionalLightHelper(light, 5);
+                directionalLightHelper.visible = false;
+                this.helpers.push(directionalLightHelper);
+                this.app.scene.add(directionalLightHelper);
                 break;
             case "spotlight":
-                light = new THREE.SpotLight(lightNode.color, lightNode.intensity, lightNode.distance, lightNode.angle, lightNode.penumbra, lightNode.decay);
+                light = new THREE.SpotLight(lightNode.color, lightNode.intensity, lightNode.distance, lightNode.angle * Math.PI / 190, lightNode.penumbra, lightNode.decay);
                 light.position.set(...lightNode.position);
                 light.target.position.set(...lightNode.target);
 
-                this.app.scene.add(new THREE.SpotLightHelper(light));
+                const spotLightHelper = new THREE.SpotLightHelper(light);
+                spotLightHelper.visible = false;
+                this.helpers.push(spotLightHelper);
+                this.app.scene.add(spotLightHelper);
                 break;
         }
         light.castShadow = lightNode.castshadow;
@@ -579,13 +587,10 @@ class MyContents  {
     changeColor(color, mesh, lightOnly) {
         this.meshes[mesh].map(obj =>
             obj.children.map(child => {
+                console.log(child);
                 lightOnly ? child.type.toLowerCase().includes("light") ? child.color = color : false : child.color = color;
             })
         );
-    }
-
-    changeControlsTarget(targetObj) {
-        return this.app.controls.target.set(...this.controlsTargets[targetObj]);
     }
 
     defineControls() {
@@ -599,6 +604,10 @@ class MyContents  {
         };
 
         this.activeCameraTarget = "Room Center";
+    }
+
+    changeControlsTarget(targetObj) {
+        return this.app.controls.target.set(...this.controlsTargets[targetObj]);
     }
 
     getWorldPos(mesh) {

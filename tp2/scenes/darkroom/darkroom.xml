@@ -211,7 +211,7 @@
             shininess="100"
             twosided = "false" />
 
-        <material id="lightPointMat" 
+        <material id="emergencyLightMat" 
             emissive="0.2 0.0 0.0 0.2"
             color="0.2 0.0 0.0 0.7"
             specular="1.0 0.0 0.0 0.2"
@@ -440,7 +440,7 @@
 			<materialref id="wallMat" />
 			
             <children>      
-                <noderef id="lightPoint"/>       
+                <noderef id="emergencyLight"/>       
                 <primitive>
                     <rectangle xy1="0 0" xy2="15 8" />
                 </primitive>
@@ -661,9 +661,13 @@
                     <cylinder base="1" top="0.5" height="1" slices="4" stacks="4" capsclose="true"/>
                 </primitive>
 
-                <pointlight id="light" enabled="true" 
-                    color="1 0 0 1" 
-                    intensity="1"
+                <spotlight id="scannerLight" enabled="true" 
+                    color="1 0 0 1"
+                    target="0 -10000 0" 
+                    angle="10"
+                    distance="2"
+                    intensity="20"
+                    decay="0.0"
                     position="0 -0.5 0" 
                 /> 
             </children>
@@ -1276,22 +1280,22 @@
         </node>
 
 
-        <node id="lightPoint">
+        <node id="emergencyLight">
             <transforms>
                 <translate value3="7.5 7 0.2" />
                 <rotate value3="90 0 0"/>
             </transforms>
 
-            <materialref id="lightPointMat" />
+            <materialref id="emergencyLightMat" />
 
             <children>
-                <noderef id="lpBase" />
+                <noderef id="elBase" />
 
                 <primitive>
                     <cylinder top="0.2" base="0.3" height="0.4" slices="20" stacks="10" capsclose="true" />
                 </primitive>
 
-                <pointlight id="light" enabled="true" 
+                <pointlight id="eLight" enabled="true" 
                     color="1 0 0 1" 
                     intensity="1"
                     position="0 0.2 0"
@@ -1299,7 +1303,7 @@
             </children>
         </node>
 
-        <node id="lpBase">
+        <node id="elBase">
             <transforms>
                 <translate value3="0 -0.2 0" />
             </transforms>

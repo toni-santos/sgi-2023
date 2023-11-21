@@ -17,7 +17,8 @@ class MyGuiInterface  {
         this.datgui =  new GUI();
         this.contents = null;
         this.defaultConf = {
-            color: new THREE.Color(1, 0, 0)
+            lensColor: new THREE.Color(1, 0, 0),
+            eLightColor: new THREE.Color(1, 0, 0),
         };
     }
 
@@ -51,8 +52,11 @@ class MyGuiInterface  {
         cameraFolder.open();
 
         const colorFolder = this.datgui.addFolder("Colors");
-        colorFolder.addColor(this.defaultConf, "color").name("Scanner Lens").onChange(() => {
-            this.contents.changeColor(this.defaultConf.color, "scannerLens", true);
+        colorFolder.addColor(this.defaultConf, "lensColor").name("Scanner Lens").onChange(() => {
+            this.contents.changeColor(this.defaultConf.lensColor, "scannerLens", true);
+        });
+        colorFolder.addColor(this.defaultConf, "eLightColor").name("Emergency Light").onChange(() => {
+            this.contents.changeColor(this.defaultConf.eLightColor, "emergencyLight", true);
         });
         colorFolder.addColor(this.trashMaterial, "color").name("Trash Can").onChange((value) => {
             this.contents.changeColor(value, "bucket", false);
@@ -69,6 +73,11 @@ class MyGuiInterface  {
         othersFolder.add(this.app, "wireframe").name("Toggle Wireframe").onChange((value) => {
             this.app.wireframes.forEach((wireframe) => {
                 wireframe.wireframe = value;
+            });
+        });
+        othersFolder.add(this.app, "wireframe").name("Toggle Light Helpers").onChange((value) => {
+            this.contents.helpers.forEach((helper) => {
+                helper.visible = value;
             });
         });
         othersFolder.add(this.contents.axis, "visible", false).name("Toggle Axis");
