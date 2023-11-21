@@ -62,7 +62,16 @@
         <texture id="doorTex" filepath="scenes/darkroom/textures/door.jpg" />
         <texture id="curtTex" filepath="scenes/darkroom/textures/curt_tex.jpg" />
         <texture id="curtBump" filepath="scenes/darkroom/textures/curt_bump.jpg" />
-        <texture id="posterTex" filepath="scenes/darkroom/textures/summerslam.jpg" />
+        <texture id="posterTex" filepath="scenes/darkroom/mipmaps/summerslam.jpg"
+            mipmaps="false"
+            mipmap0="scenes/darkroom/mipmaps/s1024.jpg"
+            mipmap1="scenes/darkroom/mipmaps/s512.jpg"
+            mipmap2="scenes/darkroom/mipmaps/s256.jpg"
+            mipmap3="scenes/darkroom/mipmaps/b128.jpg"
+            mipmap4="scenes/darkroom/mipmaps/b64.jpg"
+            mipmap5="scenes/darkroom/mipmaps/b32.jpg"
+            mipmap6="scenes/darkroom/mipmaps/p16.jpg"
+            mipmap7="scenes/darkroom/mipmaps/p8.jpg" />
         <texture id="vidTex" isVideo="true" filepath="scenes/darkroom/textures/cat_shower.mp4" />
     </textures> 
 

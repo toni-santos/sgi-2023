@@ -43,6 +43,7 @@ class MyContents  {
         }
 
         this.reader = new MyFileReader(app, this, this.onSceneLoaded);
+		// this.reader.open("scenes/demo/demo.xml");
 		this.reader.open("scenes/darkroom/darkroom.xml");
     }
 
@@ -242,8 +243,6 @@ class MyContents  {
             let texture;
             if (textureData.isVideo) {
                 texture = new THREE.VideoTexture(video);
-                this.textures[textureData.id] = texture;
-                break;
             } else {
                 texture = new THREE.TextureLoader().load(textureData.filepath);
             } 

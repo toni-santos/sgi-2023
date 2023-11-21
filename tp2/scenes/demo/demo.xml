@@ -41,7 +41,7 @@
 		<texture id="pineTex" filepath="scenes/demo/textures/pine.png" />
 		<texture id="vaseTex" filepath="scenes/demo/textures/vase.png" />
         <texture id="demoTex" filepath="scenes/demo/textures/demo.jpg" 
-            mipmaps="true"
+            mipmaps="false"
             mipmap0="scenes/demo/textures/demo1024.jpg"
             mipmap1="scenes/demo/textures/demo512.jpg"
             mipmap2="scenes/demo/textures/demo256.jpg"
