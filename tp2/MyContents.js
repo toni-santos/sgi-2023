@@ -4,6 +4,7 @@ import { MyAxis } from './MyAxis.js';
 import { MyFileReader } from './parser/MyFileReader.js';
 import { MyGraph } from './MyGraph.js';
 import { MyNurbsBuilder } from './helper/MyNurbsBuilder.js';
+import { MySceneData } from './parser/MySceneData.js';
 
 /**
  *  This class contains the contents of out application
@@ -50,7 +51,7 @@ class MyContents  {
     onSceneLoaded(data) {
         //console.info("scene data loaded " + data + ". visit MySceneData javascript class to check contents for each data item.")
         //this.onAfterSceneLoadedAndBeforeRender(data);
-        this.render(data);
+        this.convert(data);
     }
 
     output(obj, indent = 0) {
@@ -100,20 +101,28 @@ class MyContents  {
         }
     }
 
-    render(data) {
+    /**
+     * Converts all data parsed.
+     * @param {*} data the entire scene data object
+     */
+    convert(data) {
         this.data = data;
         const allObjs = {...data.nodes, ...data.lods};
-        this.renderGlobals(data.options);
-        this.renderCameras(data.cameras);
-        this.renderSkybox(data.skyboxes);
-        this.renderTextures(data.textures);
-        this.renderMaterials(data.materials);
-        this.renderObjects(allObjs);
+        this.convertGlobals(data.options);
+        this.convertCameras(data.cameras);
+        this.convertSkyboxes(data.skyboxes);
+        this.convertTextures(data.textures);
+        this.convertMaterials(data.materials);
+        this.convertObjects(allObjs);
         this.displayObjects(allObjs);
         this.defineControls();
     }
 
-    renderGlobals(opt) {
+    /**
+     * Converts the global parameters parsed.
+     * @param {MySceneData} opt the global options in the scene data object
+     */
+    convertGlobals(opt) {
         if (opt.background !== undefined) {
             let color = opt.background;
             this.app.scene.background = color;
@@ -126,7 +135,11 @@ class MyContents  {
         }
     }
 
-    renderCameras(cameras) {
+    /**
+     * Converts the cameras parsed.
+     * @param {MySceneData} cameras the cameras defined in the scene data object
+     */
+    convertCameras(cameras) {
         this.app.activeCameraName = this.data.activeCameraId;
         for (const cameraKey in cameras) {
             const camera = cameras[cameraKey];
@@ -148,7 +161,11 @@ class MyContents  {
         this.app.cameras = this.cameras;
     }
 
-    renderSkybox(skyboxes) {
+    /**
+     * Converts the skyboxes parsed.
+     * @param {MySceneData} skyboxes the skyboxes defined in the scene data object
+     */
+    convertSkyboxes(skyboxes) {
         for (const skyboxId in skyboxes) {
 
             const skybox = skyboxes[skyboxId];
@@ -210,7 +227,11 @@ class MyContents  {
         }
     }
 
-    renderTextures(textures) {
+    /**
+     * Converts the textures parsed.
+     * @param {MySceneData} textures the textures defined in the scene data object
+     */
+    convertTextures(textures) {
         for (const textureKey in textures) {
             const textureData = textures[textureKey];
             let texture;
@@ -250,7 +271,11 @@ class MyContents  {
         });
     }
 
-    renderMaterials(materials) {
+    /**
+     * Converts the materials parsed.
+     * @param {MySceneData} materials the materials defined in the scene data object
+     */
+    convertMaterials(materials) {
         this.app.wireframe = false;
         this.app.wireframes = [];
         for (const materialKey in materials) {
@@ -294,14 +319,27 @@ class MyContents  {
         };
     }
 
-    renderObjects(objects) {
+    /**
+     * Converts the objects parsed.
+     * @param {MySceneData} objects the objects defined in the scene data object
+     */
+    convertObjects(objects) {
         const meshes = [];
         this.createSceneGraph(objects);
-        this.renderObject(this.data.rootId, objects, meshes);
+        this.convertObject(this.data.rootId, objects, meshes);
         this.meshes = meshes;
     }
 
-    renderObject(nodeId, objects, visited, parentData=undefined, idx=0) {
+    /**
+     * 
+     * @param {string} nodeId the ID of the current node
+     * @param {MySceneData} objects the objects defined in the scene data object
+     * @param {Array} visited the nodes visited (meshes created)
+     * @param {MySceneData | undefined} parentData the data from the parent of the current node.
+     * @param {number} idx the index of the current node in the parent's children array 
+     * @returns A ThreeJS object (Group, LOD or BufferGeometry)
+     */
+    convertObject(nodeId, objects, visited, parentData=undefined, idx=0) {
         const nodeData = objects[nodeId];
 
         if (nodeData?.type !== "lod" ) {
@@ -330,7 +368,7 @@ class MyContents  {
                 if (nodeId !== this.data.rootId && parentData.materialIds?.length !== 0 && nodeData.materialIds?.length === 0) {
                     nodeData.materialIds = parentData.materialIds;
                 }
-                const childMesh = this.renderObject(childId, objects, visited, nodeData, index);
+                const childMesh = this.convertObject(childId, objects, visited, nodeData, index);
                 visited[childId].push(childMesh);
                 
                 childMesh.name = nodeId + "_" + childId + index;
@@ -343,13 +381,18 @@ class MyContents  {
         } else {
             const lod = new THREE.LOD();
             for (const child of nodeData.children) {
-                const mesh = this.renderObject(child.node.id, objects, visited, parentData);
+                const mesh = this.convertObject(child.node.id, objects, visited, parentData);
                 lod.addLevel(mesh, child.mindist);
             }
             return lod;
         }
     }
 
+    /**
+     * Generates the transformation matrix from an array of transformations.
+     * @param {Array} transformations the transformations to be applied.
+     * @returns The appropriate transformation matrix.
+     */
     transformObject(transformations) {
         const matrix = new THREE.Matrix4();
         for (const transformation of transformations) {
@@ -374,6 +417,11 @@ class MyContents  {
         return matrix;
     }
 
+    /**
+     * Converts the light data node into a ThreeJS Light object.
+     * @param {MySceneData} lightNode the light data from the scene data object
+     * @returns a ThreeJS Light object.
+     */
     createLight(lightNode) {
         let light;
         switch (lightNode.type) {
@@ -418,7 +466,13 @@ class MyContents  {
 
         return light;
     }
-
+    /**
+     * 
+     * @param {string} nodeId The id of the current primitive node
+     * @param {MySceneData} objectData The data on the current primitive node's parent.
+     * @param {number} index the index of the current node in the parent's children array
+     * @returns 
+     */
     createPrimitive(nodeId, objectData, index) {
         let geometry;
         const representation = objectData.children[index].representations[0];
@@ -560,6 +614,10 @@ class MyContents  {
         return mesh;
     }
 
+    /**
+     * Generates a MyGraph object (a simple graph representation) which stores the scene graph.
+     * @param {MySceneData} objects the objects defined in the scene data object
+     */
     createSceneGraph(objects) {
         const rootNodeChildIds = objects[this.data.rootId].children.map((node) => node.id ?? node.subtype);
         const graph = new MyGraph(Object.keys(objects).concat(this.data.primitiveIds).concat(rootNodeChildIds).concat(["pointlight", "directionallight", "spotlight"]));
@@ -573,6 +631,11 @@ class MyContents  {
         this.sceneGraph = graph;
     }
 
+
+    /**
+     * Render the objects onto the scene.
+     * @param {MySceneData} objects the objects defined in the scene data object
+     */
     displayObjects(objects) {
         for (const key of objects[this.data.rootId].children) {
             const meshes = this.meshes[key.id] ?? this.meshes[key.type] ?? [];
@@ -587,7 +650,6 @@ class MyContents  {
     changeColor(color, mesh, lightOnly) {
         this.meshes[mesh].map(obj =>
             obj.children.map(child => {
-                console.log(child);
                 lightOnly ? child.type.toLowerCase().includes("light") ? child.color = color : false : child.color = color;
             })
         );
