@@ -50,7 +50,6 @@ class MyNurbsBuilder {
         for (var i = 0; i < controlPoints.length; i += degree2 + 1) {
             let row = [];
             for (let j = i; j <= i + degree2; j++) {
-                console.log("control point ", controlPoints[j]);
                 row.push(controlPoints[j]);
             }
 
@@ -58,7 +57,6 @@ class MyNurbsBuilder {
 
             for (let k = 0; k < row.length; k++) {
                 let item = row[k];
-                console.log("item ", item);
                 newRow.push(
                     new THREE.Vector3(
                         item.xx,
@@ -67,7 +65,6 @@ class MyNurbsBuilder {
                     )
                 );
             }
-            console.log("newRow: ", newRow);
 
             stackedPoints.push(newRow);
         }

@@ -108,6 +108,7 @@ class MyApp  {
                 this.controls = new OrbitControls( this.activeCamera, this.renderer.domElement );
                 this.controls.enableZoom = true;
                 this.controls.update();
+                this.contents.defineControls();
             }
             else {
                 this.controls.object = this.activeCamera

@@ -77,7 +77,7 @@
 
     <skybox size="100 100 100"
         center="0 0 0" 
-        emissive="1.0 1.0 1.0 1.0" 
+        emissive="1.0 1.0 1.0 0" 
         intensity="0.1" 
         up="scenes/darkroom/skybox/posy.jpg" 
         down="scenes/darkroom/skybox/negy.jpg" 
@@ -309,7 +309,7 @@
 
     </materials> 
 
-    <graph rootid="scene"> 
+    <graph rootid="root"> 
         <lod id="cameraLOD">
             <!-- <noderef id="camera3D" mindist="10"/> -->
             <noderef id="camera" mindist="10"/>
@@ -335,7 +335,13 @@
             <noderef id="cameraRollLP2" mindist="20"/>
         </lod>
 
-        <node id="scene"> 
+        <node id="root">
+            <children>
+                <noderef id="scene" />
+            </children>
+        </node>
+
+        <node id="scene">
             <transforms>
                 <translate value3="-7.5 -4 -7.5" />
             </transforms>

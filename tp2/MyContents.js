@@ -9,13 +9,6 @@ import { MyNurbsBuilder } from './helper/MyNurbsBuilder.js';
  *  This class contains the contents of out application
  */
 class MyContents  {
-    /*
-        TODO:
-            - mapear os nomes das primitivas às instancias de tjs (agora só há BoxGeometries)
-            - aplicar transformações
-            - aplicar materiais
-    */
-
     /**
        constructs the object
        @param {MyApp} app The application object
@@ -26,25 +19,14 @@ class MyContents  {
         this.cameras = [];
         this.textures = [];
         this.materials = [];
-        this.objects = [];
         this.sceneGraph = null;
         this.meshes = {};
-        this.mat = new THREE.MeshPhongMaterial({color: 0x00ff00});
-
-        this.objectMap = {
-            cylinder: THREE.CylinderGeometry,
-            rectangle: THREE.PlaneGeometry,
-            triangle: THREE.Triangle,
-            sphere: THREE.SphereGeometry,
-            nurbs: 'wip',
-            box: THREE.BoxGeometry,
-            model3d: 'wip',
-            skybox: 'wip',
-        }
+        this.controlsTargets = [];
+        this.activeCameraTarget = null;
+        this.scenePath = "scenes/darkroom/darkroom.xml";
 
         this.reader = new MyFileReader(app, this, this.onSceneLoaded);
-		// this.reader.open("scenes/demo/demo.xml");
-		this.reader.open("scenes/darkroom/darkroom.xml");
+		this.reader.open(this.scenePath);
     }
 
     /**
@@ -56,6 +38,7 @@ class MyContents  {
             // create and attach the axis to the scene
             this.axis = new MyAxis(this)
             this.app.scene.add(this.axis)
+            this.axis.visible = false;
         }
     }
 
@@ -64,8 +47,8 @@ class MyContents  {
      * @param {MySceneData} data the entire scene data object
      */
     onSceneLoaded(data) {
-        console.info("scene data loaded " + data + ". visit MySceneData javascript class to check contents for each data item.")
-        this.onAfterSceneLoadedAndBeforeRender(data);
+        //console.info("scene data loaded " + data + ". visit MySceneData javascript class to check contents for each data item.")
+        //this.onAfterSceneLoadedAndBeforeRender(data);
         this.render(data);
     }
 
@@ -117,8 +100,6 @@ class MyContents  {
     }
 
     render(data) {
-        console.log("---- Render phase ----");
-        console.log(data);
         this.data = data;
         const allObjs = {...data.nodes, ...data.lods};
         this.renderGlobals(data.options);
@@ -128,6 +109,7 @@ class MyContents  {
         this.renderMaterials(data.materials);
         this.renderObjects(allObjs);
         this.displayObjects(allObjs);
+        this.defineControls();
     }
 
     renderGlobals(opt) {
@@ -163,7 +145,6 @@ class MyContents  {
             }
         };
         this.app.cameras = this.cameras;
-        console.log("Cameras: ", this.cameras);
     }
 
     renderSkybox(skyboxes) {
@@ -231,23 +212,18 @@ class MyContents  {
     renderTextures(textures) {
         for (const textureKey in textures) {
             const textureData = textures[textureKey];
-            console.log(`the texture id is ${textureData.id} with filepath ${textureData.filepath}`);
-            const video = document.createElement('video');
+            let texture;
             if (textureData.isVideo) {
-                console.log("new video texture!");
+                const video = document.createElement('video');
                 video.src = textureData.filepath;
                 video.loop = true;
                 video.load();
                 video.play();
-            }
-            let texture;
-            if (textureData.isVideo) {
                 texture = new THREE.VideoTexture(video);
             } else {
                 texture = new THREE.TextureLoader().load(textureData.filepath);
             } 
-            texture.anisotropy = textureData.anisotropy;
-            if (!textureData.mipmaps) {
+            if (!textureData.mipmaps && textureData.mipmap0) {
                 texture.generateMipmaps = false;
                 if (textureData.mipmap0) this.loadMipmap(texture, textureData.mipmap0, 0);
                 if (textureData.mipmap1) this.loadMipmap(texture, textureData.mipmap1, 1);
@@ -265,7 +241,6 @@ class MyContents  {
             }
             this.textures[textureData.id] = texture;
         };
-        console.log("Textures: ", this.textures);
     }
 
     loadMipmap(parent, texture, level) {
@@ -279,8 +254,6 @@ class MyContents  {
         this.app.wireframes = [];
         for (const materialKey in materials) {
             const materialData = materials[materialKey];
-            console.log(`the texture id is ${materialData.textureref} for material ${materialData.id}`);
-            console.log("color: ", materialData.color);
             const texture = this.textures[materialData.textureref];
             if (texture !== undefined) {
                 texture.wrapS = THREE.RepeatWrapping;
@@ -297,7 +270,7 @@ class MyContents  {
                     side: materialData.twosided ? THREE.DoubleSide : THREE.FrontSide,
                     transparent: materialData.color.a !== 1.0,
                     opacity: materialData.color.a,
-                    map: texture
+                    map: texture ?? null
                 })
                 :
                 new THREE.MeshPhongMaterial({
@@ -306,10 +279,10 @@ class MyContents  {
                     side: materialData.twosided ? THREE.DoubleSide : THREE.FrontSide,
                     wireframe: materialData.wireframe,
                     flatShading: materialData.shading === 'flat',
-                    map: texture,
+                    map: texture ?? null,
                     bumpMap: this.textures[materialData.bumpref],
                     bumpScale: materialData.bumpscale,
-                    specularMap: this.textures[materialData.specularref]
+                    specularMap: this.textures[materialData.specularref] ?? null
                 });
             if (materialData.wireframe) {
                 this.app.wireframes.push(material);
@@ -318,18 +291,13 @@ class MyContents  {
             
             this.materials[materialData.id] = material;
         };
-        console.log("Materials: ", this.materials);
     }
 
     renderObjects(objects) {
+        const meshes = [];
         this.createSceneGraph(objects);
-        console.log("scene graph: ", this.sceneGraph);
-
-        const visited = [];
-        console.log("objects: ", objects[this.data.rootId]);
-        this.renderObject(this.data.rootId, objects, visited);
-        console.log("visited: ", visited);
-        this.meshes = visited;
+        this.renderObject(this.data.rootId, objects, meshes);
+        this.meshes = meshes;
     }
 
     renderObject(nodeId, objects, visited, parentData=undefined, idx=0) {
@@ -339,41 +307,32 @@ class MyContents  {
             let group = new THREE.Group();
             group.castShadow = true;
             group.receiveShadow = true;
-            let childMesh = null;
+            group.matrixAutoUpdate = false;
             let index = idx;
     
             if (nodeData === undefined) {
-                console.log(`Object ${parentData.id} is applying this materialId: `, parentData.materialIds[0]);
                 if (parentData.children[index].type?.includes("light")) return this.createLight(parentData.children[index]);
                 return this.createPrimitive(nodeId, parentData, index);
+            }
+
+            if (nodeData.transformations.length > 0) {
+                const newMatrix = this.transformObject(nodeData.transformations);
+                group.applyMatrix4(newMatrix);
             }
     
             index = 0;
     
             for (const childId of this.sceneGraph.getNode(nodeId)) {
-                console.log("renderObject", nodeData, objects[childId]);
                 if (visited[childId] === undefined) {
                     visited[childId] = []
                 }
                 if (nodeId !== this.data.rootId && parentData.materialIds?.length !== 0 && nodeData.materialIds?.length === 0) {
                     nodeData.materialIds = parentData.materialIds;
-                    console.log(`Passing ${parentData.materialIds[0]} to ${nodeId}`);
                 }
-                const createdMesh = this.renderObject(childId, objects, visited, nodeData, index);
-                visited[childId].push(createdMesh);
+                const childMesh = this.renderObject(childId, objects, visited, nodeData, index);
+                visited[childId].push(childMesh);
                 
-                childMesh = createdMesh;
-                console.log(childMesh)
-    
-                // transform
-                if (nodeData.transformations.length > 0) {
-                    console.log(nodeData.id);
-                    const newMatrix = this.transformObject(nodeData.transformations);
-                    console.log("newMatrix: ", newMatrix);
-                    childMesh.applyMatrix4(newMatrix);
-                }
-                
-    
+                childMesh.name = childId;
                 group.add(childMesh);
     
                 index += 1;
@@ -383,7 +342,6 @@ class MyContents  {
         } else {
             const lod = new THREE.LOD();
             for (const child of nodeData.children) {
-                console.log(child);
                 const mesh = this.renderObject(child.node.id, objects, visited, parentData);
                 lod.addLevel(mesh, child.mindist);
             }
@@ -393,7 +351,6 @@ class MyContents  {
 
     transformObject(transformations) {
         const matrix = new THREE.Matrix4();
-        console.log("transformations: ", transformations);
         for (const transformation of transformations) {
             switch (transformation.type) {
                 case "T":
@@ -404,41 +361,31 @@ class MyContents  {
                     const rotation = transformation.rotation.map((x) => x * Math.PI / 180);
                     const rotationMatrix = new THREE.Matrix4().makeRotationFromEuler(new THREE.Euler(...rotation), "XYZ");
                     matrix.multiply(rotationMatrix);
-                    /*
-                    const rotation = transformation.rotation.map((x) => x * Math.PI / 180);
-                    // mesh.rotation.set(...rotation);
-                    mesh.rotation.x = rotation[0];
-                    mesh.rotation.y = rotation[1];
-                    mesh.rotation.z = rotation[2];
-                    */
                     break;
                 case "S":
                     const scaleMatrix = new THREE.Matrix4().makeScale(...transformation.scale);
                     matrix.multiply(scaleMatrix);
                     break;
                 default:
-                    console.log("unknown transformation type: ", transformation.type);
-                    break;
+                    throw TypeError(`Unsupported transformation type ${transformation.type}.`)
             }
         }
         return matrix;
     }
 
     createLight(lightNode) {
-        console.log("Creating light ", lightNode);
         let light;
         switch (lightNode.type) {
             case "pointlight":
-                console.log("Point light");
                 light = new THREE.PointLight(lightNode.color, lightNode.intensity, lightNode.distance, lightNode.decay);
                 light.position.set(...lightNode.position);
                 
-                // const pointLightHelper = new THREE.PointLightHelper(light);
-                // this.app.scene.add(pointLightHelper);
+                const pointLightHelper = new THREE.PointLightHelper(light);
+                pointLightHelper.visible = false;
+                this.app.scene.add(pointLightHelper);
                 
                 break;
             case "directionallight":
-                console.log("Directional light");
                 light = new THREE.DirectionalLight(lightNode.color, lightNode.intensity);
                 light.position.set(...lightNode.position);
                 light.shadow.camera.top = lightNode.shadowtop;
@@ -449,7 +396,6 @@ class MyContents  {
                 // this.app.scene.add(new THREE.CameraHelper(light.shadow.camera));
                 break;
             case "spotlight":
-                console.log("spotlight");
                 light = new THREE.SpotLight(lightNode.color, lightNode.intensity, lightNode.distance, lightNode.angle, lightNode.penumbra, lightNode.decay);
                 light.position.set(...lightNode.position);
                 light.target.position.set(...lightNode.target);
@@ -467,12 +413,10 @@ class MyContents  {
 
     createPrimitive(nodeId, objectData, index) {
         let geometry;
-        console.log("Creating primitive ", objectData.children[index]);
         const representation = objectData.children[index].representations[0];
         let width, height, depth, center_x, center_y, center_z, vertices, indices;
         switch (nodeId) {
             case "rectangle":
-                console.log("it's a rectangle");
                 width = Math.abs(representation.xy2[0] - representation.xy1[0]);
                 height = Math.abs(representation.xy2[1] - representation.xy1[1]);
                 center_x = (representation.xy2[0] + representation.xy1[0]) / 2;
@@ -481,21 +425,17 @@ class MyContents  {
                 geometry.translate(center_x, center_y, 0);
                 break;
             case "cylinder":
-                console.log("it's a cylinder");
                 geometry = new THREE.CylinderGeometry(representation.top, representation.base, representation.height, representation.slices, representation.stacks, !representation.capsclose, representation.thetastart, representation.thetalength);
                 break;
             case "sphere":
-                console.log("it's a sphere");
                 const radius = representation.radius ?? 1;
                 const thetastart = (representation.thetastart) ?? 0;
                 const thetalength = (representation.thetalength) ?? Math.PI;
                 const phistart = (representation.phistart) ?? 0;
                 const philength = (representation.philength) ?? Math.PI * 2;
                 geometry = new THREE.SphereGeometry(radius, (representation.slices) ?? 32, (representation.stacks) ?? 16, phistart, philength, thetastart, thetalength);
-                console.log("new sphere: ", geometry);
                 break;
             case "triangle":
-                console.log("it's a triangle");
                 geometry = new THREE.BufferGeometry();
                 vertices = [
                     representation.xyz1[0], representation.xyz1[1], representation.xyz1[2],
@@ -511,7 +451,6 @@ class MyContents  {
                 geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
                 break;
             case "box":
-                console.log("it's a box");
                 width = representation.xyz2[0] - representation.xyz1[0];
                 height = representation.xyz2[1] - representation.xyz1[1];
                 depth = representation.xyz2[2] - representation.xyz1[2];
@@ -522,7 +461,6 @@ class MyContents  {
                 geometry.translate(center_x, center_y, center_z);
                 break;  
             case "model3d":
-                console.log("it's a model3d");
                 const loader = new GLTFLoader();
                 const s = this.app.scene;
                 loader.load(representation.filepath, function (gltf) {
@@ -544,8 +482,6 @@ class MyContents  {
                 },);
                 break;
             case "nurbs":
-                console.log("it's a nurbs");
-                console.log("nurb rep: ", representation);
                 center_x = (representation.controlpoints[representation.controlpoints.length - 1].xx + representation.controlpoints[0].xx) / 2;
                 center_y = (representation.controlpoints[representation.controlpoints.length - 1].yy + representation.controlpoints[0].yy) / 2;
                 center_z = (representation.controlpoints[representation.controlpoints.length - 1].zz + representation.controlpoints[0].zz) / 2;
@@ -554,7 +490,6 @@ class MyContents  {
                 geometry.translate(-center_x, -center_y, -center_z);
                 break;
             case "polygon":
-                console.log("it's a polygon", representation);
                 geometry = new THREE.BufferGeometry();
                 const angle = 2 * Math.PI / representation.slices;
                 const start_c = representation.color_c;
@@ -609,11 +544,9 @@ class MyContents  {
                 mesh.receiveShadow = true;
                 return mesh;
             default:
-                console.log("it's something else");
-                console.log("else", representation);
-                break;
+                throw TypeError(`Unsupported primitive type ${nodeId}.`)
         }
-        const mesh = new THREE.Mesh(geometry, this.materials[objectData.materialIds[0]] ?? this.mat);
+        const mesh = new THREE.Mesh(geometry, this.materials[objectData.materialIds[0]]);
         mesh.castShadow = true;
         mesh.receiveShadow = true;
         return mesh;
@@ -621,7 +554,6 @@ class MyContents  {
 
     createSceneGraph(objects) {
         const rootNodeChildIds = objects[this.data.rootId].children.map((node) => node.id ?? node.subtype);
-        console.log("in the scene: ", rootNodeChildIds);
         const graph = new MyGraph(Object.keys(objects).concat(this.data.primitiveIds).concat(rootNodeChildIds).concat(["pointlight", "directionallight", "spotlight"]));
         for (const objectKey in objects) {
             const objectData = objects[objectKey];
@@ -630,32 +562,61 @@ class MyContents  {
                 graph.addEdge(objectData.id, id);
             }
         }
-        graph.printGraph(this.data.rootId);
         this.sceneGraph = graph;
-        console.log(this.sceneGraph);
     }
 
     displayObjects(objects) {
-        console.log("meshes: ", this.meshes);
         for (const key of objects[this.data.rootId].children) {
-            console.log("key: ", key);
             const meshes = this.meshes[key.id] ?? this.meshes[key.type] ?? [];
             if (meshes.length >= 1) {
-                console.log("key.id: ", key.id);
                 for (const mesh of meshes) {
                     this.app.scene.add(mesh);
-                    console.log("added mesh ", mesh);
                 }
             }
         }
     }
 
-    changeColor(color, mesh, isLight) {
+    changeColor(color, mesh, lightOnly) {
         this.meshes[mesh].map(obj =>
             obj.children.map(child => {
-                isLight ? child.type.toLowerCase().includes("light") ? child.color = color : false : child.color = color;
+                lightOnly ? child.type.toLowerCase().includes("light") ? child.color = color : false : child.color = color;
             })
         );
+    }
+
+    changeControlsTarget(targetObj) {
+        return this.app.controls.target.set(...this.controlsTargets[targetObj]);
+    }
+
+    defineControls() {
+        if (!this.scenePath.includes("darkroom")) return;
+        this.controlsTargets = {
+            "Room Center": new THREE.Vector3(0, 0, 0),
+            "Vinyl Player": this.getWorldPos(this.meshes["vinylPlayer"][0]) ?? new THREE.Vector3(0, 0, 0),
+            "Left Table": this.getWorldPos(this.meshes["table"][0]) ?? new THREE.Vector3(0, 0, 0),
+            "Poster": this.getWorldPos(this.meshes["poster"][0]) ?? new THREE.Vector3(0, 0, 0),
+            "TV": this.getWorldPos(this.meshes["tv"][0]) ?? new THREE.Vector3(0, 0, 0),
+        };
+
+        this.activeCameraTarget = "Room Center";
+    }
+
+    getWorldPos(mesh) {
+        if (mesh === undefined) return null;
+        const v = new THREE.Vector3();
+        return mesh.getWorldPosition(v);
+    }
+
+    printDebugInfo() {
+        console.info("--- BEGIN DEBUG ---");
+
+        console.log("Cameras: ", this.cameras);
+        console.log("Textures: ", this.textures);
+        console.log("Materials: ", this.materials);
+        console.log("Meshes: ", this.meshes);
+        this.sceneGraph.printGraph(this.data.rootId);
+
+        console.info("--- END DEBUG ---");
     }
 
     update() {

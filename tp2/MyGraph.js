@@ -17,10 +17,6 @@ class MyGraph {
         return Object.keys(this.nodes);
     }
 
-    getNeighbors(node) {
-        return this.nodes[node];
-    }
-
     getParents(node) {
         let parents = [];
         for (const [parent, children] of Object.entries(this.nodes)) {
@@ -48,8 +44,7 @@ class MyGraph {
             const graphStructure = {
                 [startNode]: this.visit(startNode)
             };
-
-            console.log("Graph: ", JSON.stringify(graphStructure, null, 2));
+            console.log("Graph: ", graphStructure);
         } else {
             throw ReferenceError(`Graph does not have node ${startNode}.`);
         }
@@ -64,17 +59,6 @@ class MyGraph {
 
         return neighbors;
     }
-
-    /**
-    dfs(node) {
-        visited[node] = true;
-        this.nodes[node].forEach(neighbor => {
-            if (!visited[neighbor]) {
-                dfs(neighbor);
-            }
-        });
-    };
-    */
 }
 
 export { MyGraph };
