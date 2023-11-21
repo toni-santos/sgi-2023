@@ -59,13 +59,14 @@
         <texture id="knobBump" filepath="scenes/darkroom/textures/knob_bump.jpg" />
         <texture id="knobSpec" filepath="scenes/darkroom/textures/knob_spec.jpg" />
         <texture id="vsTex" filepath="scenes/darkroom/textures/22.jpg" />
+        <texture id="doorTex" filepath="scenes/darkroom/textures/door.jpg" />
         <texture id="vidTex" isVideo="true" filepath="scenes/darkroom/textures/cat_shower.mp4" />
     </textures> 
 
     <skybox size="100 100 100"
         center="0 0 0" 
         emissive="1.0 1.0 1.0 1.0" 
-        intensity="1" 
+        intensity="0.1" 
         up="scenes/darkroom/skybox/posy.jpg" 
         down="scenes/darkroom/skybox/negy.jpg" 
         left="scenes/darkroom/skybox/posx.jpg" 
@@ -229,9 +230,9 @@
             twosided = "false" />
             
         <material id="vcMat" 
-            emissive="0.2 0.0 0.0 0.2"
+            emissive="0.0 0.0 0.0 0.2"
             color="1 1 1 0.2"
-            specular="1.0 0.0 0.0 0.2"
+            specular="1 1 1 0.2"
             textureref="vcTex"
             bumpref="vcBump"
             texlength_s="1"
@@ -250,6 +251,16 @@
             texlength_t="1"
             bumpscale="0.01"
             shininess="2000"
+            twosided = "false" />
+
+        <material id="doorMat" 
+            emissive="0.0 0.0 0.0 1" 
+			color="0.8 0.8 0.8 1.0" 
+            specular="0 0 0 0" 
+            shininess="0" 
+            textureref="doorTex"
+            texlength_s="1"
+            texlength_t="1"
             twosided = "false" />
 
         <material id="vidMat"
@@ -317,7 +328,7 @@
                 </primitive>
                 <pointlight id="whiteLight" enabled="true" 
                     color="1 1 1 1" 
-                    intensity="0"
+                    intensity="5"
                     castshadow="true"
                     position="7.5 7.5 8" /> 
             </children> 
@@ -351,6 +362,7 @@
                     <rectangle xy1="0 0" xy2="15 8" />
                 </primitive>
                 <noderef id="tv" />
+                <noderef id="door" />
             </children> 
         </node>
 
@@ -1215,7 +1227,7 @@
             <children>
                 <noderef id="tvVideo"/>
                 <primitive>
-                    <box xyz1="-0.6 -0.6 -0.2" xyz2="0.6 0.6 0.2" />
+                    <box xyz1="-0.6 -0.6 -0.2" xyz2="0.6 0.6 0.2" parts_x="1" parts_y="1" parts_z="1" />
                 </primitive>
             </children>
         </node>
@@ -1251,6 +1263,22 @@
                     <cylinder top="0.1" base="0.1" height="0.7" slices="20" stacks="10" capsclose="true" />
                 </primitive>
             </children>
+        </node>
+
+        <node id="door">
+
+            <transforms>
+                <translate value3="0 0 5" />
+            </transforms>
+
+            <materialref id="doorMat" />
+
+            <children>
+                <primitive>
+                    <box xyz1="-0.1 0 -1.5" xyz2="0.1 7 1.5" parts_x="10" parts_y="10" parts_z="10" />
+                </primitive>
+            </children>
+
         </node>
 
     </graph>

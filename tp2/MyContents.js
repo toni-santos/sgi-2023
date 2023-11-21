@@ -301,7 +301,7 @@ class MyContents  {
                     map: texture
                 })
                 :
-                new THREE.MeshStandardMaterial({
+                new THREE.MeshPhongMaterial({
                     color: materialData.color,
                     shininess: materialData.shininess,
                     side: materialData.twosided ? THREE.DoubleSide : THREE.FrontSide,
