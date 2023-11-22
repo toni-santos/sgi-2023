@@ -4,7 +4,7 @@
 | Name             | Number    | E-Mail             |
 | ---------------- | --------- | ------------------ |
 | António Santos         | 202008004 | up202008004@up.pt                |
-| Pedro Silva         | 202004653 | up202004653@up.pt                |
+| Pedro Silva         | 202004653 | up202004985@up.pt                |
 
 ----
 
