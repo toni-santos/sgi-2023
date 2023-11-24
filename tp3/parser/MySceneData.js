@@ -280,10 +280,10 @@ class MySceneData {
             { name: "color_p", type: "rgba" }
         ];
 
-        this.descriptors["track"] = [
-            { name: "road", type: "string" },
-            { name: "route", type: "string" },
-            { name: "obstacles", type: "string" }
+        this.descriptors["circuit"] = [
+            { name: "width", type: "integer" },
+            { name: "track", type: "string" },
+            { name: "route", type: "string" }
         ];
 
         this.descriptors["spotlight"] = [
@@ -425,7 +425,8 @@ class MySceneData {
             "model3d",
             "skybox",
             "lod",
-            "polygon"
+            "polygon",
+            "circuit"
         ];
     }
 

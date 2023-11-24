@@ -27,9 +27,9 @@ class MyXMLContents {
         this.activeCameraTarget = null;
         this.scenePath = "scenes/feupzero/feupzero.xml";
 
+        this.reader = new MyReader(app);
         this.xmlReader = new MyFileReader(app, this, this.onSceneLoaded);
         this.xmlReader.open(this.scenePath);
-        this.reader = new MyReader(app);
     }
 
     /**
@@ -816,8 +816,12 @@ class MyXMLContents {
                 mesh.castShadow = true;
                 mesh.receiveShadow = true;
                 return mesh;
-            case "track":
-                break;
+            case "circuit":
+                const group = new THREE.Group();
+                group.add(this.reader.createTrack(representation.track, representation.width));
+                group.add(this.reader.createRoute(representation.route));
+                this.reader.objects["circuit"] = group;
+                return group;
             default:
                 throw TypeError(`Unsupported primitive type ${nodeId}.`);
         }
