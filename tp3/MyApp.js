@@ -14,6 +14,8 @@ class MyApp {
     constructor() {
         this.scene = null;
         this.stats = null;
+        this.clock = null;
+        this.pressedKeys = [];
 
         // camera related attributes
         this.activeCamera = null;
@@ -27,7 +29,8 @@ class MyApp {
         this.controls = null;
         this.gui = null;
         this.axis = null;
-        this.contents == null;
+        this.contents = null;
+        this.followCamera = false;
     }
     /**
      * initializes the application
@@ -36,6 +39,8 @@ class MyApp {
         // Create an empty scene
         this.scene = new THREE.Scene();
         this.scene.background = new THREE.Color(0x101010);
+
+        this.clock = new THREE.Clock();
 
         this.stats = new Stats();
         this.stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
@@ -59,6 +64,8 @@ class MyApp {
 
         // manage window resizes
         window.addEventListener("resize", this.onResize.bind(this), false);
+        this.setupControls();
+        this.clock.start();
     }
 
     /**
@@ -141,6 +148,45 @@ class MyApp {
         this.gui = gui;
     }
 
+    setupControls() {
+        document.onkeydown = (e) => {
+            if (!["w", "a", "s", "d", " "].includes(e.key)) return;
+            if (e.key == "w") {
+                console.log("w");
+            }
+            if (e.key === "a") {
+                console.log("a");
+            }
+            if (e.key === "s") {
+                console.log("s");
+            }
+            if (e.key === "d") {
+                console.log("d");
+            }
+            if (e.key === " ") {
+                this.followCamera = !this.followCamera;
+            }
+            if (!this.pressedKeys.includes(e.key)) this.pressedKeys.push(e.key);
+        };
+        
+        document.onkeyup = (e) => {
+            if (!["w", "a", "s", "d"].includes(e.key)) return;
+            if (e.key == "w") {
+                console.log("w");
+            }
+            if (e.key === "a") {
+                console.log("a");
+            }
+            if (e.key === "s") {
+                console.log("s");
+            }
+            if (e.key === "d") {
+                console.log("d");
+            }
+            if (this.pressedKeys.includes(e.key)) this.pressedKeys = this.pressedKeys.filter(key => key !== e.key);
+        };
+    }
+
     /**
      * the main render function. Called in a requestAnimationFrame loop
      */
@@ -150,7 +196,7 @@ class MyApp {
 
         // update the animation if contents were provided
         if (this.activeCamera !== undefined && this.activeCamera !== null) {
-            this.contents.update();
+            this.contents.update(this.clock.getElapsedTime());
         }
 
         // required if controls.enableDamping or controls.autoRotate are set to true

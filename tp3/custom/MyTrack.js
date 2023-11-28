@@ -30,7 +30,7 @@ class MyTrack extends THREE.Object3D {
         });
 
         this.curve = new THREE.CatmullRomCurve3(this.points, true, "catmullrom", 0.2);
-        this.points = this.curve.getPoints(30);
+        this.points = this.curve.getPoints(200);
 
         this.curveMesh = this.buildCurve();
         this.track = new THREE.PlaneGeometry( 1, 1, 300, 1 );

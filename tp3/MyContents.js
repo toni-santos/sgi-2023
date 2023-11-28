@@ -38,12 +38,29 @@ class MyContents {
         }
         this.point = new THREE.Vector3(6, 0, 6);
         this.playerVehicle = new MyVehicle(this.app);
-        console.log(this.track);
-        this.playerVehicle.position.set(...this.track.points[0]);
+        this.placeVehicle(this.playerVehicle);
         this.objects.push(this.playerVehicle);
         this.display();
-
         //this.app.scene.add(new MyTrack(this.app));
+    }
+
+    placeVehicle(vehicle) {
+        vehicle.position.set(this.track.points[0].x, this.track.points[0].y + 1, this.track.points[0].z);
+        const q = new THREE.Quaternion();
+        const v = new THREE.Vector3();
+        vehicle.getWorldDirection(v);
+        q.setFromUnitVectors(v, this.track.curve.getTangent(0));
+        const angle = new THREE.Euler();
+        angle.setFromQuaternion(q);
+        vehicle.setRotation(angle.y);
+        vehicle.getWorldDirection(vehicle.orientation);
+    }
+
+    control() {
+        if (this.app.pressedKeys.includes("w")) this.playerVehicle.changeVelocity(0.0008);
+        if (this.app.pressedKeys.includes("s")) this.playerVehicle.changeVelocity(-0.0008);
+        if (this.app.pressedKeys.includes("a")) this.playerVehicle.turn(Math.PI/200);
+        if (this.app.pressedKeys.includes("d")) this.playerVehicle.turn(-Math.PI/200);
     }
 
     display() {
@@ -52,12 +69,22 @@ class MyContents {
         }
     }
 
-    update() {
-        /*
-        for (const point in this.track.points) {
-            this.point.distanceTo(this.track.points[point]) > this.track.width ? console.log("outside ", point) : console.log("inside ", point);
+    update(t) {
+        if (t === undefined) return;
+        this.playerVehicle.update(t);
+        if (this.app.followCamera) {
+            const pos = new THREE.Vector3();
+            this.playerVehicle.getWorldPosition(pos);
+            this.app.activeCamera.position.copy(pos).add(
+                new THREE.Vector3(
+                    - 3 * Math.sin(this.playerVehicle.angle), 
+                    1, 
+                    - 3 * Math.cos(this.playerVehicle.angle)
+                    ));
+            this.app.controls.target.set(pos.x, pos.y, pos.z);
         }
-        */
+        //console.log(this.playerVehicle.orientation);
+        this.control();
     }
 }
 
