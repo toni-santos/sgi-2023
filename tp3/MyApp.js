@@ -151,6 +151,7 @@ class MyApp {
     setupControls() {
         document.onkeydown = (e) => {
             if (!["w", "a", "s", "d", " "].includes(e.key)) return;
+            /**
             if (e.key == "w") {
                 console.log("w");
             }
@@ -163,6 +164,7 @@ class MyApp {
             if (e.key === "d") {
                 console.log("d");
             }
+            */
             if (e.key === " ") {
                 this.followCamera = !this.followCamera;
             }
@@ -171,6 +173,7 @@ class MyApp {
         
         document.onkeyup = (e) => {
             if (!["w", "a", "s", "d"].includes(e.key)) return;
+            /**
             if (e.key == "w") {
                 console.log("w");
             }
@@ -183,6 +186,7 @@ class MyApp {
             if (e.key === "d") {
                 console.log("d");
             }
+            */
             if (this.pressedKeys.includes(e.key)) this.pressedKeys = this.pressedKeys.filter(key => key !== e.key);
         };
     }

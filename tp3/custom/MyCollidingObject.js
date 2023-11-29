@@ -5,12 +5,18 @@ class MyCollidingObject extends THREE.Object3D {
         super();
         this.app = app;
         this.type = 'Group';
+        this.boundingBox = new THREE.Box3();
         this.collisionMesh = null;
         this.collisionMaterial = new THREE.MeshBasicMaterial({color: color});
     }
 
+    setBoundingBox(object) {
+        this.boundingBox = new THREE.Box3().setFromObject(object);
+    }
+
     addCollisionMesh(mesh) {
-        return new THREE.BoxHelper(mesh, 0xff0000);
+        this.collisionMesh = new THREE.BoxHelper(mesh, 0xff0000);
+        this.add(this.collisionMesh);
     }
 
     toggleCollisionMesh(value) {

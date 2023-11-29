@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { MyTrack } from "../custom/MyTrack.js";
 import { MyRoute } from "../custom/MyRoute.js";
+import { MyObstacle } from "../custom/MyObstacle.js";
 
 class MyReader {
     constructor(app) {
@@ -26,7 +27,15 @@ class MyReader {
 
     createPowerUps() {}
 
-    createObstacles() {}
+    createObstacles(obstacles) { 
+        this.objects["obstacles"] = [];   
+        const points = this.parsePoints(obstacles);
+        for (const point of points) {
+            const obstacleObj = new MyObstacle(this.app, point);
+            this.objects["obstacles"].push(obstacleObj);
+        }
+        return this.objects["obstacles"];
+    }
 
     parsePoints(pointString) {
         const pointArray = pointString.split(" ");

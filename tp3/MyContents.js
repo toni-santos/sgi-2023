@@ -23,6 +23,7 @@ class MyContents {
         this.xmlContents = new MyXMLContents(app);
         this.circuit = this.xmlContents.reader.objects["circuit"];
         this.track = this.xmlContents.reader.objects["track"];
+        this.obstacles = this.xmlContents.reader.objects["obstacles"];
         this.objects = [];
     }
 
@@ -73,7 +74,14 @@ class MyContents {
         if (t === undefined) return;
         this.playerVehicle.update(t);
         this.playerVehicle.computeClosestPoint(this.track.points);
-        this.playerVehicle.isOutOfBounds(this.track.points);
+        this.playerVehicle.isOutOfBounds(this.track.points, this.track.width);
+        for (const obs of this.obstacles) {
+            if (this.playerVehicle.boundingBox.intersectsBox(obs.boundingBox)) {
+                this.obstacles = this.obstacles.filter((o) => o !== obs);
+                this.circuit.remove(obs);
+                this.playerVehicle.applyModifier(obs);
+            }
+        }
         if (this.app.followCamera) {
             const pos = new THREE.Vector3();
             this.playerVehicle.getWorldPosition(pos);

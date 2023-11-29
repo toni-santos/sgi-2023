@@ -16,24 +16,28 @@ class MyVehicle extends MyCollidingObject {
         this.orientation = new THREE.Vector3(0, 0, 1);
         this.closestPointIndex = 0;
         this.outOfBounds = false;
+        this.modifier = null;
+        this.modifiedSince = new THREE.Clock();
         this.material = new THREE.MeshBasicMaterial({color: 0xff00ff});
         this.mesh = new THREE.Mesh(new THREE.BoxGeometry(1, 0.5, 2), this.material);
         this.mesh.position.z += 0.5;
-        this.collisionMesh = this.addCollisionMesh(this.mesh);
-        this.mesh.geometry.computeBoundingBox();
+        this.setBoundingBox(this.mesh);
+        this.addCollisionMesh(this.mesh);
         this.add(this.mesh);
         this.add(this.collisionMesh);
-        console.log(this.mesh.geometry.boundingBox);
+        console.log(this.boundingBox);
     }
 
     update(t) {
 		this.idleAnimation(t);
         this.getWorldDirection(this.orientation);
         this.changePosition();
+        this.setBoundingBox(this.mesh);
         //console.log(this.velocity * 100);
-        return this.velocity = Math.abs(this.velocity) <= 0.0001 ? 0 : 
+        this.velocity = Math.abs(this.velocity) <= 0.0001 ? 0 : 
                                 this.velocity < 0 ? this.velocity + 0.0001 :
-                                this.velocity - 0.0001
+                                this.velocity - 0.0001;
+        this.processModifiers(t)
 	}
 
     changePosition() {
@@ -54,9 +58,9 @@ class MyVehicle extends MyCollidingObject {
         return this.translateY(sinWave(t, 0.01, 2));
 	}
 
-    isOutOfBounds(trackPoints) {
-        console.log(this.distanceToPoint(this.closestPointIndex, trackPoints))
-        return this.outOfBounds = this.distanceToPoint(this.closestPointIndex, trackPoints) > 4
+    isOutOfBounds(trackPoints, width) {
+        //console.log(this.distanceToPoint(this.closestPointIndex, trackPoints))
+        return this.outOfBounds = this.distanceToPoint(this.closestPointIndex, trackPoints) > width/2
     }
 
     computeClosestPoint(trackPoints) {
@@ -66,8 +70,6 @@ class MyVehicle extends MyCollidingObject {
         else if (this.distanceToPoint(this.closestPointIndex + 1, trackPoints) <= this.distanceToPoint(this.closestPointIndex, trackPoints)) {
             this.closestPointIndex = posMod(this.closestPointIndex + 1, trackPoints.length - 1);
         }
-        //TODO: fazer uma função q devolve a expressão de baixo com o indice como argumento
-        //console.log(this.position.distanceTo(new THREE.Vector3(trackPoints[posMod(this.closestPointIndex + 1, trackPoints.length)].x, this.position.y, trackPoints[posMod(this.closestPointIndex + 1, trackPoints.length)].z)), this.position.distanceTo(new THREE.Vector3(trackPoints[this.closestPointIndex].x, this.position.y, trackPoints[this.closestPointIndex].z)));
         return this.closestPointIndex
     }
 
@@ -78,6 +80,20 @@ class MyVehicle extends MyCollidingObject {
     setRotation(angle) {
         this.angle = angle;
         return this.rotateY(angle);
+    }
+
+    applyModifier(modifier) {
+        this.modifier = modifier;
+        this.modifiedSince.start();
+    }
+
+    processModifiers() {
+        if (this.modifier === null) return;
+        this.velocity = Math.min(this.velocity, this.maxSpeed/700);
+        if (this.modifiedSince.getElapsedTime() >= this.modifier.duration) {
+            this.modifier = null;
+            this.modifiedSince.stop();
+        }
     }
 }
 
