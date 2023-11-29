@@ -72,6 +72,8 @@ class MyContents {
     update(t) {
         if (t === undefined) return;
         this.playerVehicle.update(t);
+        this.playerVehicle.computeClosestPoint(this.track.points);
+        this.playerVehicle.isOutOfBounds(this.track.points);
         if (this.app.followCamera) {
             const pos = new THREE.Vector3();
             this.playerVehicle.getWorldPosition(pos);
