@@ -820,8 +820,11 @@ class MyXMLContents {
                 const group = new THREE.Group();
                 group.add(this.reader.createTrack(representation.track, representation.width));
                 group.add(this.reader.createRoute(representation.route));
-                for (const obj of this.reader.createObstacles(representation.obstacles)) {
-                    group.add(obj);
+                for (const obs of this.reader.createObstacles(representation.obstacles)) {
+                    group.add(obs);
+                }
+                for (const pup of this.reader.createPowerUps(representation.powerups)) {
+                    group.add(pup);
                 }
                 this.reader.objects["circuit"] = group;
                 return group;

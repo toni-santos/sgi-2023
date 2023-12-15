@@ -24,6 +24,8 @@ class MyContents {
         this.circuit = this.xmlContents.reader.objects["circuit"];
         this.track = this.xmlContents.reader.objects["track"];
         this.obstacles = this.xmlContents.reader.objects["obstacles"];
+        this.powerups = this.xmlContents.reader.objects["powerups"];
+        this.collidableObjects = this.powerups.concat(this.obstacles);
         this.objects = [];
     }
 
@@ -75,11 +77,11 @@ class MyContents {
         this.playerVehicle.update(t);
         this.playerVehicle.computeClosestPoint(this.track.points);
         this.playerVehicle.isOutOfBounds(this.track.points, this.track.width);
-        for (const obs of this.obstacles) {
+        for (const obs of this.collidableObjects) {
             if (this.playerVehicle.boundingBox.intersectsBox(obs.boundingBox)) {
-                this.obstacles = this.obstacles.filter((o) => o !== obs);
+                this.collidableObjects = this.collidableObjects.filter((o) => o !== obs);
                 this.circuit.remove(obs);
-                this.playerVehicle.applyModifier(obs);
+                obs.apply(this.playerVehicle);
             }
         }
         if (this.app.followCamera) {

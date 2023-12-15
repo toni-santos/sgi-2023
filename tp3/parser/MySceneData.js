@@ -284,7 +284,8 @@ class MySceneData {
             { name: "width", type: "integer" },
             { name: "track", type: "string" },
             { name: "route", type: "string" },
-            { name: "obstacles", type: "string" }
+            { name: "obstacles", type: "string", required: false},
+            { name: "powerups", type: "string", required: false}
         ];
 
         this.descriptors["spotlight"] = [

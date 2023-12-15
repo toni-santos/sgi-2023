@@ -4,11 +4,12 @@ import { sinWave } from "../helper/MyAnimations.js";
 import { posMod } from "../helper/MyUtils.js";
 
 class MyVehicle extends MyCollidingObject {
-    constructor(app, maxSpeed=30, acceleration=1.9, handling=0.7) {
+    constructor(app, maxSpeed=30, acceleration=1.9, handling=1.5) {
         super(app, 0xff00ff);
-        this.maxSpeed = maxSpeed;
+        this.maxSpeed = maxSpeed / 100;
         this.acceleration = acceleration;
         this.handling = handling;
+        this.saveDefaults();
         this.app = app;
         this.type = 'Group';
         this.velocity = 0;
@@ -17,7 +18,6 @@ class MyVehicle extends MyCollidingObject {
         this.closestPointIndex = 0;
         this.outOfBounds = false;
         this.modifier = null;
-        this.modifiedSince = new THREE.Clock();
         this.material = new THREE.MeshBasicMaterial({color: 0xff00ff});
         this.mesh = new THREE.Mesh(new THREE.BoxGeometry(1, 0.5, 2), this.material);
         this.mesh.position.z += 0.5;
@@ -37,8 +37,21 @@ class MyVehicle extends MyCollidingObject {
         this.velocity = Math.abs(this.velocity) <= 0.0001 ? 0 : 
                                 this.velocity < 0 ? this.velocity + 0.0001 :
                                 this.velocity - 0.0001;
-        this.processModifiers(t)
+        this.processModifiers();
+        console.log(this.velocity);
 	}
+
+    saveDefaults() {
+        this.defaultMaxSpeed = this.maxSpeed;
+        this.defaultAcceleration = this.acceleration;
+        this.defaultHandling = this.handling;
+    }
+
+    loadDefaults() {
+        this.maxSpeed = this.defaultMaxSpeed;
+        this.acceleration = this.defaultAcceleration;
+        this.handling = this.defaultHandling;
+    }
 
     changePosition() {
         this.position.x += 1 * this.velocity * Math.sin(this.angle);
@@ -46,7 +59,7 @@ class MyVehicle extends MyCollidingObject {
     }
 
     changeVelocity(inc) {
-        return this.velocity = Math.min(Math.max(-0.04, this.velocity + inc * this.acceleration), this.outOfBounds ? this.maxSpeed/700 : this.maxSpeed/100);
+        return this.velocity = Math.min(Math.max(-0.04, this.velocity + inc * this.acceleration), this.outOfBounds ? this.maxSpeed/7 : this.maxSpeed);
     }
 
     turn(angle) {
@@ -64,12 +77,15 @@ class MyVehicle extends MyCollidingObject {
     }
 
     computeClosestPoint(trackPoints) {
-        if (this.distanceToPoint(this.closestPointIndex - 1, trackPoints) <= this.distanceToPoint(this.closestPointIndex, trackPoints)) {
-            this.closestPointIndex = posMod(this.closestPointIndex - 1, trackPoints.length - 1);
+        const range = 13;
+        for (let i = 0; i < range; i++) {
+            if (-Math.floor(range / 2) + i === 0) continue
+            if (this.distanceToPoint(this.closestPointIndex - Math.floor(range / 2) + i, trackPoints) <= this.distanceToPoint(this.closestPointIndex, trackPoints)) {
+                this.closestPointIndex = posMod(this.closestPointIndex - Math.floor(range / 2) + i, trackPoints.length - 1);
+                break;
+            }
         }
-        else if (this.distanceToPoint(this.closestPointIndex + 1, trackPoints) <= this.distanceToPoint(this.closestPointIndex, trackPoints)) {
-            this.closestPointIndex = posMod(this.closestPointIndex + 1, trackPoints.length - 1);
-        }
+        //console.log(this.closestPointIndex);
         return this.closestPointIndex
     }
 
@@ -82,17 +98,14 @@ class MyVehicle extends MyCollidingObject {
         return this.rotateY(angle);
     }
 
-    applyModifier(modifier) {
-        this.modifier = modifier;
-        this.modifiedSince.start();
-    }
-
     processModifiers() {
         if (this.modifier === null) return;
-        this.velocity = Math.min(this.velocity, this.maxSpeed/700);
-        if (this.modifiedSince.getElapsedTime() >= this.modifier.duration) {
+        this.modifier.modifierFunc(this);
+        console.log(this.modifier.modifyingSince.getElapsedTime());
+        if (this.modifier.modifyingSince.getElapsedTime() >= this.modifier.duration) {
+            this.modifier.modifyingSince.stop();
             this.modifier = null;
-            this.modifiedSince.stop();
+            this.loadDefaults();
         }
     }
 }
