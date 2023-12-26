@@ -20,7 +20,7 @@ class MyReader {
     }
 
     createRoute(route) {
-        const points = this.parsePoints(route);
+        const points = this.parsePoints(route, [0, 1, 0]);
         const routeObj = new MyRoute(this.app, points);
         this.objects["route"] = routeObj;
         return routeObj;
@@ -46,12 +46,12 @@ class MyReader {
         return this.objects["obstacles"];
     }
 
-    parsePoints(pointString) {
+    parsePoints(pointString, off=[0, 0, 0]) {
         const pointArray = pointString.split(" ");
         if (pointArray.length % 2 != 0) throw SyntaxError("Coordinate number is not even.");
         const points = [];
         for (let i = 0; i < pointArray.length - 1; i=i+2) {
-            const point = new THREE.Vector3(parseInt(pointArray[i]), 0, parseInt(pointArray[i+1]));
+            const point = new THREE.Vector3(parseInt(pointArray[i]) + off[0], 0 + off[1], parseInt(pointArray[i+1]) + off[2]);
             points.push(point);
           }
         return points;

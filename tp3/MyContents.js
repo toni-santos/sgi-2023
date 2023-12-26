@@ -23,6 +23,7 @@ class MyContents {
         this.xmlContents = new MyXMLContents(app);
         this.circuit = this.xmlContents.reader.objects["circuit"];
         this.track = this.xmlContents.reader.objects["track"];
+        this.route = this.xmlContents.reader.objects["route"];
         this.obstacles = this.xmlContents.reader.objects["obstacles"];
         this.powerups = this.xmlContents.reader.objects["powerups"];
         this.collidableObjects = this.powerups.concat(this.obstacles);
@@ -39,16 +40,22 @@ class MyContents {
             this.axis = new MyAxis(this);
             this.app.scene.add(this.axis);
         }
+        this.raceClock = new THREE.Clock();
         this.point = new THREE.Vector3(6, 0, 6);
         this.playerVehicle = new MyVehicle(this.app);
-        this.placeVehicle(this.playerVehicle);
+        this.cpuVehicle = new MyVehicle(this.app);
+        this.placeVehicle(this.playerVehicle, this.track.points[0]);
+        //this.placeVehicle(this.cpuVehicle, this.route.points[0]);
         this.objects.push(this.playerVehicle);
+        this.objects.push(this.cpuVehicle);
+        this.setupCPUPath(this.cpuVehicle);
         this.display();
+        this.raceClock.start();
         //this.app.scene.add(new MyTrack(this.app));
     }
 
-    placeVehicle(vehicle) {
-        vehicle.position.set(this.track.points[0].x, this.track.points[0].y + 1, this.track.points[0].z);
+    placeVehicle(vehicle, point) {
+        vehicle.position.set(point.x, point.y + 1, point.z);
         const q = new THREE.Quaternion();
         const v = new THREE.Vector3();
         vehicle.getWorldDirection(v);
@@ -70,11 +77,89 @@ class MyContents {
         for (const object of this.objects) {
             this.app.scene.add(object);
         }
+        this.debugKeyFrames();
+    }
+
+    setupCPUPath(cpuVehicle) {
+        this.keyPoints = this.route.points;
+        let pValues = [];
+        for (const point of this.keyPoints) {
+            pValues.push(...point);
+        }
+        const positionKF = new THREE.VectorKeyframeTrack('.position', [...Array(this.keyPoints.length).keys()],
+            pValues,
+            THREE.InterpolateSmooth  /* THREE.InterpolateLinear (default), THREE.InterpolateDiscrete,*/
+        )
+
+        const yAxis = new THREE.Vector3(0, 1, 0);
+        const rValues = [];
+        let vector = new THREE.Vector3();
+        let cross = new THREE.Vector3();
+
+        // Angle in each route point = angle between initial orientation and 
+        for (let i = 0; i < this.keyPoints.length; i++) {
+            vector = this.keyPoints[(i + 1) % this.keyPoints.length].clone();
+            vector.subVectors(vector, this.keyPoints[i]);
+            cross.crossVectors(new THREE.Vector3(0, 0, 1), vector);
+            let angle = cpuVehicle.orientation.angleTo(vector);
+            angle = cross.y < 0 ? -angle : angle;
+            console.log(THREE.MathUtils.radToDeg(angle), this.keyPoints[i], vector);
+            const q = new THREE.Quaternion().setFromAxisAngle(yAxis, angle);
+            rValues.push(...q);
+        }
+
+        // Seamless lap
+        rValues.splice(-4), rValues.push(...[rValues[0], rValues[1], rValues[2], rValues[3]])
+
+        const quaternionKF = new THREE.QuaternionKeyframeTrack('.quaternion', [...Array(this.keyPoints.length).keys()],
+            rValues
+        );
+
+        const positionClip = new THREE.AnimationClip('positionAnimation', this.keyPoints.length - 1, [positionKF])
+        const rotationClip = new THREE.AnimationClip('rotationAnimation', this.keyPoints.length - 1, [quaternionKF])
+
+        // Create an AnimationMixer
+        this.mixer = new THREE.AnimationMixer(cpuVehicle)
+
+        // Create AnimationActions for each clip
+        const positionAction = this.mixer.clipAction(positionClip)
+        const rotationAction = this.mixer.clipAction(rotationClip)
+
+        // Play both animations
+        positionAction.play()
+        rotationAction.play()
+    }
+
+    debugKeyFrames() {
+
+        let spline = new THREE.CatmullRomCurve3([...this.keyPoints])
+
+        // Setup visual control points
+
+        for (let i = 0; i < this.keyPoints.length; i++) {
+            const geometry = new THREE.SphereGeometry(1, 32, 32)
+            const material = new THREE.MeshBasicMaterial({ color: 0x0000ff })
+            const sphere = new THREE.Mesh(geometry, material)
+            sphere.scale.set(0.2, 0.2, 0.2)
+            sphere.position.set(... this.keyPoints[i])
+
+            this.app.scene.add(sphere)
+        }
+
+        const tubeGeometry = new THREE.TubeGeometry(spline, 100, 0.05, 10, false)
+        const tubeMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 })
+        const tubeMesh = new THREE.Mesh(tubeGeometry, tubeMaterial)
+
+        this.app.scene.add(tubeMesh)
+
     }
 
     update(t) {
         if (t === undefined) return;
+        const delta = this.raceClock.getDelta();
+        this.mixer.update(delta*3);
         this.playerVehicle.update(t);
+        this.cpuVehicle.update(t);
         this.playerVehicle.computeClosestPoint(this.track.points);
         this.playerVehicle.isOutOfBounds(this.track.points, this.track.width);
         for (const obs of this.collidableObjects) {
@@ -84,6 +169,8 @@ class MyContents {
                 obs.apply(this.playerVehicle);
             }
         }
+        if (this.playerVehicle.boundingBox.intersectsBox(this.cpuVehicle.boundingBox))
+            this.playerVehicle.velocity = Math.min(this.playerVehicle.velocity, this.playerVehicle.maxSpeed/7)
         if (this.app.followCamera) {
             const pos = new THREE.Vector3();
             this.playerVehicle.getWorldPosition(pos);
