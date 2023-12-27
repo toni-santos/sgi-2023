@@ -5,7 +5,7 @@ import { posMod } from "../helper/MyUtils.js";
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 class MyVehicle extends MyCollidingObject {
-    constructor(app, model, maxSpeed=30, acceleration=1.9, handling=1.5) {
+    constructor(app, model, shadow = false, maxSpeed=30, acceleration=1.9, handling=1.5) {
         super(app, 0xff00ff);
         this.maxSpeed = maxSpeed / 100;
         this.acceleration = acceleration;
@@ -28,6 +28,7 @@ class MyVehicle extends MyCollidingObject {
         // this.add(this.collisionMesh);
         // console.log(this.boundingBox);
         this.name = model;
+        this.castShadow = shadow;
     }
 
     async loadModel(layer) {
@@ -41,6 +42,7 @@ class MyVehicle extends MyCollidingObject {
         self.mesh.traverse((child) => {
             if (child.isMesh) {
                 child.layers.set(self.layer);
+                child.castShadow = self.castShadow;
                 child.name = self.name;
             }
         });

@@ -34,7 +34,7 @@ class MyContents {
 
     cars = ["ae86", "skyline", "impreza"]
 
-    OFFSET = 1000;
+    OFFSET = 2000;
 
     /**
        constructs the object
@@ -283,7 +283,6 @@ class MyContents {
                 load2.finally(() => {
                     this.objects.push(this.cpuVehicle);
                     this.display();
-                    this.placeVehicle(this.cpuVehicle, this.route.points[0]);
                     this.setupCPUPath(this.cpuVehicle);
 
                     this.app.setActiveCamera("Play");

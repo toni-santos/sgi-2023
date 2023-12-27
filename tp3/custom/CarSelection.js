@@ -1,6 +1,8 @@
 import * as THREE from "three";
 import { MyVehicle } from "./MyVehicle.js";
 import { MyText } from "./MyText.js";
+import { MyWheelStack } from "./MyWheelStack.js";
+import { MyLampPost } from "./MyLampPost.js";
 
 class CarSelection {
 
@@ -11,12 +13,12 @@ class CarSelection {
         this.map = [];
         this.layer = layer;
 
-        this.playerCar1 = new MyVehicle(this.app, this.cars[0]);
-        this.playerCar2 = new MyVehicle(this.app, this.cars[1]);
-        this.playerCar3 = new MyVehicle(this.app, this.cars[2]);
-        this.opposingCar1 = new MyVehicle(this.app, this.cars[0]);
-        this.opposingCar2 = new MyVehicle(this.app, this.cars[1]);
-        this.opposingCar3 = new MyVehicle(this.app, this.cars[2]);
+        this.playerCar1 = new MyVehicle(this.app, this.cars[0], true);
+        this.playerCar2 = new MyVehicle(this.app, this.cars[1], true);
+        this.playerCar3 = new MyVehicle(this.app, this.cars[2], true);
+        this.opposingCar1 = new MyVehicle(this.app, this.cars[0], true);
+        this.opposingCar2 = new MyVehicle(this.app, this.cars[1], true);
+        this.opposingCar3 = new MyVehicle(this.app, this.cars[2], true);
         this.backButton = new MyText(this.app, "Back", layer, new THREE.Vector3(-4, 0, 4));
         this.confirmButton = new MyText(this.app, "Confirm", layer, new THREE.Vector3(4, 0, 4));
 
@@ -52,6 +54,22 @@ class CarSelection {
 
         this.backButton.layers.set(layer);
         this.confirmButton.layers.set(layer);
+
+        // Props        
+        this.wheelStack = new MyWheelStack(this.app, 30, 5);
+        this.wheelStack.position.set(0, 0, -1);
+        // ShadowMaterial is a bit wonky but it's the best we can get while keeping the aesthetic
+        this.floor = new THREE.Mesh(new THREE.PlaneGeometry(50, 50), new THREE.ShadowMaterial({ opacity: 0.05 }));
+        this.floor.rotateOnAxis(new THREE.Vector3(1, 0, 0), -Math.PI / 2);
+        this.floor.position.set(0, -0.02, 0);
+        this.floor.receiveShadow = true;
+        this.lamp1 = new MyLampPost(this.app, this.floor, -Math.PI/2);
+        this.lamp2 = new MyLampPost(this.app, this.floor, -Math.PI/2);
+        this.lamp1.translateX(-4);
+        this.lamp1.translateZ(-3);
+        this.lamp2.translateX(4);
+        this.lamp2.translateZ(-3);
+        this.objects.push(this.wheelStack, this.lamp1, this.lamp2, this.floor);
     }
 
 }
