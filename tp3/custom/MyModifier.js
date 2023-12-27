@@ -45,7 +45,7 @@ class MyModifier extends MyCollidingObject {
 
     spin(obj) {
         this.limitSpeed(obj);
-        return obj.turn((Math.PI/20 - this.modifyingSince.getElapsedTime() / (10 * this.duration))/obj.defaultHandling);
+        return obj.turn((Math.PI/20 - this.modifyingSince.getElapsedTime() / (10 * this.duration))/obj.defaultHandling, true);
     }
 }
 

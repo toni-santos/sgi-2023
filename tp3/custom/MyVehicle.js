@@ -15,6 +15,7 @@ class MyVehicle extends MyCollidingObject {
         this.type = 'Group';
         this.velocity = 0;
         this.angle = 0;
+        this.wheelAngle = 0;
         this.orientation = new THREE.Vector3(0, 0, 1);
         this.closestPointIndex = 0;
         this.outOfBounds = false;
@@ -50,23 +51,47 @@ class MyVehicle extends MyCollidingObject {
         self.mesh.rotateY(Math.PI/2);
         self.setBoundingBox(self.mesh);
         self.addCollisionMesh(self.mesh);
+        this.mesh = self.mesh;
         self.add(self.mesh);
         self.add(self.collisionMesh);
+        this.frontWheels = [self.mesh.getObjectByName("Front_Left_Wheel_0"), self.mesh.getObjectByName("Front_Right_Wheel_1")];
+        this.wheels = this.frontWheels.concat([self.mesh.getObjectByName("Rear_Wheel_2")]);
+        console.log(self.name, this.wheels);
         console.log("done");
     }
 
     update(t) {
-		this.idleAnimation(t);
+        this.animate(t);
         this.getWorldDirection(this.orientation);
-        this.changePosition();
-        this.setBoundingBox(this.mesh);
-        //console.log(this.velocity * 100);
+        if (this.mesh) {
+            this.changePosition();
+            this.setBoundingBox(this.mesh);
+            //console.log(this.velocity * 100);
+            this.slowReset();
+            this.processModifiers();
+            // console.log(this.velocity);
+        }
+	}
+
+    animate(t) {
+		this.idleAnimation(t);
+        if (this.wheels) this.changeWheelRotation();
+    }
+
+    slowReset() {
         this.velocity = Math.abs(this.velocity) <= 0.0001 ? 0 : 
                                 this.velocity < 0 ? this.velocity + 0.0001 :
                                 this.velocity - 0.0001;
-        this.processModifiers();
-        // console.log(this.velocity);
-	}
+        let offset = 0;
+        if (Math.abs(this.wheelAngle) <= 0.01) {
+            this.changeWheelYaw(-this.wheelAngle);
+            this.wheelAngle = offset;
+        } else {
+            offset = this.wheelAngle < 0 ? 0.02 : -0.02;
+            this.changeWheelYaw(offset);
+        }
+
+    }
 
     saveDefaults() {
         this.defaultMaxSpeed = this.maxSpeed;
@@ -89,13 +114,33 @@ class MyVehicle extends MyCollidingObject {
         return this.velocity = Math.min(Math.max(-0.04, this.velocity + inc * this.acceleration), this.outOfBounds ? this.maxSpeed/7 : this.maxSpeed);
     }
 
-    turn(angle) {
-        this.angle += angle * this.handling;
-        return this.rotateY(angle * this.handling);
+    turn(angle, overrideVelocity=false) {
+        const offset =  angle * this.handling;
+        const modifier = overrideVelocity ? 1 : Math.min(1, this.velocity * 8);
+        this.angle += offset * modifier;
+        this.changeWheelYaw(offset * 3);
+        return this.rotateY(offset * modifier);
+    }
+
+    changeWheelYaw(angle=0) {
+        if (angle != 0 && Math.abs(this.wheelAngle + angle) <= Math.PI/4) {
+            for (const wheel of this.frontWheels) {
+                wheel.rotateOnWorldAxis(new THREE.Vector3(0, 1, 0), angle);
+            }
+            this.wheelAngle += angle;
+        }
+        return this.wheelAngle;
+    }
+
+    changeWheelRotation() {
+        //TODO: blue car model rotates on Z axis, red car on X axis. Weird
+        for (const wheel of this.wheels) {
+            wheel.rotateX(-this.velocity * 4);
+        }
     }
 
     idleAnimation(t) {
-        return this.translateY(sinWave(t, 0.01, 2));
+        return this.translateY(sinWave(t, 0.003, 20));
 	}
 
     isOutOfBounds(trackPoints, width) {
@@ -128,7 +173,6 @@ class MyVehicle extends MyCollidingObject {
     processModifiers() {
         if (this.modifier === null) return;
         this.modifier.modifierFunc(this);
-        console.log(this.modifier.modifyingSince.getElapsedTime());
         if (this.modifier.modifyingSince.getElapsedTime() >= this.modifier.duration) {
             this.modifier.modifyingSince.stop();
             this.modifier = null;
