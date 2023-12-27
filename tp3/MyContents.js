@@ -8,11 +8,34 @@ import { MySceneData } from "./parser/MySceneData.js";
 import { MyXMLContents } from "./MyXMLContents.js";
 import { MyTrack } from "./custom/MyTrack.js";
 import { MyVehicle } from "./custom/MyVehicle.js";
+import { MainMenu } from "./custom/MainMenu.js";
+import { CarSelection } from "./custom/CarSelection.js";
 
 /**
  *  This class contains the contents of out application
  */
 class MyContents {
+    state = {
+        PLAYING: 0,
+        CAR_SELECTION: 1,
+        TRACK_SELECTION: 2,
+        MAIN: 3,
+        PAUSED: 4,
+        END: 5
+    }
+
+    layers = {
+        NONE: 0,
+        MENU: 1,
+        CAR: 2,
+        POWERUP: 3,
+        OBSTACLE: 4
+    }
+
+    cars = ["ae86", "skyline", "impreza"]
+
+    OFFSET = 1000;
+
     /**
        constructs the object
        @param {MyApp} app The application object
@@ -20,38 +43,260 @@ class MyContents {
     constructor(app) {
         this.app = app;
         this.axis = null;
-        this.xmlContents = new MyXMLContents(app);
-        this.circuit = this.xmlContents.reader.objects["circuit"];
-        this.track = this.xmlContents.reader.objects["track"];
-        this.route = this.xmlContents.reader.objects["route"];
-        this.obstacles = this.xmlContents.reader.objects["obstacles"];
-        this.powerups = this.xmlContents.reader.objects["powerups"];
-        this.collidableObjects = this.powerups.concat(this.obstacles);
         this.objects = [];
+
+        // Picking
+        this.raycaster = new THREE.Raycaster()
+        this.raycaster.near = 1
+        this.raycaster.far = 20
+
+        this.pointer = new THREE.Vector2()
+        this.intersectedObj = null
+        this.pickingColor = "0x00ff00"
+
+        this.activeLayer = this.layers.NONE
+
+        document.addEventListener(
+            "pointermove",
+            this.onPointerMove.bind(this)
+        );
+
+        document.addEventListener(
+            "pointerdown",
+            this.onPointerDown.bind(this)
+        );
+
+        // Menuing
+        this.currentState = this.state.MAIN;
+
+        this.playerCar = this.cars[1];
+        this.previousPlayerCar = this.cars[1];
+        this.opposingCar = this.cars[1];
+        this.previousOpposingCar = this.cars[1];
+    }
+
+    onPointerDown(event) {
+        this.pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
+        this.pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+        this.raycaster.setFromCamera(this.pointer, this.app.activeCamera);
+
+        var intersects = this.raycaster.intersectObjects(this.app.scene.children);
+
+        if (intersects.length > 0) {
+            const obj = intersects[0].object;
+            switch(this.currentState) {
+                case this.state.MAIN:
+                    this.mainMenuClickHandler(obj);
+                    break;
+                case this.state.CAR_SELECTION:
+                    this.carSelectionClickHandler(obj);
+                    break;
+                case this.state.TRACK_SELECTION:
+                    // this.trackSelectionHandler(obj);
+                    break;
+                case this.state.PLAYING:
+                    // this.playingHandler(obj);
+                    break;
+                case this.state.PAUSED:
+                    // this.pausedHandler(obj);
+                    break;
+                case this.state.END:
+                    // this.endHandler(obj);
+                    break;
+            }
+        }
+    }
+
+    mainMenuClickHandler(obj) {
+        switch(obj.name) {
+            case "Start":
+                this.moveTo(this.state.CAR_SELECTION);
+                break;
+            case "Options":
+                break;
+        }
+    }
+
+    carSelectionClickHandler(obj) {
+        switch(obj.name.split("_")[0]) {
+            case "player":
+                this.previousPlayerCar = this.playerCar;
+                this.playerCar = obj.name.split("_")[1];
+                break;
+            case "cpu":
+                this.previousOpposingCar = this.opposingCar;
+                this.opposingCar = obj.name.split("_")[1];
+                break;
+            case "Back":
+                // this.playerCar = null;
+                // this.opposingCar = null;
+                this.moveTo(this.state.MAIN);
+                break;
+            case "Confirm":
+                if (this.playerCar && this.opposingCar) {
+                    // TODO: track selection
+                    this.moveTo(this.state.PLAYING);
+                }
+                break;
+        }
+    }
+
+    onPointerMove(event) {
+        this.pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
+        this.pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+        this.raycaster.setFromCamera(this.pointer, this.app.activeCamera);
+
+        var intersects = this.raycaster.intersectObjects(this.app.scene.children);
+
+        if (intersects.length > 0) {
+            const obj = intersects[0].object;
+            switch (this.currentState) {
+                case this.state.MAIN:
+                    this.mainMenuHoverHandler(obj, true);
+                    break;
+                case this.state.CAR_SELECTION: 
+                    this.carSelectionHoverHandler(obj, true);
+                    break;
+                case this.state.TRACK_SELECTION:
+                    break;
+                case this.state.PLAYING:
+                    break;
+                case this.state.PAUSED:
+                    break;
+                case this.state.END:
+                    break;
+            }
+        } else {
+            if (this.lastPickedObj) {
+                switch (this.currentState) {
+                    case this.state.MAIN:
+                        this.mainMenuHoverHandler(null, false);
+                        break;
+                    case this.state.CAR_SELECTION:
+                        this.carSelectionHoverHandler(null, false);
+                        break;
+                    case this.state.TRACK_SELECTION:
+                        break;
+                    case this.state.PLAYING:
+                        break;
+                    case this.state.PAUSED:
+                        break;
+                    case this.state.END:
+                        break;
+                }
+            }
+        }
+    }
+
+    mainMenuHoverHandler(obj, isHovering) {
+        if (isHovering) {
+            if (this.lastPickedObj != obj) {
+                if (this.lastPickedObj)
+                    this.lastPickedObj.parent.scale.set(1,1,1);
+                this.lastPickedObj = obj;
+                this.lastPickedObj.parent.scale.set(1.1,1.1,1.1);
+            } 
+        } else {
+            this.lastPickedObj.parent.scale.set(1,1,1);
+            this.lastPickedObj = null;
+        }
+    }
+
+    carSelectionHoverHandler(obj, isHovering) {
+        if (isHovering) {
+            if (this.lastPickedObj != obj) {
+                if (this.lastPickedObj)
+                    this.lastPickedObj.parent.scale.set(1,1,1);
+                this.lastPickedObj = obj;
+                if ((this.lastPickedObj.name.split("_")[0] == "player" || this.lastPickedObj.name.split("_")[0] == "cpu") && (this.lastPickedObj.name.split("_")[1] != this.playerCar || this.lastPickedObj.name.split("_")[1] != this.opposingCar))
+                    this.lastPickedObj.parent.scale.set(1.1,1.1,1.1);
+                if (this.lastPickedObj.name == "Back" || this.lastPickedObj.name == "Confirm")
+                    this.lastPickedObj.parent.scale.set(1.1,1.1,1.1);
+            } 
+        } else {
+            this.lastPickedObj.parent.scale.set(1,1,1);
+            this.lastPickedObj = null;
+        }
+    }
+
+
+    updateSelectedLayer() {
+        switch (this.selectedLayer) {
+            case this.layers.NONE:
+                this.raycaster.layers.enableAll()
+                break;
+            default:
+                this.raycaster.layers.set(this.selectedLayer)
+                break;
+        }
     }
 
     /**
      * initializes the contents
      */
     init() {
-        // create once
-        if (this.axis === null) {
-            // create and attach the axis to the scene
-            this.axis = new MyAxis(this);
-            this.app.scene.add(this.axis);
-        }
         this.raceClock = new THREE.Clock();
-        this.point = new THREE.Vector3(6, 0, 6);
-        this.playerVehicle = new MyVehicle(this.app);
-        this.cpuVehicle = new MyVehicle(this.app);
-        this.placeVehicle(this.playerVehicle, this.track.points[0]);
-        //this.placeVehicle(this.cpuVehicle, this.route.points[0]);
-        this.objects.push(this.playerVehicle);
-        this.objects.push(this.cpuVehicle);
-        this.setupCPUPath(this.cpuVehicle);
-        this.display();
-        this.raceClock.start();
-        //this.app.scene.add(new MyTrack(this.app));
+        this.playGame();
+        this.mainMenu();
+        this.selectCar();
+        // Change this to "PLAYING" to skip the menuing
+        this.moveTo(this.state.MAIN);
+    }
+
+    moveTo(state) {
+        switch (state) {
+            case this.state.MAIN:
+                this.selectedLayer = this.layers.MENU;
+                this.updateSelectedLayer();
+                this.currentState = this.state.MAIN;
+
+                this.app.setActiveCamera("Menu");
+                this.app.updateCameraIfRequired();
+                this.app.activeCamera.position.set(this.currentState * this.OFFSET, 10, 5);
+                this.app.controls.target.set(this.currentState * this.OFFSET, 0, 0);
+                break;
+            case this.state.CAR_SELECTION:
+                this.selectedLayer = this.layers.CAR;
+                this.updateSelectedLayer();
+                this.currentState = this.state.CAR_SELECTION;
+
+                this.app.setActiveCamera("Menu");
+                this.app.updateCameraIfRequired();
+                this.app.activeCamera.position.set(this.currentState * this.OFFSET, 10, 5);
+                this.app.controls.target.set(this.currentState * this.OFFSET, 0, 0);
+                break;
+            case this.state.TRACK_SELECTION:
+                break;
+            case this.state.PLAYING:        
+                this.playerVehicle = new MyVehicle(this.app, this.playerCar);
+                const load = this.playerVehicle.loadModel()
+                load.finally(() => {
+                    this.objects.push(this.playerVehicle);
+                    this.display();
+                    this.placeVehicle(this.playerVehicle, this.track.points[0]);
+                });
+
+                this.cpuVehicle = new MyVehicle(this.app, this.opposingCar);
+                const load2 = this.cpuVehicle.loadModel()
+                load2.finally(() => {
+                    this.objects.push(this.cpuVehicle);
+                    this.display();
+                    this.placeVehicle(this.cpuVehicle, this.route.points[0]);
+                    this.setupCPUPath(this.cpuVehicle);
+
+                    this.app.setActiveCamera("Play");
+                    this.app.updateCameraIfRequired();
+                    this.currentState = this.state.PLAYING;
+
+                    this.raceClock.start();
+                });
+
+
+                //TODO: enhance this (timer before start (?)) 
+                break;
+        }
     }
 
     placeVehicle(vehicle, point) {
@@ -77,7 +322,8 @@ class MyContents {
         for (const object of this.objects) {
             this.app.scene.add(object);
         }
-        this.debugKeyFrames();
+        if (this.keyPoints)
+            this.debugKeyFrames();
     }
 
     setupCPUPath(cpuVehicle) {
@@ -157,7 +403,30 @@ class MyContents {
     update(t) {
         if (t === undefined) return;
         const delta = this.raceClock.getDelta();
-        this.mixer.update(delta*3);
+        this.mixer?.update(delta*3);
+        switch (this.currentState) {
+            case this.state.MAIN:
+                // this.updateMain(t);
+                break;
+            case this.state.CAR_SELECTION:
+                this.updateCarSelection(t);
+                break;
+            case this.state.TRACK_SELECTION:
+                // this.updateTrackSelection(t);
+                break;
+            case this.state.PLAYING:
+                this.updatePlaying(t);
+                break;
+            case this.state.PAUSED:
+                // this.updatePaused(t);
+                break;
+            case this.state.END:
+                // this.updateEnd(t);
+                break;
+        }
+    }
+
+    updatePlaying(t) {
         this.playerVehicle.update(t);
         this.cpuVehicle.update(t);
         this.playerVehicle.computeClosestPoint(this.track.points);
@@ -185,6 +454,58 @@ class MyContents {
         //console.log(this.playerVehicle.orientation);
         this.control();
     }
+
+    updateCarSelection(t) {
+        if (this.previousPlayerCar != this.playerCar) {
+            this.carSelection.map["player_" + this.previousPlayerCar].position.y = 0;
+            this.carSelection.map["player_" + this.previousPlayerCar].setRotationFromAxisAngle(new THREE.Vector3(0,1,0), 0);
+        }
+
+        if (this.previousOpposingCar != this.opposingCar) {
+            this.carSelection.map["cpu_" + this.previousOpposingCar].position.y = 0;
+            this.carSelection.map["cpu_" + this.previousOpposingCar].setRotationFromAxisAngle(new THREE.Vector3(0,1,0), 0);
+        }
+
+        this.carSelection.map["player_" + this.playerCar].position.y = 2;
+        this.carSelection.map["player_" + this.playerCar].rotateY(0.01);
+        this.carSelection.map["cpu_" + this.opposingCar].position.y = 2;
+        this.carSelection.map["cpu_" + this.opposingCar].rotateY(0.01);
+    }
+
+    mainMenu() {
+        this.mainmenu = new MainMenu(this.app, this.layers.MENU);
+
+        this.objects.push(...this.mainmenu.objects.map(obj => {
+            obj.translateX(this.OFFSET * this.state.MAIN)
+            return obj;
+        }));
+        this.display();
+    }
+
+    selectCar() {
+        this.carSelection = new CarSelection(this.app, this.layers.CAR, this.cars);
+        this.objects.push(...this.carSelection.objects.map(obj => {
+            obj.translateX(this.OFFSET * this.state.CAR_SELECTION)
+            return obj;
+        }));
+        this.display();
+    }
+
+    playGame() {
+        this.app.followCamera = true;
+        this.app.setActiveCamera("Play");
+
+        this.xmlContents = new MyXMLContents(this.app);
+        this.circuit = this.xmlContents.reader.objects["circuit"];
+        this.track = this.xmlContents.reader.objects["track"];
+        this.route = this.xmlContents.reader.objects["route"];
+        this.obstacles = this.xmlContents.reader.objects["obstacles"];
+        this.powerups = this.xmlContents.reader.objects["powerups"];
+        this.collidableObjects = this.powerups.concat(this.obstacles);
+
+        this.display();
+    }
+
 }
 
 export { MyContents };

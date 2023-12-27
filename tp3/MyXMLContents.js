@@ -184,7 +184,10 @@ class MyXMLContents {
                     break;
             }
         }
-        this.app.cameras = this.cameras;
+        for (const cameraKey in this.cameras) {
+            const camera = this.cameras[cameraKey];
+            this.app.cameras[cameraKey] = camera;
+        }
     }
 
     /**

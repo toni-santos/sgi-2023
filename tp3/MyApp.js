@@ -47,7 +47,7 @@ class MyApp {
         document.body.appendChild(this.stats.dom);
 
         this.initCameras();
-        this.setActiveCamera("Perspective");
+        this.setActiveCamera("Menu");
 
         // Create a renderer with Antialiasing
         this.renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -78,6 +78,14 @@ class MyApp {
         const perspective = new THREE.PerspectiveCamera(75, aspect, 0.1, 1000);
         perspective.position.set(10, 10, 3);
         this.cameras["Perspective"] = perspective;
+
+        const menu = new THREE.PerspectiveCamera(75, aspect, 0.1, 1000);
+        menu.layers.enableAll();
+        this.cameras["Menu"] = menu;
+        
+        const play = new THREE.PerspectiveCamera(75, aspect, 0.1, 1000);
+        play.position.set(0, 10, 0);
+        this.cameras["Play"] = play;
     }
 
     /**
@@ -114,8 +122,11 @@ class MyApp {
                     this.renderer.domElement
                 );
                 this.controls.enableZoom = true;
+                if (this.activeCameraName === "Menu") {
+                    this.controls.enabled = false;
+                }
                 this.controls.update();
-                this.contents.xmlContents.defineControls();
+                this.contents?.xmlContents?.defineControls();
             } else {
                 this.controls.object = this.activeCamera;
             }

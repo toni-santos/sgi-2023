@@ -27,7 +27,7 @@ class MyGuiInterface {
      */
     setContents(contents) {
         this.contents = contents;
-        this.xmlContents = contents.xmlContents;
+        // this.xmlContents = contents.xmlContents;
         this.defaultConf["debug"] = () => this.contents.printDebugInfo();
     }
 
@@ -36,23 +36,23 @@ class MyGuiInterface {
      */
     init() {
         const cameraFolder = this.datgui.addFolder("Camera");
-        cameraFolder
-            .add(
-                this.app,
-                "activeCameraName",
-                Object.keys(this.xmlContents.cameras)
-            )
-            .name("Active Camera");
-        cameraFolder
-            .add(
-                this.contents,
-                "activeCameraTarget",
-                Object.keys(this.xmlContents.controlsTargets)
-            )
-            .name("Active Target")
-            .onChange((value) => {
-                this.xmlContents.changeControlsTarget(value);
-            });
+        // cameraFolder
+        //     .add(
+        //         this.app,
+        //         "activeCameraName",
+        //         Object.keys(this.xmlContents.cameras)
+        //     )
+        //     .name("Active Camera");
+        // cameraFolder
+        //     .add(
+        //         this.contents,
+        //         "activeCameraTarget",
+        //         Object.keys(this.xmlContents.controlsTargets)
+        //     )
+        //     .name("Active Target")
+        //     .onChange((value) => {
+        //         this.xmlContents.changeControlsTarget(value);
+        //     });
         cameraFolder.open();
     }
 }

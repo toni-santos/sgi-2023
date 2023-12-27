@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-16" standalone="yes"?>
 <yaf>
-    <globals background="0 0 0 1" ambient="0.6 0.6 0.6 1" />
+    <globals background="0.612 0.706 0.675 1" ambient="0.6 0.6 0.6 1" />
     <cameras initial="main"> 
         <perspective id="main" 
             angle="60" 

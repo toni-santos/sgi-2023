@@ -2,9 +2,10 @@ import * as THREE from "three";
 import { MyCollidingObject } from "./MyCollidingObject.js";
 import { sinWave } from "../helper/MyAnimations.js";
 import { posMod } from "../helper/MyUtils.js";
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 class MyVehicle extends MyCollidingObject {
-    constructor(app, maxSpeed=30, acceleration=1.9, handling=1.5) {
+    constructor(app, model, maxSpeed=30, acceleration=1.9, handling=1.5) {
         super(app, 0xff00ff);
         this.maxSpeed = maxSpeed / 100;
         this.acceleration = acceleration;
@@ -18,14 +19,38 @@ class MyVehicle extends MyCollidingObject {
         this.closestPointIndex = 0;
         this.outOfBounds = false;
         this.modifier = null;
-        this.material = new THREE.MeshBasicMaterial({color: 0xff00ff});
-        this.mesh = new THREE.Mesh(new THREE.BoxGeometry(1, 0.5, 2), this.material);
-        this.mesh.position.z += 0.5;
-        this.setBoundingBox(this.mesh);
-        this.addCollisionMesh(this.mesh);
-        this.add(this.mesh);
-        this.add(this.collisionMesh);
-        console.log(this.boundingBox);
+        // this.material = new THREE.MeshBasicMaterial({color: 0xff00ff});
+        // this.mesh = new THREE.Mesh(new THREE.BoxGeometry(1, 0.5, 2), this.material);
+        // this.mesh.position.z += 0.5;
+        // this.setBoundingBox(this.mesh);
+        // this.addCollisionMesh(this.mesh);
+        // this.add(this.mesh);
+        // this.add(this.collisionMesh);
+        // console.log(this.boundingBox);
+        this.name = model;
+    }
+
+    async loadModel(layer) {
+        this.layer = layer;
+        const loader = new GLTFLoader();
+        return await loader.loadAsync(`scenes/feupzero/models/${this.name}/scene.gltf`).then((gltf) => this.loadHelper(this, gltf));
+    }
+
+    loadHelper(self, gltf) {
+        self.mesh = gltf.scene;
+        self.mesh.traverse((child) => {
+            if (child.isMesh) {
+                child.layers.set(self.layer);
+                child.name = self.name;
+            }
+        });
+        // self.mesh.scale.set(0.01, 0.01, 0.01);
+        self.mesh.rotateY(Math.PI/2);
+        self.setBoundingBox(self.mesh);
+        self.addCollisionMesh(self.mesh);
+        self.add(self.mesh);
+        self.add(self.collisionMesh);
+        console.log("done");
     }
 
     update(t) {
@@ -38,7 +63,7 @@ class MyVehicle extends MyCollidingObject {
                                 this.velocity < 0 ? this.velocity + 0.0001 :
                                 this.velocity - 0.0001;
         this.processModifiers();
-        console.log(this.velocity);
+        // console.log(this.velocity);
 	}
 
     saveDefaults() {
