@@ -10,7 +10,7 @@ class MyTrack extends THREE.Object3D {
         this.points = points;
 
         this.trackTexture = new THREE.TextureLoader().load(
-            "scenes/feupzero/textures/asphalt.jpg"
+            "scenes/feupzero/textures/dirt.png"
         );
         this.trackTexture.wrapS = THREE.RepeatWrapping;
         this.trackTexture.wrapT = THREE.RepeatWrapping;

@@ -116,7 +116,7 @@ class MyVehicle extends MyCollidingObject {
 
     turn(angle, overrideVelocity=false) {
         const offset =  angle * this.handling;
-        const modifier = overrideVelocity ? 1 : Math.min(1, this.velocity * 8);
+        const modifier = overrideVelocity ? 1 : Math.min(1, this.velocity * 5);
         this.angle += offset * modifier;
         this.changeWheelYaw(offset * 3);
         return this.rotateY(offset * modifier);
@@ -133,7 +133,6 @@ class MyVehicle extends MyCollidingObject {
     }
 
     changeWheelRotation() {
-        //TODO: blue car model rotates on Z axis, red car on X axis. Weird
         for (const wheel of this.wheels) {
             wheel.rotateX(-this.velocity * 4);
         }

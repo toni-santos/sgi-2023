@@ -20,7 +20,7 @@ class MyReader {
     }
 
     createRoute(route) {
-        const points = this.parsePoints(route, [0, 0.3, 0]);
+        const points = this.parsePoints(route, [0, 0.01, 0]);
         const routeObj = new MyRoute(this.app, points);
         this.objects["route"] = routeObj;
         return routeObj;

@@ -299,7 +299,7 @@ class MyContents {
     }
 
     placeVehicle(vehicle, point) {
-        vehicle.position.set(point.x, point.y + 0.3, point.z);
+        vehicle.position.set(point.x, point.y + 0.01, point.z);
         const q = new THREE.Quaternion();
         const v = new THREE.Vector3();
         vehicle.getWorldDirection(v);

@@ -13,7 +13,7 @@ class MyModifier extends MyCollidingObject {
         this.negativeEffects = [this.limitSpeed, this.spin];
         this.material = new THREE.MeshBasicMaterial({color: color});
         this.mesh = new THREE.Mesh(this.geometries[effect], this.material);
-        this.mesh.position.set(position.x, 1, position.z);
+        this.mesh.position.set(position.x, 0.35, position.z);
         console.log(this.position);
         this.setBoundingBox(this.mesh);
         this.addCollisionMesh(this.mesh);
