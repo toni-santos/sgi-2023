@@ -32,7 +32,7 @@ class MyContents {
         OBSTACLE: 4
     }
 
-    cars = ["ae86", "skyline", "impreza"]
+    cars = ["ae86", "skyline", "lancer"]
 
     OFFSET = 2000;
 

@@ -140,7 +140,7 @@ class MyVehicle extends MyCollidingObject {
     }
 
     idleAnimation(t) {
-        return this.translateY(sinWave(t, 0.003, 20));
+        return this.translateY(sinWave(t, 0.002, 20));
 	}
 
     isOutOfBounds(trackPoints, width) {
