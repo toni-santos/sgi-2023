@@ -460,6 +460,10 @@ class MyContents {
         this.hudTime.innerHTML = this.raceClock.getElapsedTime().toFixed(2);
         this.hudSpeed.innerHTML = (this.playerVehicle.velocity * 100).toFixed(2);
         this.hudLap.innerHTML = `Lap ${this.playerVehicle.completedLaps + 1}/${this.track.laps}`;
+        if (this.playerVehicle.modifier)
+            this.hudPowerup.innerHTML = `Modifier timer: ${(this.playerVehicle.modifier.duration - 
+            this.playerVehicle.modifier.modifyingSince.getElapsedTime()).toFixed(2)}`
+        else {this.hudPowerup.innerHTML = ""}
     }
 
     showHUD() {
