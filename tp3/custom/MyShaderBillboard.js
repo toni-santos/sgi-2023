@@ -47,6 +47,7 @@ class MyShaderBillboard extends THREE.Object3D {
         this.shader = new MyShader(this.app, "Basic", "Basic shader", vertexShader, fragmentShader, {
             uSampler1: {type: 'sampler2D', value: this.map },
             uSampler2: {type: 'sampler2D', value: this.texture },
+            offset: {type: 'float', value: 0.2},
         }),
 
         this.waitForShaders();

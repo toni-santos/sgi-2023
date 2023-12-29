@@ -108,6 +108,7 @@ class MyApp {
         } else {
             this.composer.removePass(this.renderPixelatedPass);
             this.composer.removePass(this.outputPass);
+            this.renderPixelatedPass = null;
         }
     }
     

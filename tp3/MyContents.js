@@ -12,6 +12,7 @@ import { MainMenu } from "./custom/MainMenu.js";
 import { CarSelection } from "./custom/CarSelection.js";
 import { MyShader } from "./custom/MyShader.js";
 import { MyShaderBillboard } from "./custom/MyShaderBillboard.js";
+import { MyEnvironmentPlane } from "./custom/MyEnvironmentPlane.js";
 
 /**
  *  This class contains the contents of out application
@@ -137,8 +138,6 @@ class MyContents {
                 this.opposingCar = obj.name.split("_")[1];
                 break;
             case "Back":
-                // this.playerCar = null;
-                // this.opposingCar = null;
                 this.moveTo(this.state.MAIN);
                 break;
             case "Confirm":
@@ -530,14 +529,15 @@ class MyContents {
         this.obstacles = this.xmlContents.reader.objects["obstacles"];
         this.powerups = this.xmlContents.reader.objects["powerups"];
         this.collidableObjects = this.powerups.concat(this.obstacles);
+        // TODO: remove this, it's just a placeholder for testing
+        this.envPlane = new MyEnvironmentPlane(this.app, 200,"scenes/feupzero/textures/envMap.jpg", "scenes/feupzero/textures/ground.jpg", "shaders/s1.vert", "shaders/s1.frag");
+        this.objects.push(this.envPlane);
     }
 
     playGame() {
         this.app.followCamera = true;
-        this.app.setActiveCamera("Play");
         this.display();
     }
-
 }
 
 export { MyContents };
