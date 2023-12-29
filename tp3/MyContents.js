@@ -10,6 +10,8 @@ import { MyTrack } from "./custom/MyTrack.js";
 import { MyVehicle } from "./custom/MyVehicle.js";
 import { MainMenu } from "./custom/MainMenu.js";
 import { CarSelection } from "./custom/CarSelection.js";
+import { MyShader } from "./custom/MyShader.js";
+import { MyShaderBillboard } from "./custom/MyShaderBillboard.js";
 
 /**
  *  This class contains the contents of out application
