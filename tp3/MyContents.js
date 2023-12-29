@@ -246,7 +246,7 @@ class MyContents {
      */
     init() {
         this.raceClock = new THREE.Clock();
-        this.playGame();
+        this.readXML();
         this.mainMenu();
         this.selectCar();
         // Change this to "PLAYING" to skip the menuing
@@ -277,7 +277,7 @@ class MyContents {
                 break;
             case this.state.TRACK_SELECTION:
                 break;
-            case this.state.PLAYING: 
+            case this.state.PLAYING:
                 this.playerVehicle = new MyVehicle(this.app, this.playerCar);
                 const load = this.playerVehicle.loadModel()
                 load.finally(() => {
@@ -300,8 +300,7 @@ class MyContents {
 
                     this.raceClock.start();
                 });
-
-
+                this.playGame();
                 //TODO: enhance this (timer before start (?)) 
                 break;
         }
@@ -330,8 +329,6 @@ class MyContents {
         for (const object of this.objects) {
             this.app.scene.add(object);
         }
-        if (this.keyPoints)
-            this.debugKeyFrames();
     }
 
     setupCPUPath(cpuVehicle) {
@@ -357,7 +354,6 @@ class MyContents {
             cross.crossVectors(new THREE.Vector3(0, 0, 1), vector);
             let angle = cpuVehicle.orientation.angleTo(vector);
             angle = cross.y < 0 ? -angle : angle;
-            console.log(THREE.MathUtils.radToDeg(angle), this.keyPoints[i], vector);
             const q = new THREE.Quaternion().setFromAxisAngle(yAxis, angle);
             rValues.push(...q);
         }
@@ -437,6 +433,7 @@ class MyContents {
     updatePlaying(t) {
         this.playerVehicle.update(t, this.track);
         this.cpuVehicle.update(t, this.track);
+        if (this.playerVehicle.completedLaps === this.track.laps) return this.endGame();
         for (const obs of this.collidableObjects) {
             if (this.playerVehicle.boundingBox.intersectsBox(obs.boundingBox)) {
                 this.collidableObjects = this.collidableObjects.filter((o) => o !== obs);
@@ -457,7 +454,6 @@ class MyContents {
                     ));
             this.app.controls.target.set(pos.x, pos.y, pos.z);
         }
-        //console.log(this.playerVehicle.orientation);
         this.updateHUD();
         this.control();
     }
@@ -465,7 +461,7 @@ class MyContents {
     updateHUD() {
         this.hudTime.innerHTML = this.raceClock.getElapsedTime().toFixed(2);
         this.hudSpeed.innerHTML = (this.playerVehicle.velocity * 100).toFixed(2);
-        // this.hudLap.innerHTML = this.playerVehicle.lap;
+        this.hudLap.innerHTML = `Lap ${this.playerVehicle.completedLaps + 1}/${this.track.laps}`;
     }
 
     showHUD() {
@@ -473,6 +469,21 @@ class MyContents {
         this.hudSpeed.style.display = "block";
         this.hudLap.style.display = "block";
         this.hudPowerup.style.display = "block";
+    }
+
+    hideHUD() {
+        this.hudTime.style.display = "none";
+        this.hudSpeed.style.display = "none";
+        this.hudLap.style.display = "none";
+        this.hudPowerup.style.display = "none";
+    }
+
+    endGame() {
+        this.hideHUD();
+        this.objects = this.objects.filter((o) => o !== this.playerVehicle && o !== this.cpuVehicle);
+        this.app.scene.remove(this.playerVehicle);
+        this.app.scene.remove(this.cpuVehicle);
+        return this.moveTo(this.state.MAIN);
     }
 
     updateCarSelection(t) {
@@ -511,10 +522,7 @@ class MyContents {
         this.display();
     }
 
-    playGame() {
-        this.app.followCamera = true;
-        this.app.setActiveCamera("Play");
-
+    readXML() {
         this.xmlContents = new MyXMLContents(this.app);
         this.circuit = this.xmlContents.reader.objects["circuit"];
         this.track = this.xmlContents.reader.objects["track"];
@@ -522,7 +530,11 @@ class MyContents {
         this.obstacles = this.xmlContents.reader.objects["obstacles"];
         this.powerups = this.xmlContents.reader.objects["powerups"];
         this.collidableObjects = this.powerups.concat(this.obstacles);
+    }
 
+    playGame() {
+        this.app.followCamera = true;
+        this.app.setActiveCamera("Play");
         this.display();
     }
 

@@ -18,9 +18,11 @@ class MyVehicle extends MyCollidingObject {
         this.wheelAngle = 0;
         this.orientation = new THREE.Vector3(0, 0, 1);
         this.closestPointIndex = 0;
+        this.visitedPoints = [0];
+        this.completedLaps = 0;
         this.outOfBounds = false;
         this.modifier = null;
-        // this.material = new THREE.MeshBasicMaterial({color: 0xff00ff});
+        this.material = new THREE.MeshBasicMaterial({color: 0xff00ff});
         // this.mesh = new THREE.Mesh(new THREE.BoxGeometry(1, 0.5, 2), this.material);
         // this.mesh.position.z += 0.5;
         // this.setBoundingBox(this.mesh);
@@ -73,6 +75,7 @@ class MyVehicle extends MyCollidingObject {
             this.processModifiers();
             // console.log(this.velocity);
         }
+        if (this.closestPointIndex === 1) this.addLap(track.checkpoints);
 	}
 
     animate(t) {
@@ -129,6 +132,7 @@ class MyVehicle extends MyCollidingObject {
     }
 
     changeWheelYaw(angle=0) {
+        if (!this.wheels) return;
         if (angle != 0 && Math.abs(this.wheelAngle + angle) <= Math.PI/4) {
             for (const wheel of this.frontWheels) {
                 wheel.rotateOnWorldAxis(new THREE.Vector3(0, 1, 0), angle);
@@ -159,15 +163,27 @@ class MyVehicle extends MyCollidingObject {
             if (-Math.floor(range / 2) + i === 0) continue
             if (this.distanceToPoint(this.closestPointIndex - Math.floor(range / 2) + i, trackPoints) <= this.distanceToPoint(this.closestPointIndex, trackPoints)) {
                 this.closestPointIndex = posMod(this.closestPointIndex - Math.floor(range / 2) + i, trackPoints.length - 1);
+                this.addVisitedPoint(this.closestPointIndex);
                 break;
             }
         }
-        //console.log(this.closestPointIndex);
         return this.closestPointIndex
+    }
+
+    addVisitedPoint(index) {
+        if (!this.visitedPoints.includes(index)) this.visitedPoints.push(index);
     }
 
     distanceToPoint(idx, trackPoints) {
         return this.position.distanceTo(new THREE.Vector3(trackPoints[posMod(idx, trackPoints.length - 1)].x, this.position.y, trackPoints[posMod(idx, trackPoints.length - 1)].z))
+    }
+
+    addLap(checkpoints) {
+        const checkpointsPassed = checkpoints.every(v => this.visitedPoints.includes(v));
+        if (checkpointsPassed) {
+            this.visitedPoints = [0, 1];
+            this.completedLaps += 1;
+        }
     }
 
     setRotation(angle) {

@@ -1,13 +1,15 @@
 import * as THREE from "three";
 
 class MyTrack extends THREE.Object3D {
-    constructor(app, width=4, points, routes=[], powerups=[], obstacles=[]) {
+    constructor(app, width=4, points, routes=[], powerups=[], obstacles=[], laps=3) {
         super();
         this.app = app;
         this.width = width
         this.type = "Group";
         this.width = width;
         this.points = points;
+        this.laps = laps;
+        this.checkpoints = [5, 30, 60, 80];
 
         this.trackTexture = new THREE.TextureLoader().load(
             "scenes/feupzero/textures/dirt.png"
