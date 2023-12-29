@@ -435,10 +435,8 @@ class MyContents {
     }
 
     updatePlaying(t) {
-        this.playerVehicle.update(t);
-        this.cpuVehicle.update(t);
-        this.playerVehicle.computeClosestPoint(this.track.points);
-        this.playerVehicle.isOutOfBounds(this.track.points, this.track.width);
+        this.playerVehicle.update(t, this.track);
+        this.cpuVehicle.update(t, this.track);
         for (const obs of this.collidableObjects) {
             if (this.playerVehicle.boundingBox.intersectsBox(obs.boundingBox)) {
                 this.collidableObjects = this.collidableObjects.filter((o) => o !== obs);

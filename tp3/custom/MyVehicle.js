@@ -60,9 +60,11 @@ class MyVehicle extends MyCollidingObject {
         console.log("done");
     }
 
-    update(t) {
+    update(t, track) {
         this.animate(t);
         this.getWorldDirection(this.orientation);
+        this.computeClosestPoint(track.points);
+        this.isOutOfBounds(track.points, track.width);
         if (this.mesh) {
             this.changePosition();
             this.setBoundingBox(this.mesh);
@@ -80,8 +82,8 @@ class MyVehicle extends MyCollidingObject {
 
     slowReset() {
         this.velocity = Math.abs(this.velocity) <= 0.0001 ? 0 : 
-                                this.velocity < 0 ? this.velocity + 0.0001 :
-                                this.velocity - 0.0001;
+                                this.velocity < 0 ? this.velocityWithRestrictions(this.velocity + 0.0001) :
+                                this.velocityWithRestrictions(this.velocity - 0.0001);
         let offset = 0;
         if (Math.abs(this.wheelAngle) <= 0.01) {
             this.changeWheelYaw(-this.wheelAngle);
@@ -111,7 +113,11 @@ class MyVehicle extends MyCollidingObject {
     }
 
     changeVelocity(inc) {
-        return this.velocity = Math.min(Math.max(-0.04, this.velocity + inc * this.acceleration), this.outOfBounds ? this.maxSpeed/7 : this.maxSpeed);
+        return this.velocity = this.velocityWithRestrictions(this.velocity + inc * this.acceleration);
+    }
+
+    velocityWithRestrictions(v) {
+        return Math.min(Math.max(-0.04, v), this.outOfBounds ? this.maxSpeed/7 : this.maxSpeed);
     }
 
     turn(angle, overrideVelocity=false) {
