@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { MyCollidingObject } from "./MyCollidingObject.js";
 import { sinWave } from "../helper/MyAnimations.js";
-import { posMod } from "../helper/MyUtils.js";
+import { posMod, signedAngleTo } from "../helper/MyUtils.js";
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 class MyVehicle extends MyCollidingObject {
@@ -66,7 +66,7 @@ class MyVehicle extends MyCollidingObject {
         this.animate(t);
         this.getWorldDirection(this.orientation);
         this.computeClosestPoint(track.points);
-        this.isOutOfBounds(track.points, track.width);
+        this.handleOutOfBounds(track);
         if (this.mesh) {
             this.changePosition();
             this.setBoundingBox(this.mesh);
@@ -74,6 +74,7 @@ class MyVehicle extends MyCollidingObject {
             this.slowReset();
             this.processModifiers();
             // console.log(this.velocity);
+            if (this.name == "skyline") console.log(this.orientation, this.angle);
         }
         if (this.closestPointIndex === 1) this.addLap(track.checkpoints);
 	}
@@ -95,7 +96,7 @@ class MyVehicle extends MyCollidingObject {
             offset = this.wheelAngle < 0 ? 0.02 : -0.02;
             this.changeWheelYaw(offset);
         }
-
+        this.angle = this.angle % (2*Math.PI);
     }
 
     saveDefaults() {
@@ -113,6 +114,14 @@ class MyVehicle extends MyCollidingObject {
     changePosition() {
         this.position.x += 1 * this.velocity * Math.sin(this.angle);
         this.position.z += 1 * this.velocity * Math.cos(this.angle);
+    }
+
+    resetPosition(trackPoints) {
+        this.position.x = trackPoints[this.closestPointIndex].x;
+        this.position.z = trackPoints[this.closestPointIndex].z;
+        const direction = new THREE.Vector3().subVectors(trackPoints[(this.closestPointIndex + 1) % trackPoints.length], trackPoints[this.closestPointIndex]);
+        const angle = signedAngleTo(this.orientation, direction);
+        this.turn(angle / this.handling, true);
     }
 
     changeVelocity(inc) {
@@ -152,9 +161,18 @@ class MyVehicle extends MyCollidingObject {
         return this.translateY(sinWave(t, 0.002, 20));
 	}
 
+    handleOutOfBounds(track) {
+        this.isOutOfBounds(track.points, track.width);
+        this.needsReset(track.points, track.width);
+    }
+
     isOutOfBounds(trackPoints, width) {
         //console.log(this.distanceToPoint(this.closestPointIndex, trackPoints))
         return this.outOfBounds = this.distanceToPoint(this.closestPointIndex, trackPoints) > width/2
+    }
+
+    needsReset(trackPoints, width) {
+        if (this.distanceToPoint(this.closestPointIndex, trackPoints) > (width/2) * 2) this.resetPosition(trackPoints);
     }
 
     computeClosestPoint(trackPoints) {
