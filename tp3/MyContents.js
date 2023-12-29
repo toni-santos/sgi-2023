@@ -47,6 +47,12 @@ class MyContents {
         this.axis = null;
         this.objects = [];
 
+        // HUD
+        this.hudTime = document.getElementById("time");
+        this.hudSpeed = document.getElementById("speed");
+        this.hudLap = document.getElementById("lap");
+        this.hudPowerup = document.getElementById("powerup");
+
         // Picking
         this.raycaster = new THREE.Raycaster()
         this.raycaster.near = 1
@@ -271,7 +277,7 @@ class MyContents {
                 break;
             case this.state.TRACK_SELECTION:
                 break;
-            case this.state.PLAYING:        
+            case this.state.PLAYING: 
                 this.playerVehicle = new MyVehicle(this.app, this.playerCar);
                 const load = this.playerVehicle.loadModel()
                 load.finally(() => {
@@ -289,6 +295,7 @@ class MyContents {
 
                     this.app.setActiveCamera("Play");
                     this.app.updateCameraIfRequired();
+                    this.showHUD();
                     this.currentState = this.state.PLAYING;
 
                     this.raceClock.start();
@@ -453,7 +460,21 @@ class MyContents {
             this.app.controls.target.set(pos.x, pos.y, pos.z);
         }
         //console.log(this.playerVehicle.orientation);
+        this.updateHUD();
         this.control();
+    }
+
+    updateHUD() {
+        this.hudTime.innerHTML = this.raceClock.getElapsedTime().toFixed(2);
+        this.hudSpeed.innerHTML = (this.playerVehicle.velocity * 100).toFixed(2);
+        // this.hudLap.innerHTML = this.playerVehicle.lap;
+    }
+
+    showHUD() {
+        this.hudTime.style.display = "block";
+        this.hudSpeed.style.display = "block";
+        this.hudLap.style.display = "block";
+        this.hudPowerup.style.display = "block";
     }
 
     updateCarSelection(t) {
