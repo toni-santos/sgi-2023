@@ -35,6 +35,12 @@ class MyGuiInterface {
      * Initialize the gui interface
      */
     init() {
+        const postProcessingFolder = this.datgui.addFolder("Post Processing");
+        postProcessingFolder
+            .add(this.app, "postProcessing")
+            .name("Post Processing").onChange((value) => {
+                this.app.togglePP(value);
+            });
         const cameraFolder = this.datgui.addFolder("Camera");
         // cameraFolder
         //     .add(

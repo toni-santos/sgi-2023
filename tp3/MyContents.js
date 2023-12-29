@@ -262,7 +262,7 @@ class MyContents {
 
                 this.app.setActiveCamera("Menu");
                 this.app.updateCameraIfRequired();
-                this.app.activeCamera.position.set(this.currentState * this.OFFSET, 10, 5);
+                this.app.activeCamera.position.set(this.currentState * this.OFFSET, 7, 5);
                 this.app.controls.target.set(this.currentState * this.OFFSET, 0, 0);
                 break;
             case this.state.CAR_SELECTION:
@@ -272,7 +272,7 @@ class MyContents {
 
                 this.app.setActiveCamera("Menu");
                 this.app.updateCameraIfRequired();
-                this.app.activeCamera.position.set(this.currentState * this.OFFSET, 10, 5);
+                this.app.activeCamera.position.set(this.currentState * this.OFFSET, 7, 5);
                 this.app.controls.target.set(this.currentState * this.OFFSET, 0, 0);
                 break;
             case this.state.TRACK_SELECTION:

@@ -4,6 +4,10 @@ import { MyContents } from "./MyContents.js";
 import { MyGuiInterface } from "./MyGuiInterface.js";
 import Stats from "three/addons/libs/stats.module.js";
 
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPixelatedPass } from 'three/addons/postprocessing/RenderPixelatedPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+
 /**
  * This class contains the application object
  */
@@ -31,6 +35,13 @@ class MyApp {
         this.axis = null;
         this.contents = null;
         this.followCamera = false;
+
+        // postprocessing
+        this.postProcessing = false;
+        this.composer = null;
+        this.outputPass = null
+        this.renderPixelatedPass = null;
+
     }
     /**
      * initializes the application
@@ -66,8 +77,40 @@ class MyApp {
         window.addEventListener("resize", this.onResize.bind(this), false);
         this.setupControls();
         this.clock.start();
+
+        // setup postprocessing
+        if (this.postProcessing) {
+            this.renderPixelatedPass = new RenderPixelatedPass( 4, this.scene, this.activeCamera );
+            this.renderPixelatedPass.normalEdgeStrength = 0;
+            this.renderPixelatedPass.depthEdgeStrength = 0.1;
+            this.composer.addPass( this.renderPixelatedPass );    
+        }
+
     }
 
+    togglePP(value) {
+        if (value) {
+            if (this.renderPixelatedPass == null) {
+                this.composer = new EffectComposer( this.renderer );
+                this.composer.removePass(this.renderPixelatedPass);
+                this.renderPixelatedPass = new RenderPixelatedPass( 4, this.scene, this.activeCamera );
+                this.renderPixelatedPass.normalEdgeStrength = 0;
+                this.renderPixelatedPass.depthEdgeStrength = 0.1;
+                this.composer.addPass( this.renderPixelatedPass );
+                this.outputPass = new OutputPass();
+                this.composer.addPass( this.outputPass );
+            } else {
+                this.renderPixelatedPass = new RenderPixelatedPass( 4, this.scene, this.activeCamera );
+                this.renderPixelatedPass.normalEdgeStrength = 0;
+                this.renderPixelatedPass.depthEdgeStrength = 0.1;
+                this.composer.addPass( this.renderPixelatedPass );
+            }
+        } else {
+            this.composer.removePass(this.renderPixelatedPass);
+            this.composer.removePass(this.outputPass);
+        }
+    }
+    
     /**
      * initializes all the cameras
      */
@@ -114,6 +157,15 @@ class MyApp {
             // among other things
             this.onResize();
 
+            // update effects
+            if (this.postProcessing) {
+                this.composer.removePass(this.renderPixelatedPass);
+                this.renderPixelatedPass = new RenderPixelatedPass( 5, this.scene, this.activeCamera );
+                this.renderPixelatedPass.normalEdgeStrength = 0;
+                this.renderPixelatedPass.depthEdgeStrength = 0.1;
+                this.composer.addPass( this.renderPixelatedPass );    
+            }
+
             // are the controls yet?
             if (this.controls === null) {
                 // Orbit controls allow the camera to orbit around a target.
@@ -141,6 +193,8 @@ class MyApp {
             this.activeCamera.aspect = window.innerWidth / window.innerHeight;
             this.activeCamera.updateProjectionMatrix();
             this.renderer.setSize(window.innerWidth, window.innerHeight);
+            if (this.composer)
+                this.composer.setSize( window.innerWidth, window.innerHeight );
         }
     }
     /**
@@ -224,6 +278,8 @@ class MyApp {
         requestAnimationFrame(this.render.bind(this));
 
         this.lastCameraName = this.activeCameraName;
+        if (this.composer)
+            this.composer.render();
         this.stats.end();
     }
 }
