@@ -9,35 +9,35 @@ class EndScreen {
         this.objects = [];
         this.fireworks = [];
         
-        // TODO: add difficulty, winner, loser, etc.
         this.returnButton = new MyText(this.app, "Return", layer, new THREE.Vector3(-4, 0, 4));
         this.returnButton.layers.set(layer);
         this.restartButton = new MyText(this.app, "Restart", layer, new THREE.Vector3(4, 0, 4));
         this.restartButton.layers.set(layer);
 
         this.endText = new MyText(this.app, "Finish!", layer, new THREE.Vector3(0, 0, -2));
-        this.levelDifficulty = new MyText(this.app, difficulty, layer, new THREE.Vector3(0.5, 0, -1)); 
-        this.levelDifficulty.scale.set(0.75, 0.75, 0.75);
+        this.levelDifficulty = new MyText(this.app, difficulty, layer, new THREE.Vector3(0.125, 0, -1), 0.75); 
 
         this.playerName = new MyText(this.app, name, layer, new THREE.Vector3(-4, 0, 2));
         this.playerTime = new MyText(this.app, this.prettifyTime(time), layer, new THREE.Vector3(4, 0, 2));
 
-        // TODO: add particle system fireworks
-
         this.objects.push(this.endText, this.returnButton, this.restartButton, this.playerName, this.playerTime, this.levelDifficulty);
     }
 
+    // TODO: winner logic
     updateResult(name, time, player, cpu, difficulty, winner) {
         this.objects = [];
+
         this.playerName.setText(name);
         this.playerTime.setText(this.prettifyTime(time));
         this.levelDifficulty.setText(difficulty);
+
         this.playerCar = new MyVehicle(this.app, player, true);
         this.cpuCar = new MyVehicle(this.app, cpu, true);
         this.playerCar.position.set(-4, 0, 0);
         this.cpuCar.position.set(4, 0, 0);
         this.playerCar.loadModel(this.layer);
         this.cpuCar.loadModel(this.layer);
+
         this.objects.push(this.playerName, this.playerTime, this.playerCar, this.cpuCar, this.levelDifficulty);
     }
 

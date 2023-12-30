@@ -5,7 +5,6 @@ import { MyTreeTrunk } from "./MyTreeTrunk.js";
 import { MyEnvironmentPlane } from "./MyEnvironmentPlane.js";
 
 class MainMenu {
-
     constructor(app, layer) {
         this.app = app;
         this.objects = [];

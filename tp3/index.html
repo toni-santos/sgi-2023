@@ -38,6 +38,17 @@
                 left: 50%;
                 transform: translateX(-50%)
             }
+
+            #name {
+                position: absolute;
+                width: 70%;
+                height: 10%;
+                display: none;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                opacity: 0;
+            }
         </style>
 
         <script
@@ -61,6 +72,7 @@
         <div id="lap"></div>
         <div id="powerup"></div>
         <div id="speed"></div>
+        <input id="name"></input>
         <script type="module" src="main.js"></script>
     </body>
 </html>

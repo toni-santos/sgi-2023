@@ -16,6 +16,7 @@ import { MyEnvironmentPlane } from "./custom/MyEnvironmentPlane.js";
 import { EndScreen } from "./custom/EndScreen.js";
 import { signedAngleTo } from "./helper/MyUtils.js";
 import { MyFirework } from "./custom/MyFirework.js";
+import { Options } from "./custom/Options.js";
 
 /**
  *  This class contains the contents of out application
@@ -27,7 +28,8 @@ class MyContents {
         TRACK_SELECTION: 2,
         MAIN: 3,
         PAUSED: 4,
-        END: 5
+        END: 5,
+        OPTIONS: 6
     }
 
     layers = {
@@ -50,6 +52,7 @@ class MyContents {
         this.app = app;
         this.axis = null;
         this.objects = [];
+        this.playerName = "Player"
 
         // HUD
         this.hudTime = document.getElementById("time");
@@ -80,6 +83,7 @@ class MyContents {
 
         // Menuing
         this.currentState = this.state.MAIN;
+        this.nameInput = document.getElementById("name");
 
         this.playerCar = this.cars[1];
         this.previousPlayerCar = this.cars[1];
@@ -116,6 +120,9 @@ class MyContents {
                 case this.state.END:
                     this.endClickHandler(obj);
                     break;
+                case this.state.OPTIONS:
+                    this.optionsClickHandler(obj);
+                    break;    
             }
         }
     }
@@ -126,6 +133,23 @@ class MyContents {
                 this.moveTo(this.state.CAR_SELECTION);
                 break;
             case "Options":
+                this.moveTo(this.state.OPTIONS);
+                break;
+        }
+    }
+
+    optionsClickHandler(obj) {
+        switch(obj.name) {
+            case "Back":
+                this.nameInput.style.display = "none";
+                this.nameInput.removeEventListener("input", (e) => this.nameChanging(e));
+                this.moveTo(this.state.MAIN);
+                break;
+            case "Easy":
+                break;
+            case "Normal":
+                break;
+            case "Hard":
                 break;
         }
     }
@@ -190,6 +214,9 @@ class MyContents {
                 case this.state.END:
                     this.endHoverHandler(obj, true);
                     break;
+                case this.state.OPTIONS:
+                    this.optionsHoverHandler(obj, true);
+                    break;
             }
         } else {
             if (this.lastPickedObj) {
@@ -209,6 +236,9 @@ class MyContents {
                     case this.state.END:
                         this.endHoverHandler(null, false);
                         break;
+                    case this.state.OPTIONS:
+                        this.optionsHoverHandler(null, false);
+                        break;        
                 }
             }
         }
@@ -225,6 +255,22 @@ class MyContents {
         } else {
             this.lastPickedObj.parent.scale.set(1,1,1);
             this.lastPickedObj = null;
+        }
+    }
+
+    optionsHoverHandler(obj, isHovering) {
+        if (isHovering && (obj.name != "Options" && obj.name != this.playerName)) {
+            if (this.lastPickedObj != obj) {
+                if (this.lastPickedObj)
+                    this.lastPickedObj.parent.scale.set(1,1,1);
+                this.lastPickedObj = obj;
+                this.lastPickedObj.parent.scale.set(1.1,1.1,1.1);
+            } 
+        } else {
+            if (this.lastPickedObj) {
+                this.lastPickedObj.parent.scale.set(1,1,1);
+                this.lastPickedObj = null;
+            }
         }
     }
 
@@ -282,6 +328,7 @@ class MyContents {
         this.mainMenu();
         this.selectCar();
         this.endScreen();
+        this.optionsMenu();
         // Change this to "PLAYING" to skip the menuing
         this.moveTo(this.state.MAIN);
     }
@@ -340,7 +387,7 @@ class MyContents {
                 this.selectedLayer = this.layers.MENU;
                 this.updateSelectedLayer();
 
-                this.finalScreen.updateResult("WOW", this.raceClock.getElapsedTime(), this.playerCar, this.opposingCar, "Easy", "Player");
+                this.finalScreen.updateResult(this.playerName, this.raceClock.getElapsedTime(), this.playerCar, this.opposingCar, "Easy", "Player");
                 this.objects.push(...this.finalScreen.objects.map(obj => {
                     obj.translateX(this.OFFSET * this.state.END);
                     return obj;
@@ -356,6 +403,18 @@ class MyContents {
                 this.app.activeCamera.position.set(this.currentState * this.OFFSET, 7, 5);
                 this.app.controls.target.set(this.currentState * this.OFFSET, 0, 0);
 
+                break;
+            case this.state.OPTIONS:
+                this.nameInput.style.display = "block";
+                this.selectedLayer = this.layers.MENU;
+                this.updateSelectedLayer();
+                this.nameInput.addEventListener("input", (e) => this.nameChanging(e));
+                
+                this.currentState = this.state.OPTIONS;
+                this.app.setActiveCamera("Menu");
+                this.app.updateCameraIfRequired();
+                this.app.activeCamera.position.set(this.currentState * this.OFFSET, 7, 5);
+                this.app.controls.target.set(this.currentState * this.OFFSET, 0, 0);
                 break;
         }
     }
@@ -602,11 +661,20 @@ class MyContents {
         this.display();
     }
 
+    optionsMenu() {
+        this.options = new Options(this.app, this.layers.MENU, this.playerName);
+        this.objects.push(...this.options.objects.map(obj => {
+            obj.translateX(this.OFFSET * this.state.OPTIONS);
+            return obj;
+        }));
+        this.nameInput.value = this.playerName;
+        this.display();
+    }
+
     endScreen() {
         this.finalScreen = new EndScreen(this.app, this.layers.MENU);
         this.objects.push(...this.finalScreen.objects.map(obj => {
             obj.translateX(this.OFFSET * this.state.END);
-            console.log(obj.position.x);
             return obj;
         }));
         this.display();
@@ -627,6 +695,21 @@ class MyContents {
 
     playGame() {
         this.app.followCamera = true;
+        this.display();
+    }
+
+    nameChanging(e) {
+        console.log(e);
+        if (this.playerName.length >= 7 && e.inputType == 'insertText')
+            return;
+
+        this.options.handleNameInput(e);
+        this.objects.push(...this.options.objects.map(obj => {
+            obj.translateX(this.OFFSET * this.state.OPTIONS);
+            return obj;
+        }));
+
+        this.playerName = this.options.playerName;
         this.display();
     }
 }

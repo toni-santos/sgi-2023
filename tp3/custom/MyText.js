@@ -1,7 +1,7 @@
 import * as THREE from "three";
 
 class MyText extends THREE.Object3D {
-    constructor(app, text, layer, offset) {
+    constructor(app, text, layer, offset, size = 1) {
         super();
         this.app = app;
         this.text = text;
@@ -11,6 +11,7 @@ class MyText extends THREE.Object3D {
         this.offset = offset;
         this.layer = layer;
         this.name = text;
+        this.size = size;
         this.buildText();
     }
 
@@ -22,7 +23,7 @@ class MyText extends THREE.Object3D {
             const charRow = charCode >= 32 && charCode <= 59 ? 0 : charCode >= 60 && charCode <= 87 ? 1 : charCode >= 88 && charCode <= 115 ? 2 : 3;  2;
             const charY = 1 - (this.letterH + charRow * this.letterH);
 
-            const letterGeometry = new THREE.PlaneGeometry(1,1);
+            const letterGeometry = new THREE.PlaneGeometry(this.size,this.size);
             const letterTexture = new THREE.TextureLoader().load(
                 "scenes/feupzero/textures/SpriteFont_Arial_Regular_(72)_[1,1,1,1]_72x90.png"
             );
@@ -34,7 +35,7 @@ class MyText extends THREE.Object3D {
             const letterMaterial = new THREE.MeshBasicMaterial({transparent: true});
             letterMaterial.map = letterTexture;
             const letter = new THREE.Mesh(letterGeometry, letterMaterial);
-            letter.position.set(i, 0, 0);
+            letter.position.set(i*this.size, 0, 0);
             letter.rotateX(-Math.PI / 2);
             letter.layers.set(this.layer);
             letter.name = this.text;
