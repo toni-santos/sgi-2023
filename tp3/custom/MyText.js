@@ -11,10 +11,10 @@ class MyText extends THREE.Object3D {
         this.offset = offset;
         this.layer = layer;
         this.name = text;
-        this.buildButton();
+        this.buildText();
     }
 
-    buildButton() {
+    buildText() {
         for (let i = 0; i < this.text.length; i++) {
             const charCode = this.text.charCodeAt(i);
             const charCol = (charCode - 32) % 28;
@@ -42,6 +42,14 @@ class MyText extends THREE.Object3D {
         }
 
         this.position.set(-(this.text.length - 1)/2 + this.offset.x, 0 + this.offset.y, 0 + this.offset.z);
+    }
+
+    setText(text) {
+        this.text = text;
+        this.name = text;
+        this.remove(...this.children);
+        this.buildText();
+        console.log(this);
     }
 }
 

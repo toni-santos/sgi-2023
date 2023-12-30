@@ -13,6 +13,7 @@ import { CarSelection } from "./custom/CarSelection.js";
 import { MyShader } from "./custom/MyShader.js";
 import { MyShaderBillboard } from "./custom/MyShaderBillboard.js";
 import { MyEnvironmentPlane } from "./custom/MyEnvironmentPlane.js";
+import { EndScreen } from "./custom/EndScreen.js";
 
 /**
  *  This class contains the contents of out application
@@ -111,7 +112,7 @@ class MyContents {
                     // this.pausedHandler(obj);
                     break;
                 case this.state.END:
-                    // this.endHandler(obj);
+                    this.endClickHandler(obj);
                     break;
             }
         }
@@ -149,6 +150,17 @@ class MyContents {
         }
     }
 
+    endClickHandler(obj) {
+        switch(obj.name) {
+            case "Return":
+                this.moveTo(this.state.MAIN);
+                break;
+            case "Restart":
+                this.moveTo(this.state.PLAYING);
+                break;
+        }
+    }
+    
     onPointerMove(event) {
         this.pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
         this.pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
@@ -173,6 +185,7 @@ class MyContents {
                 case this.state.PAUSED:
                     break;
                 case this.state.END:
+                    this.endHoverHandler(obj, true);
                     break;
             }
         } else {
@@ -191,6 +204,7 @@ class MyContents {
                     case this.state.PAUSED:
                         break;
                     case this.state.END:
+                        this.endHoverHandler(null, false);
                         break;
                 }
             }
@@ -199,6 +213,20 @@ class MyContents {
 
     mainMenuHoverHandler(obj, isHovering) {
         if (isHovering) {
+            if (this.lastPickedObj != obj) {
+                if (this.lastPickedObj)
+                    this.lastPickedObj.parent.scale.set(1,1,1);
+                this.lastPickedObj = obj;
+                this.lastPickedObj.parent.scale.set(1.1,1.1,1.1);
+            } 
+        } else {
+            this.lastPickedObj.parent.scale.set(1,1,1);
+            this.lastPickedObj = null;
+        }
+    }
+
+    endHoverHandler(obj, isHovering) {
+        if (isHovering && (obj.name == "Return" || obj.name == "Restart")) {
             if (this.lastPickedObj != obj) {
                 if (this.lastPickedObj)
                     this.lastPickedObj.parent.scale.set(1,1,1);
@@ -248,6 +276,7 @@ class MyContents {
         this.readXML();
         this.mainMenu();
         this.selectCar();
+        this.endScreen();
         // Change this to "PLAYING" to skip the menuing
         this.moveTo(this.state.MAIN);
     }
@@ -302,6 +331,25 @@ class MyContents {
                 this.playGame();
                 //TODO: enhance this (timer before start (?)) 
                 break;
+            case this.state.END:
+                this.selectedLayer = this.layers.MENU;
+                this.updateSelectedLayer();
+                this.currentState = this.state.END;
+
+                this.finalScreen.updateResult("WOW", this.raceClock.getElapsedTime());
+                this.objects.push(...this.finalScreen.objects.map(obj => {
+                    obj.translateX(this.OFFSET * this.state.END);
+                    return obj;
+                }));
+                this.display();
+        
+                this.app.setActiveCamera("Menu");
+                this.app.updateCameraIfRequired();
+                // TODO: change this to a better position
+                this.app.activeCamera.position.set(this.currentState * this.OFFSET, 7, 5);
+                this.app.controls.target.set(this.currentState * this.OFFSET, 0, 0);
+
+                break;
         }
     }
 
@@ -328,6 +376,7 @@ class MyContents {
         for (const object of this.objects) {
             this.app.scene.add(object);
         }
+        this.objects = [];
     }
 
     setupCPUPath(cpuVehicle) {
@@ -482,7 +531,7 @@ class MyContents {
         this.objects = this.objects.filter((o) => o !== this.playerVehicle && o !== this.cpuVehicle);
         this.app.scene.remove(this.playerVehicle);
         this.app.scene.remove(this.cpuVehicle);
-        return this.moveTo(this.state.MAIN);
+        return this.moveTo(this.state.END);
     }
 
     updateCarSelection(t) {
@@ -516,6 +565,16 @@ class MyContents {
         this.carSelection = new CarSelection(this.app, this.layers.CAR, this.cars);
         this.objects.push(...this.carSelection.objects.map(obj => {
             obj.translateX(this.OFFSET * this.state.CAR_SELECTION)
+            return obj;
+        }));
+        this.display();
+    }
+
+    endScreen() {
+        this.finalScreen = new EndScreen(this.app, this.layers.MENU);
+        this.objects.push(...this.finalScreen.objects.map(obj => {
+            obj.translateX(this.OFFSET * this.state.END);
+            console.log(obj.position.x);
             return obj;
         }));
         this.display();
