@@ -8,7 +8,7 @@ class MyTrack extends THREE.Object3D {
         this.type = "Group";
         this.width = width;
         this.points = points;
-        this.laps = laps;
+        this.laps = 1;
         this.checkpoints = [5, 30, 60, 80];
 
         this.trackTexture = new THREE.TextureLoader().load(

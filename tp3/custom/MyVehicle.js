@@ -5,11 +5,12 @@ import { posMod, signedAngleTo } from "../helper/MyUtils.js";
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 class MyVehicle extends MyCollidingObject {
-    constructor(app, model, shadow = false, maxSpeed=30, acceleration=1.9, handling=1.5) {
+    constructor(app, model, shadow = false, maxSpeed=30, acceleration=1.9, handling=1.5, owner="Player") {
         super(app, 0xff00ff);
         this.maxSpeed = maxSpeed / 100;
         this.acceleration = acceleration;
         this.handling = handling;
+        this.owner = owner;
         this.saveDefaults();
         this.app = app;
         this.type = 'Group';
