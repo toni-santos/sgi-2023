@@ -15,6 +15,7 @@ import { MyShaderBillboard } from "./custom/MyShaderBillboard.js";
 import { MyEnvironmentPlane } from "./custom/MyEnvironmentPlane.js";
 import { EndScreen } from "./custom/EndScreen.js";
 import { signedAngleTo } from "./helper/MyUtils.js";
+import { MyFirework } from "./custom/MyFirework.js";
 
 /**
  *  This class contains the contents of out application
@@ -152,6 +153,7 @@ class MyContents {
     }
 
     endClickHandler(obj) {
+        this.finalScreen.reset();
         switch(obj.name) {
             case "Return":
                 this.moveTo(this.state.MAIN);
@@ -235,8 +237,10 @@ class MyContents {
                 this.lastPickedObj.parent.scale.set(1.1,1.1,1.1);
             } 
         } else {
-            this.lastPickedObj.parent.scale.set(1,1,1);
-            this.lastPickedObj = null;
+            if (this.lastPickedObj) {
+                this.lastPickedObj.parent.scale.set(1,1,1);
+                this.lastPickedObj = null;
+            }
         }
     }
 
@@ -335,15 +339,17 @@ class MyContents {
             case this.state.END:
                 this.selectedLayer = this.layers.MENU;
                 this.updateSelectedLayer();
-                this.currentState = this.state.END;
 
-                this.finalScreen.updateResult("WOW", this.raceClock.getElapsedTime());
+                this.finalScreen.updateResult("WOW", this.raceClock.getElapsedTime(), this.playerCar, this.opposingCar, "Easy", "Player");
                 this.objects.push(...this.finalScreen.objects.map(obj => {
                     obj.translateX(this.OFFSET * this.state.END);
                     return obj;
                 }));
                 this.display();
-        
+                // TODO: check who won
+                this.winnerCar = this.finalScreen.playerCar;
+
+                this.currentState = this.state.END;
                 this.app.setActiveCamera("Menu");
                 this.app.updateCameraIfRequired();
                 // TODO: change this to a better position
@@ -472,7 +478,7 @@ class MyContents {
                 // this.updatePaused(t);
                 break;
             case this.state.END:
-                // this.updateEnd(t);
+                this.updateEnd(t);
                 break;
         }
     }
@@ -513,6 +519,29 @@ class MyContents {
             this.hudPowerup.innerHTML = `Modifier timer: ${(this.playerVehicle.modifier.duration - 
             this.playerVehicle.modifier.modifyingSince.getElapsedTime()).toFixed(2)}`
         else {this.hudPowerup.innerHTML = ""}
+    }
+
+    updateEnd(t) {
+        this.winnerCar.rotateY(0.01);
+        if(this.finalScreen.fireworks.length < 1 ) {
+            const firework = new MyFirework(this.app, this.winnerCar.position);
+            this.finalScreen.fireworks.push(firework);
+            console.log("firework added")
+        }
+
+        // for each fireworks 
+        for( let i = 0; i < this.finalScreen.fireworks.length; i++ ) {
+            // is firework finished?
+            if (this.finalScreen.fireworks[i].done) {
+                // remove firework 
+                this.finalScreen.fireworks.splice(i,1) 
+                console.log("firework removed")
+                continue 
+            }
+            // otherwise upsdate  firework
+            this.finalScreen.fireworks[i].update()
+        }
+
     }
 
     showHUD() {
