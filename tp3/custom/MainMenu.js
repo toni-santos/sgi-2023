@@ -19,8 +19,6 @@ class MainMenu {
         this.startButton.layers.set(layer);
         this.optionsButton.layers.set(layer);
         this.objects.push(this.startButton, this.optionsButton, this.shaderBillboard, this.treeTrunk);
-
-        this.app.setActiveCamera("Menu");
     }
 }
 

@@ -17,6 +17,7 @@ import { EndScreen } from "./custom/EndScreen.js";
 import { signedAngleTo } from "./helper/MyUtils.js";
 import { MyFirework } from "./custom/MyFirework.js";
 import { Options } from "./custom/Options.js";
+import { PausedScreen } from "./custom/PausedScreen.js";
 
 /**
  *  This class contains the contents of out application
@@ -117,7 +118,7 @@ class MyContents {
                     // this.playingHandler(obj);
                     break;
                 case this.state.PAUSED:
-                    // this.pausedHandler(obj);
+                    this.pausedClickHandler(obj);
                     break;
                 case this.state.END:
                     this.endClickHandler(obj);
@@ -139,6 +140,25 @@ class MyContents {
                 break;
         }
     }
+
+    pausedClickHandler(obj) {
+        switch(obj.name) {
+            case "Continue":
+                this.changePauseState(false);
+                
+                this.app.setActiveCamera("Play");
+                this.app.updateCameraIfRequired();
+                this.showHUD();
+
+                this.currentState = this.state.PLAYING;
+                break;
+            case "Exit":
+                this.changePauseState(false);
+                this.moveTo(this.state.MAIN);
+                break;
+        }
+    }
+
 
     optionsClickHandler(obj) {
         switch(obj.name) {
@@ -212,6 +232,7 @@ class MyContents {
                 case this.state.PLAYING:
                     break;
                 case this.state.PAUSED:
+                    this.pausedHoverHandler(obj, true);
                     break;
                 case this.state.END:
                     this.endHoverHandler(obj, true);
@@ -234,6 +255,7 @@ class MyContents {
                     case this.state.PLAYING:
                         break;
                     case this.state.PAUSED:
+                        this.pausedHoverHandler(null, false);
                         break;
                     case this.state.END:
                         this.endHoverHandler(null, false);
@@ -247,6 +269,20 @@ class MyContents {
     }
 
     mainMenuHoverHandler(obj, isHovering) {
+        if (isHovering) {
+            if (this.lastPickedObj != obj) {
+                if (this.lastPickedObj)
+                    this.lastPickedObj.parent.scale.set(1,1,1);
+                this.lastPickedObj = obj;
+                this.lastPickedObj.parent.scale.set(1.1,1.1,1.1);
+            } 
+        } else {
+            this.lastPickedObj.parent.scale.set(1,1,1);
+            this.lastPickedObj = null;
+        }
+    }
+
+    pausedHoverHandler(obj, isHovering) {
         if (isHovering) {
             if (this.lastPickedObj != obj) {
                 if (this.lastPickedObj)
@@ -331,6 +367,7 @@ class MyContents {
         this.selectCar();
         this.endScreen();
         this.optionsMenu();
+        this.pauseMenu();
         // Change this to "PLAYING" to skip the menuing
         this.moveTo(this.state.MAIN);
     }
@@ -418,6 +455,19 @@ class MyContents {
                 this.app.activeCamera.position.set(this.currentState * this.OFFSET, 7, 5);
                 this.app.controls.target.set(this.currentState * this.OFFSET, 0, 0);
                 break;
+            case this.state.PAUSED:
+                this.selectedLayer = this.layers.MENU;
+                this.updateSelectedLayer();
+                this.currentState = this.state.PAUSED;
+                
+                this.changePauseState(true);
+                this.hideHUD();
+
+                this.app.setActiveCamera("Menu");
+                this.app.updateCameraIfRequired();
+                this.app.activeCamera.position.set(this.currentState * this.OFFSET, 7, 5);
+                this.app.controls.target.set(this.currentState * this.OFFSET, 0, 0);
+                break;
         }
     }
 
@@ -438,6 +488,7 @@ class MyContents {
         if (this.app.pressedKeys.includes("s")) this.playerVehicle.changeVelocity(-0.0008);
         if (this.app.pressedKeys.includes("a")) this.playerVehicle.turn(Math.PI/200);
         if (this.app.pressedKeys.includes("d")) this.playerVehicle.turn(-Math.PI/200);
+        if (this.app.pressedKeys.includes("p")) this.moveTo(this.state.PAUSED);
     }
 
     display() {
@@ -545,9 +596,9 @@ class MyContents {
     }
 
     updatePlaying(t) {
-        console.log(this.raceClock.elapsedTime);
         this.animationPauseState();
-        if (this.paused) return;
+        if (this.paused)
+            return;
         this.playerVehicle.update(t, this.track);
         this.cpuVehicle.update(t, this.track);
         if (this.playerVehicle.completedLaps === this.track.laps) return this.endGame();
@@ -705,6 +756,15 @@ class MyContents {
         this.display();
     }
 
+    pauseMenu() {
+        this.pausedScreen = new PausedScreen(this.app, this.layers.MENU);
+        this.objects.push(...this.pausedScreen.objects.map(obj => {
+            obj.translateX(this.OFFSET * this.state.PAUSED);
+            return obj;
+        }));
+        this.display();
+    }
+
     readXML() {
         this.xmlContents = new MyXMLContents(this.app);
         this.circuit = this.xmlContents.reader.objects["circuit"];
@@ -724,7 +784,6 @@ class MyContents {
     }
 
     nameChanging(e) {
-        console.log(e);
         if (this.playerName.length >= 7 && e.inputType == 'insertText')
             return;
 

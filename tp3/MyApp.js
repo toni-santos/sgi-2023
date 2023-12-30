@@ -216,7 +216,7 @@ class MyApp {
 
     setupControls() {
         document.onkeydown = (e) => {
-            if (!["w", "a", "s", "d", " "].includes(e.key)) return;
+            if (!["w", "a", "s", "d", " ", "p"].includes(e.key)) return;
             /**
             if (e.key == "w") {
                 console.log("w");
@@ -238,7 +238,7 @@ class MyApp {
         };
         
         document.onkeyup = (e) => {
-            if (!["w", "a", "s", "d"].includes(e.key)) return;
+            if (!["w", "a", "s", "d", "p"].includes(e.key)) return;
             /**
             if (e.key == "w") {
                 console.log("w");
