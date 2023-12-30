@@ -14,6 +14,7 @@ import { MyShader } from "./custom/MyShader.js";
 import { MyShaderBillboard } from "./custom/MyShaderBillboard.js";
 import { MyEnvironmentPlane } from "./custom/MyEnvironmentPlane.js";
 import { EndScreen } from "./custom/EndScreen.js";
+import { signedAngleTo } from "./helper/MyUtils.js";
 
 /**
  *  This class contains the contents of out application
@@ -395,13 +396,11 @@ class MyContents {
         let vector = new THREE.Vector3();
         let cross = new THREE.Vector3();
 
-        // Angle in each route point = angle between initial orientation and 
+        // Angle in each route point = angle between current orientation vector and direction vector to next point
         for (let i = 0; i < this.keyPoints.length; i++) {
             vector = this.keyPoints[(i + 1) % this.keyPoints.length].clone();
             vector.subVectors(vector, this.keyPoints[i]);
-            cross.crossVectors(new THREE.Vector3(0, 0, 1), vector);
-            let angle = cpuVehicle.orientation.angleTo(vector);
-            angle = cross.y < 0 ? -angle : angle;
+            const angle = signedAngleTo(cpuVehicle.orientation, vector);
             const q = new THREE.Quaternion().setFromAxisAngle(yAxis, angle);
             rValues.push(...q);
         }
@@ -510,6 +509,10 @@ class MyContents {
         this.hudTime.innerHTML = this.raceClock.getElapsedTime().toFixed(2);
         this.hudSpeed.innerHTML = (this.playerVehicle.velocity * 100).toFixed(2);
         this.hudLap.innerHTML = `Lap ${this.playerVehicle.completedLaps + 1}/${this.track.laps}`;
+        if (this.playerVehicle.modifier)
+            this.hudPowerup.innerHTML = `Modifier timer: ${(this.playerVehicle.modifier.duration - 
+            this.playerVehicle.modifier.modifyingSince.getElapsedTime()).toFixed(2)}`
+        else {this.hudPowerup.innerHTML = ""}
     }
 
     showHUD() {
