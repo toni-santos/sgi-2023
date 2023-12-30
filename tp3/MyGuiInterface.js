@@ -42,6 +42,10 @@ class MyGuiInterface {
                 this.app.togglePP(value);
             });
         const cameraFolder = this.datgui.addFolder("Camera");
+        this.datgui.add(this.contents, "paused")
+        .name("Pause").onChange((value) => {
+            this.contents.changePauseState(value);
+        });
         // cameraFolder
         //     .add(
         //         this.app,

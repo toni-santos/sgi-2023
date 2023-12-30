@@ -74,7 +74,6 @@ class MyVehicle extends MyCollidingObject {
             this.slowReset();
             this.processModifiers();
             // console.log(this.velocity);
-            if (this.name == "skyline") console.log(this.orientation, this.angle);
         }
         if (this.closestPointIndex === 1) this.addLap(track.checkpoints);
 	}

@@ -89,6 +89,8 @@ class MyContents {
         this.previousPlayerCar = this.cars[1];
         this.opposingCar = this.cars[1];
         this.previousOpposingCar = this.cars[1];
+
+        this.paused = false;
     }
 
     onPointerDown(event) {
@@ -484,12 +486,12 @@ class MyContents {
         this.mixer = new THREE.AnimationMixer(cpuVehicle)
 
         // Create AnimationActions for each clip
-        const positionAction = this.mixer.clipAction(positionClip)
-        const rotationAction = this.mixer.clipAction(rotationClip)
+        this.positionAction = this.mixer.clipAction(positionClip)
+        this.rotationAction = this.mixer.clipAction(rotationClip)
 
         // Play both animations
-        positionAction.play()
-        rotationAction.play()
+        this.positionAction.play()
+        this.rotationAction.play()
     }
 
     debugKeyFrames() {
@@ -543,6 +545,9 @@ class MyContents {
     }
 
     updatePlaying(t) {
+        console.log(this.raceClock.elapsedTime);
+        this.animationPauseState();
+        if (this.paused) return;
         this.playerVehicle.update(t, this.track);
         this.cpuVehicle.update(t, this.track);
         if (this.playerVehicle.completedLaps === this.track.laps) return this.endGame();
@@ -615,6 +620,26 @@ class MyContents {
         this.hudSpeed.style.display = "none";
         this.hudLap.style.display = "none";
         this.hudPowerup.style.display = "none";
+    }
+
+    changePauseState(value) {
+        if (value) {
+            this.paused = true;
+            this.pauseClock = new THREE.Clock(false);
+            this.pauseClock.start();
+        } else {
+            this.paused = false;
+            this.raceClock.elapsedTime -= this.pauseClock.getElapsedTime();
+            this.pauseClock.stop();
+        }
+    }
+
+    animationPauseState() {
+        if (this.paused) {
+            this.mixer.timeScale = 0;
+        } else { 
+            this.mixer.timeScale = 1;
+        };
     }
 
     endGame() {
