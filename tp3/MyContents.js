@@ -11,6 +11,7 @@ import { Options } from "./custom/Options.js";
 import { PausedScreen } from "./custom/PausedScreen.js";
 import { ObstaclesScreen } from "./custom/ObstaclesScreen.js";
 import { MyTreeTrunk } from "./custom/MyTreeTrunk.js";
+import { MyModifier } from "./custom/MyModifier.js";
 
 /**
  *  This class contains the contents of out application
@@ -146,14 +147,6 @@ class MyContents {
 
     obstacleClickHandler(obj, position) {
         switch(obj.name) {
-            case "Trunk":
-                if (this.selectedObstacle) {
-                    this.previousObstacle = this.selectedObstacle;
-                }
-                this.selectedObstacle = "Trunk";
-                console.log("ashjfasndfkjnasdfnljk");
-
-                break;
             case "Confirm":
                 this.app.setActiveCamera("Menu");
                 this.app.updateCameraIfRequired();
@@ -161,16 +154,11 @@ class MyContents {
                 this.app.controls.target.set(this.state.PLAYING * this.OFFSET, 0, 0);
                 break;
             case "Track":
-                switch (this.selectedObstacle) {
-                    case "Trunk":
-                        const trunk = new MyTreeTrunk(this.app);
-                        trunk.position.set(position.x, position.y + trunk.radius, position.z);
-                        this.collidableObjects.push(trunk);
-                        this.circuit.add(trunk);
-                        this.objects.push(trunk);
-                        this.display();
-                        break;
-                }
+                const pos = new THREE.Vector3(position.x, position.y + 0.35, position.z);
+                const obs = new MyModifier(this.app, this.obstaclesScreen.selected.name, pos, 3, false);
+                this.collidableObjects.push(obs);
+                this.circuit.add(obs);
+                this.display();
 
                 // Reset to play state
                 this.changePauseState(false);
@@ -182,7 +170,12 @@ class MyContents {
                 this.app.updateCameraIfRequired();
                 this.currentState = this.state.PLAYING;
                 break;
+            default:
+                this.obstaclesScreen.selected = this.obstaclesScreen.obstacles[obj.name];
+                break;
         }
+        console.log(obj.name);
+        console.log(this.obstaclesScreen.selected);
     }
 
     pausedClickHandler(obj) {
@@ -533,7 +526,6 @@ class MyContents {
                 this.currentState = this.state.PAUSED;
                 
                 this.changePauseState(true);
-                this.animationPauseState();
                 this.hideHUD();
 
                 this.app.setActiveCamera("Menu");
@@ -547,7 +539,6 @@ class MyContents {
                 this.currentState = this.state.OBSTACLE;
 
                 this.changePauseState(true);
-                this.animationPauseState();
                 this.hideHUD();
                 this.app.followCamera = false;
                 this.raycaster.far = 1000;
@@ -687,7 +678,6 @@ class MyContents {
     }
 
     updatePlaying(t) {
-        this.animationPauseState();
         if (this.paused) return;
         for (const vehicle of this.vehicles) {
             vehicle.update(t, this.track);
@@ -697,8 +687,7 @@ class MyContents {
             if (this.playerVehicle.boundingBox.intersectsBox(obs.boundingBox)) {
                 this.collidableObjects = this.collidableObjects.filter((o) => o !== obs);
                 this.circuit.remove(obs);
-                // TODO: Implement obstacles && check for collisions with them
-                // this.moveTo(this.state.OBSTACLE);
+                if (obs.positive) this.moveTo(this.state.OBSTACLE);
                 obs.apply(this.playerVehicle);
             }
         }
@@ -724,7 +713,7 @@ class MyContents {
         this.hudSpeed.innerHTML = (this.playerVehicle.velocity * 100).toFixed(2);
         this.hudLap.innerHTML = `Lap ${this.playerVehicle.completedLaps + 1}/${this.track.laps}`;
         if (this.playerVehicle.modifier)
-            this.hudPowerup.innerHTML = `Modifier timer: ${(this.playerVehicle.modifier.duration - 
+            this.hudPowerup.innerHTML = `${this.playerVehicle.modifier.name}: ${(this.playerVehicle.modifier.duration - 
             this.playerVehicle.modifier.modifyingSince.getElapsedTime()).toFixed(2)}`
         else {this.hudPowerup.innerHTML = ""}
     }
@@ -774,8 +763,10 @@ class MyContents {
         } else {
             this.paused = false;
             this.raceClock.elapsedTime -= this.pauseClock.getElapsedTime();
+            if (this.playerVehicle.modifier) this.playerVehicle.modifier.modifyingSince.elapsedTime -= this.pauseClock.getElapsedTime();
             this.pauseClock.stop();
         }
+        this.animationPauseState();
     }
 
     animationPauseState() {
@@ -792,6 +783,9 @@ class MyContents {
         this.objects = this.objects.filter((o) => o !== this.playerVehicle && o !== this.cpuVehicle);
         this.app.scene.remove(this.playerVehicle);
         this.app.scene.remove(this.cpuVehicle);
+        for (const obj of this.collidableObjects) {
+            this.circuit.remove(obj);
+        }
         return this.moveTo(this.state.END);
     }
 
@@ -886,7 +880,6 @@ class MyContents {
         this.route = this.xmlContents.reader.objects["route"];
         this.obstacles = this.xmlContents.reader.objects["obstacles"];
         this.powerups = this.xmlContents.reader.objects["powerups"];
-        this.collidableObjects = this.powerups.concat(this.obstacles);
         // TODO: remove this, it's just a placeholder for testing
         this.envPlane = new MyEnvironmentPlane(this.app, 200,"scenes/feupzero/textures/envMap.jpg", "scenes/feupzero/textures/ground.jpg", "shaders/s1.vert", "shaders/s1.frag");
         this.objects.push(this.envPlane);
@@ -894,6 +887,10 @@ class MyContents {
 
     playGame() {
         this.app.followCamera = true;
+        this.collidableObjects = this.powerups.concat(this.obstacles);
+        for (const obj of this.collidableObjects) {
+            this.circuit.add(obj);
+        }
         this.display();
     }
 

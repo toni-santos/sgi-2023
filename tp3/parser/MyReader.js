@@ -1,8 +1,7 @@
 import * as THREE from "three";
 import { MyTrack } from "../custom/MyTrack.js";
 import { MyRoute } from "../custom/MyRoute.js";
-import { MyObstacle } from "../custom/MyObstacle.js";
-import { MyPowerUp } from "../custom/MyPowerUp.js";
+import { MyModifier } from "../custom/MyModifier.js";
 
 class MyReader {
     constructor(app) {
@@ -27,10 +26,10 @@ class MyReader {
     }
 
     createPowerUps(powerups) {
-        this.objects["powerups"] = [];   
+        this.objects["powerups"] = [];
         const points = this.parsePoints(powerups);
         for (const point of points) {
-            const powerupObj = new MyPowerUp(this.app, THREE.MathUtils.randInt(0,1), point, 7);
+            const powerupObj = new MyModifier(this.app, THREE.MathUtils.randInt(0,1), point, 7, true);
             this.objects["powerups"].push(powerupObj);
         }
         return this.objects["powerups"];
@@ -40,7 +39,7 @@ class MyReader {
         this.objects["obstacles"] = [];   
         const points = this.parsePoints(obstacles);
         for (const point of points) {
-            const obstacleObj = new MyObstacle(this.app, THREE.MathUtils.randInt(0,1), point, 3);
+            const obstacleObj = new MyModifier(this.app, THREE.MathUtils.randInt(2,3), point, 3, false);
             this.objects["obstacles"].push(obstacleObj);
         }
         return this.objects["obstacles"];
