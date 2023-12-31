@@ -14,11 +14,10 @@ class MainMenu {
         
         // TODO: remove this as it is a testing placeholder
         this.shaderBillboard = new MyShaderBillboard(this.app, "scenes/feupzero/textures/okcomp_map.jpg", "scenes/feupzero/textures/okcomp.jpg", "shaders/s1.vert", "shaders/s1.frag");
-        this.treeTrunk = new MyTreeTrunk(this.app);
 
         this.startButton.layers.set(layer);
         this.optionsButton.layers.set(layer);
-        this.objects.push(this.startButton, this.optionsButton, this.shaderBillboard, this.treeTrunk);
+        this.objects.push(this.startButton, this.optionsButton, this.shaderBillboard);
     }
 }
 

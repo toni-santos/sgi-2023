@@ -129,6 +129,7 @@ class MyApp {
         
         const play = new THREE.PerspectiveCamera(75, aspect, 0.1, 1000);
         play.position.set(0, 10, 0);
+        play.layers.enableAll();
         this.cameras["Play"] = play;
     }
 

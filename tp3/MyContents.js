@@ -9,6 +9,7 @@ import { signedAngleTo } from "./helper/MyUtils.js";
 import { MyFirework } from "./custom/MyFirework.js";
 import { Options } from "./custom/Options.js";
 import { PausedScreen } from "./custom/PausedScreen.js";
+import { ObstaclesScreen } from "./custom/ObstaclesScreen.js";
 import { MyTreeTrunk } from "./custom/MyTreeTrunk.js";
 
 /**
@@ -85,6 +86,9 @@ class MyContents {
         this.opposingCar = this.cars[1];
         this.previousOpposingCar = this.cars[1];
 
+        this.previousObstacle = null;
+        this.selectedObstacle = null;
+
         this.paused = false;
         this.difficulty = 3;
         this.difficultyName = "Normal";
@@ -123,7 +127,7 @@ class MyContents {
                     this.optionsClickHandler(obj);
                     break;    
                 case this.state.OBSTACLE:
-                    this.obstacleClickHandler(obj);
+                    this.obstacleClickHandler(obj, intersects[0].point);
                     break;
             }
         }
@@ -140,8 +144,45 @@ class MyContents {
         }
     }
 
-    obstacleClickHandler(obj) {
-        console.log(obj);
+    obstacleClickHandler(obj, position) {
+        switch(obj.name) {
+            case "Trunk":
+                if (this.selectedObstacle) {
+                    this.previousObstacle = this.selectedObstacle;
+                }
+                this.selectedObstacle = "Trunk";
+                console.log("ashjfasndfkjnasdfnljk");
+
+                break;
+            case "Confirm":
+                this.app.setActiveCamera("Menu");
+                this.app.updateCameraIfRequired();
+                this.app.activeCamera.position.set(this.state.PLAYING * this.OFFSET, 35, 0);
+                this.app.controls.target.set(this.state.PLAYING * this.OFFSET, 0, 0);
+                break;
+            case "Track":
+                switch (this.selectedObstacle) {
+                    case "Trunk":
+                        const trunk = new MyTreeTrunk(this.app);
+                        trunk.position.set(position.x, position.y + trunk.radius, position.z);
+                        this.collidableObjects.push(trunk);
+                        this.circuit.add(trunk);
+                        this.objects.push(trunk);
+                        this.display();
+                        break;
+                }
+
+                // Reset to play state
+                this.changePauseState(false);
+                this.animationPauseState();
+                this.showHUD();
+                this.app.followCamera = true;
+
+                this.app.setActiveCamera("Play");
+                this.app.updateCameraIfRequired();
+                this.currentState = this.state.PLAYING;
+                break;
+        }
     }
 
     pausedClickHandler(obj) {
@@ -161,7 +202,6 @@ class MyContents {
                 break;
         }
     }
-
 
     optionsClickHandler(obj) {
         switch(obj.name) {
@@ -310,7 +350,7 @@ class MyContents {
     }
 
     obstacleHoverHandler(obj, isHovering) {
-        if (isHovering) {
+        if (isHovering && (obj.name != "Pick an obstacle" && obj.name != "Track")) {
             if (this.lastPickedObj != obj) {
                 if (this.lastPickedObj)
                     this.lastPickedObj.parent.scale.set(1,1,1);
@@ -318,7 +358,7 @@ class MyContents {
                 this.lastPickedObj.parent.scale.set(1.1,1.1,1.1);
             } 
         } else {
-            this.lastPickedObj.parent.scale.set(1,1,1);
+            this.lastPickedObj?.parent.scale.set(1,1,1);
             this.lastPickedObj = null;
         }
     }
@@ -376,10 +416,12 @@ class MyContents {
     updateSelectedLayer() {
         switch (this.selectedLayer) {
             case this.layers.NONE:
-                this.raycaster.layers.enableAll()
+                this.raycaster.layers.enableAll();
+                this.activeLayer = this.selectedLayer;
                 break;
             default:
-                this.raycaster.layers.set(this.selectedLayer)
+                this.raycaster.layers.set(this.selectedLayer);
+                this.activeLayer = this.selectedLayer;
                 break;
         }
     }
@@ -395,6 +437,7 @@ class MyContents {
         this.endScreen();
         this.optionsMenu();
         this.pauseMenu();
+        this.obstaclesMenu();
         // Change this to "PLAYING" to skip the menuing
         this.moveTo(this.state.MAIN);
     }
@@ -503,27 +546,18 @@ class MyContents {
                 this.updateSelectedLayer();
                 this.currentState = this.state.OBSTACLE;
 
-                this.showObstacles();
                 this.changePauseState(true);
                 this.animationPauseState();
                 this.hideHUD();
                 this.app.followCamera = false;
+                this.raycaster.far = 1000;
 
                 this.app.setActiveCamera("Menu");
                 this.app.updateCameraIfRequired();
-                this.app.activeCamera.position.set(this.state.PLAYING * this.OFFSET, 40, 0);
-                this.app.controls.target.set(this.state.PLAYING * this.OFFSET, 0, 0);
+                this.app.activeCamera.position.set(this.currentState * this.OFFSET, 7, 5);
+                this.app.controls.target.set(this.currentState * this.OFFSET, 0, 0);
                 break;
         }
-    }
-
-    showObstacles() {
-        const trunk = new MyTreeTrunk(this.app);
-        trunk.position.set(10, 25, 0);
-        trunk.mesh.layers.set(this.layers.OBSTACLE);
-
-        this.objects.push(trunk);
-        this.display();
     }
 
     placeVehicle(vehicle, point) {
@@ -647,7 +681,7 @@ class MyContents {
                 this.updateEnd(t);
                 break;
             case this.state.OBSTACLE:
-                // this.updateObstacle(t);
+                this.updateObstacle(t);
                 break;
         }
     }
@@ -663,9 +697,9 @@ class MyContents {
             if (this.playerVehicle.boundingBox.intersectsBox(obs.boundingBox)) {
                 this.collidableObjects = this.collidableObjects.filter((o) => o !== obs);
                 this.circuit.remove(obs);
-                // TODO: remove this, placeholder for testing
-                this.moveTo(this.state.OBSTACLE);
-                // obs.apply(this.playerVehicle);
+                // TODO: Implement obstacles && check for collisions with them
+                // this.moveTo(this.state.OBSTACLE);
+                obs.apply(this.playerVehicle);
             }
         }
         if (this.playerVehicle.boundingBox.intersectsBox(this.cpuVehicle.boundingBox))
@@ -778,6 +812,17 @@ class MyContents {
         this.carSelection.map["cpu_" + this.opposingCar].rotateY(0.01);
     }
 
+    updateObstacle(t) {
+        if (this.previousObstacle && this.selectedObstacle && (this.previousObstacle != this.selectedObstacle)) {
+            this.obstaclesScreen.obstacles[this.selectedObstacle].position.y = 0;
+            this.obstaclesScreen.obstacles[this.selectedObstacle].setRotationFromAxisAngle(new THREE.Vector3(0,1,0), 0);
+        }
+        if (this.selectedObstacle) {
+            this.obstaclesScreen.obstacles[this.selectedObstacle].position.y = 2;
+            this.obstaclesScreen.obstacles[this.selectedObstacle].rotateY(0.01);
+        }
+    }
+
     mainMenu() {
         this.mainmenu = new MainMenu(this.app, this.layers.MENU);
 
@@ -820,6 +865,15 @@ class MyContents {
         this.pausedScreen = new PausedScreen(this.app, this.layers.MENU);
         this.objects.push(...this.pausedScreen.objects.map(obj => {
             obj.translateX(this.OFFSET * this.state.PAUSED);
+            return obj;
+        }));
+        this.display();
+    }
+    
+    obstaclesMenu() {
+        this.obstaclesScreen = new ObstaclesScreen(this.app, this.layers.OBSTACLE);
+        this.objects.push(...this.obstaclesScreen.objects.map(obj => {
+            obj.translateX(this.OFFSET * this.state.OBSTACLE);
             return obj;
         }));
         this.display();

@@ -23,7 +23,6 @@ class EndScreen {
         this.objects.push(this.endText, this.returnButton, this.restartButton, this.playerName, this.playerTime, this.levelDifficulty);
     }
 
-    // TODO: winner logic
     updateResult(name, time, player, cpu, difficulty, winner) {
         this.objects = [];
 

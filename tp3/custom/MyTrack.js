@@ -37,6 +37,8 @@ class MyTrack extends THREE.Object3D {
         this.curveMesh = this.buildCurve();
         this.track = new THREE.PlaneGeometry( 1, 1, 300, 1 );
         this.trackMesh = this.buildTrack();
+        this.trackMesh.layers.set(4);
+        this.trackMesh.name = "Track";
         console.log(this.trackMesh.geometry.getAttribute('position'));
 
         this.add(this.curveMesh);
