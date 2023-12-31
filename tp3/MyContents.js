@@ -563,11 +563,11 @@ class MyContents {
         vehicle.getWorldDirection(vehicle.orientation);
     }
 
-    control() {
-        if (this.app.pressedKeys.includes("w")) this.playerVehicle.changeVelocity(0.0008);
-        if (this.app.pressedKeys.includes("s")) this.playerVehicle.changeVelocity(-0.0008);
-        if (this.app.pressedKeys.includes("a")) this.playerVehicle.turn(Math.PI/200);
-        if (this.app.pressedKeys.includes("d")) this.playerVehicle.turn(-Math.PI/200);
+    control(delta) {
+        if (this.app.pressedKeys.includes("w")) this.playerVehicle.changeVelocity(0.0008 * delta);
+        if (this.app.pressedKeys.includes("s")) this.playerVehicle.changeVelocity(-0.0008 * delta);
+        if (this.app.pressedKeys.includes("a")) this.playerVehicle.turn(Math.PI * delta / 200);
+        if (this.app.pressedKeys.includes("d")) this.playerVehicle.turn(-Math.PI * delta / 200);
         if (this.app.pressedKeys.includes("p")) this.moveTo(this.state.PAUSED);
     }
 
@@ -651,7 +651,6 @@ class MyContents {
     update(t) {
         if (t === undefined) return;
         const delta = this.raceClock.getDelta();
-        this.mixer?.update(delta*this.difficulty);
         switch (this.currentState) {
             case this.state.MAIN:
                 // this.updateMain(t);
@@ -663,7 +662,7 @@ class MyContents {
                 // this.updateTrackSelection(t);
                 break;
             case this.state.PLAYING:
-                this.updatePlaying(t);
+                this.updatePlaying(t, delta);
                 break;
             case this.state.PAUSED:
                 // this.updatePaused(t);
@@ -677,10 +676,10 @@ class MyContents {
         }
     }
 
-    updatePlaying(t) {
+    updatePlaying(t, delta) {
         if (this.paused) return;
         for (const vehicle of this.vehicles) {
-            vehicle.update(t, this.track);
+            vehicle.update(t, delta*50, this.track);
             if (vehicle.completedLaps === this.track.laps) return this.endGame(vehicle.owner);
         }
         for (const obs of this.collidableObjects) {
@@ -691,6 +690,7 @@ class MyContents {
                 obs.apply(this.playerVehicle);
             }
         }
+        this.mixer?.update(delta*this.difficulty);
         if (this.playerVehicle.boundingBox.intersectsBox(this.cpuVehicle.boundingBox))
             this.playerVehicle.velocity = Math.min(this.playerVehicle.velocity, this.playerVehicle.maxSpeed/7)
         if (this.app.followCamera) {
@@ -705,7 +705,7 @@ class MyContents {
             this.app.controls.target.set(pos.x, pos.y, pos.z);
         }
         this.updateHUD();
-        this.control();
+        this.control(delta*50);
     }
 
     updateHUD() {

@@ -17,6 +17,7 @@ class MyCollidingObject extends THREE.Object3D {
     addCollisionMesh(mesh) {
         this.collisionMesh = new THREE.BoxHelper(mesh, 0xff0000);
         this.add(this.collisionMesh);
+        this.toggleCollisionMesh(false);
     }
 
     toggleCollisionMesh(value) {

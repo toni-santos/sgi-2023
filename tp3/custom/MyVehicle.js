@@ -61,13 +61,13 @@ class MyVehicle extends MyCollidingObject {
         this.wheels = this.frontWheels.concat([self.mesh.getObjectByName("Rear_Wheel_2")]);
     }
 
-    update(t, track) {
+    update(t, delta, track) {
         this.animate(t);
         this.getWorldDirection(this.orientation);
         this.computeClosestPoint(track.points);
         this.handleOutOfBounds(track);
         if (this.mesh) {
-            this.changePosition();
+            this.changePosition(delta);
             this.setBoundingBox(this.mesh);
             //console.log(this.velocity * 100);
             this.slowReset();
@@ -109,9 +109,9 @@ class MyVehicle extends MyCollidingObject {
         this.handling = this.defaultHandling;
     }
 
-    changePosition() {
-        this.position.x += 1 * this.velocity * Math.sin(this.angle);
-        this.position.z += 1 * this.velocity * Math.cos(this.angle);
+    changePosition(delta) {
+        this.position.x += delta * this.velocity * Math.sin(this.angle);
+        this.position.z += delta * this.velocity * Math.cos(this.angle);
     }
 
     resetPosition(trackPoints) {
