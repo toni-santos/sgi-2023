@@ -59,8 +59,6 @@ class MyVehicle extends MyCollidingObject {
         self.add(self.collisionMesh);
         this.frontWheels = [self.mesh.getObjectByName("Front_Left_Wheel_0"), self.mesh.getObjectByName("Front_Right_Wheel_1")];
         this.wheels = this.frontWheels.concat([self.mesh.getObjectByName("Rear_Wheel_2")]);
-        console.log(self.name, this.wheels);
-        console.log("done");
     }
 
     update(t, track) {

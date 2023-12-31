@@ -1,23 +1,15 @@
 import * as THREE from "three";
-import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
-import { MyAxis } from "./MyAxis.js";
-import { MyFileReader } from "./parser/MyFileReader.js";
-import { MyGraph } from "./helper/MyGraph.js";
-import { MyNurbsBuilder } from "./helper/MyNurbsBuilder.js";
-import { MySceneData } from "./parser/MySceneData.js";
 import { MyXMLContents } from "./MyXMLContents.js";
-import { MyTrack } from "./custom/MyTrack.js";
 import { MyVehicle } from "./custom/MyVehicle.js";
 import { MainMenu } from "./custom/MainMenu.js";
 import { CarSelection } from "./custom/CarSelection.js";
-import { MyShader } from "./custom/MyShader.js";
-import { MyShaderBillboard } from "./custom/MyShaderBillboard.js";
 import { MyEnvironmentPlane } from "./custom/MyEnvironmentPlane.js";
 import { EndScreen } from "./custom/EndScreen.js";
 import { signedAngleTo } from "./helper/MyUtils.js";
 import { MyFirework } from "./custom/MyFirework.js";
 import { Options } from "./custom/Options.js";
 import { PausedScreen } from "./custom/PausedScreen.js";
+import { MyTreeTrunk } from "./custom/MyTreeTrunk.js";
 
 /**
  *  This class contains the contents of out application
@@ -30,7 +22,8 @@ class MyContents {
         MAIN: 3,
         PAUSED: 4,
         END: 5,
-        OPTIONS: 6
+        OPTIONS: 6,
+        OBSTACLE: 7
     }
 
     layers = {
@@ -129,6 +122,9 @@ class MyContents {
                 case this.state.OPTIONS:
                     this.optionsClickHandler(obj);
                     break;    
+                case this.state.OBSTACLE:
+                    this.obstacleClickHandler(obj);
+                    break;
             }
         }
     }
@@ -142,6 +138,10 @@ class MyContents {
                 this.moveTo(this.state.OPTIONS);
                 break;
         }
+    }
+
+    obstacleClickHandler(obj) {
+        console.log(obj);
     }
 
     pausedClickHandler(obj) {
@@ -247,6 +247,9 @@ class MyContents {
                 case this.state.OPTIONS:
                     this.optionsHoverHandler(obj, true);
                     break;
+                case this.state.OBSTACLE:
+                    this.obstacleHoverHandler(obj, true);
+                    break;
             }
         } else {
             if (this.lastPickedObj) {
@@ -269,7 +272,10 @@ class MyContents {
                         break;
                     case this.state.OPTIONS:
                         this.optionsHoverHandler(null, false);
-                        break;        
+                        break;
+                    case this.state.OBSTACLE:
+                        this.obstacleHoverHandler(null, false);
+                        break;
                 }
             }
         }
@@ -303,6 +309,20 @@ class MyContents {
         }
     }
 
+    obstacleHoverHandler(obj, isHovering) {
+        if (isHovering) {
+            if (this.lastPickedObj != obj) {
+                if (this.lastPickedObj)
+                    this.lastPickedObj.parent.scale.set(1,1,1);
+                this.lastPickedObj = obj;
+                this.lastPickedObj.parent.scale.set(1.1,1.1,1.1);
+            } 
+        } else {
+            this.lastPickedObj.parent.scale.set(1,1,1);
+            this.lastPickedObj = null;
+        }
+    }
+    
     optionsHoverHandler(obj, isHovering) {
         if (isHovering && (obj.name != "Options" && obj.name != this.playerName)) {
             if (this.lastPickedObj != obj) {
@@ -470,6 +490,7 @@ class MyContents {
                 this.currentState = this.state.PAUSED;
                 
                 this.changePauseState(true);
+                this.animationPauseState();
                 this.hideHUD();
 
                 this.app.setActiveCamera("Menu");
@@ -477,7 +498,32 @@ class MyContents {
                 this.app.activeCamera.position.set(this.currentState * this.OFFSET, 7, 5);
                 this.app.controls.target.set(this.currentState * this.OFFSET, 0, 0);
                 break;
+            case this.state.OBSTACLE:
+                this.selectedLayer = this.layers.OBSTACLE;
+                this.updateSelectedLayer();
+                this.currentState = this.state.OBSTACLE;
+
+                this.showObstacles();
+                this.changePauseState(true);
+                this.animationPauseState();
+                this.hideHUD();
+                this.app.followCamera = false;
+
+                this.app.setActiveCamera("Menu");
+                this.app.updateCameraIfRequired();
+                this.app.activeCamera.position.set(this.state.PLAYING * this.OFFSET, 40, 0);
+                this.app.controls.target.set(this.state.PLAYING * this.OFFSET, 0, 0);
+                break;
         }
+    }
+
+    showObstacles() {
+        const trunk = new MyTreeTrunk(this.app);
+        trunk.position.set(10, 25, 0);
+        trunk.mesh.layers.set(this.layers.OBSTACLE);
+
+        this.objects.push(trunk);
+        this.display();
     }
 
     placeVehicle(vehicle, point) {
@@ -600,6 +646,9 @@ class MyContents {
             case this.state.END:
                 this.updateEnd(t);
                 break;
+            case this.state.OBSTACLE:
+                // this.updateObstacle(t);
+                break;
         }
     }
 
@@ -614,7 +663,9 @@ class MyContents {
             if (this.playerVehicle.boundingBox.intersectsBox(obs.boundingBox)) {
                 this.collidableObjects = this.collidableObjects.filter((o) => o !== obs);
                 this.circuit.remove(obs);
-                obs.apply(this.playerVehicle);
+                // TODO: remove this, placeholder for testing
+                this.moveTo(this.state.OBSTACLE);
+                // obs.apply(this.playerVehicle);
             }
         }
         if (this.playerVehicle.boundingBox.intersectsBox(this.cpuVehicle.boundingBox))
