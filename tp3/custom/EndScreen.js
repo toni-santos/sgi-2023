@@ -9,25 +9,30 @@ class EndScreen {
         this.objects = [];
         this.fireworks = [];
         
-        this.returnButton = new MyText(this.app, "Return", layer, new THREE.Vector3(-4, 0, 4));
+        this.returnButton = new MyText(this.app, "Return", layer, new THREE.Vector3(-5, 0, 4));
         this.returnButton.layers.set(layer);
-        this.restartButton = new MyText(this.app, "Restart", layer, new THREE.Vector3(4, 0, 4));
+        this.restartButton = new MyText(this.app, "Restart", layer, new THREE.Vector3(5, 0, 4));
         this.restartButton.layers.set(layer);
 
-        this.endText = new MyText(this.app, "Finish!", layer, new THREE.Vector3(0, 0, -2));
-        this.levelDifficulty = new MyText(this.app, difficulty, layer, new THREE.Vector3(0.125, 0, -1), 0.75); 
+        this.endText = new MyText(this.app, "Finish!", 0, new THREE.Vector3(0, 0, -2));
+        this.levelDifficulty = new MyText(this.app, difficulty, 0, new THREE.Vector3(0.125, 0, -1), 0.75); 
 
-        this.playerName = new MyText(this.app, name, layer, new THREE.Vector3(-4, 0, 2));
-        this.playerTime = new MyText(this.app, this.prettifyTime(time), layer, new THREE.Vector3(4, 0, 2));
+        this.playerName = new MyText(this.app, name, 0, new THREE.Vector3(-5, 0, 1.8));
+        this.playerTime = new MyText(this.app, this.prettifyTime(time), 0, new THREE.Vector3(-5, 0, 2.8));
 
-        this.objects.push(this.endText, this.returnButton, this.restartButton, this.playerName, this.playerTime, this.levelDifficulty);
+        this.cpuName = new MyText(this.app, "CPU", 0, new THREE.Vector3(5, 0, 1.8));
+        this.cpuTime = new MyText(this.app, this.prettifyTime(time), 0, new THREE.Vector3(5, 0, 2.8));
+
+        this.objects.push(this.endText, this.returnButton, this.restartButton, this.playerName, this.playerTime, this.cpuName, this.cpuTime, this.levelDifficulty);
     }
 
-    updateResult(name, time, player, cpu, difficulty, winner) {
+    updateResult(name, player, cpu, playerTime, cpuTime, difficulty, winner) {
         this.objects = [];
 
         this.playerName.setText(name);
-        this.playerTime.setText(this.prettifyTime(time));
+        this.playerTime.setText(this.prettifyTime(playerTime));
+
+        this.cpuTime.setText(this.prettifyTime(cpuTime));
         this.levelDifficulty.setText(difficulty);
 
         this.playerCar = new MyVehicle(this.app, player, true);
@@ -37,7 +42,7 @@ class EndScreen {
         this.playerCar.loadModel(this.layer);
         this.cpuCar.loadModel(this.layer);
 
-        this.objects.push(this.playerName, this.playerTime, this.playerCar, this.cpuCar, this.levelDifficulty);
+        this.objects.push(this.playerName, this.playerTime, this.playerCar, this.cpuCar, this.cpuTime, this.levelDifficulty);
     }
 
     // TODO: check if this is correctly done
@@ -46,12 +51,9 @@ class EndScreen {
     }
 
     prettifyTime(time) {
-        let minutes = Math.floor(time / 60);
-        let seconds = Math.floor(time % 60);
-        let miliseconds = Math.floor((time % 1) * 100);
-        if (seconds < 10)
-            seconds = "0" + seconds;
-
+        let minutes = Math.floor(time / 60).toString().padStart(2, "0");
+        let seconds = Math.floor(time % 60).toString().padStart(2, "0");
+        let miliseconds = Math.floor((time % 1) * 100).toString().padStart(2, "0");
         return `${minutes}:${seconds}:${miliseconds}`;
     }
 }
