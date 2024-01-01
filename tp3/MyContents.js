@@ -92,8 +92,12 @@ class MyContents {
         this.selectedObstacle = null;
 
         this.paused = false;
+        this.winner = null;
         this.difficulty = 3;
         this.difficultyName = "Normal";
+        this.raceClock = new THREE.Clock();
+        this.playerTime = 0;
+        this.cpuTime = 0;
     }
 
     onPointerDown(event) {
@@ -197,6 +201,7 @@ class MyContents {
     }
 
     optionsClickHandler(obj) {
+        console.log(obj);
         switch(obj.name) {
             case "Back":
                 this.nameInput.style.display = "none";
@@ -423,7 +428,6 @@ class MyContents {
      * initializes the contents
      */
     init() {
-        this.raceClock = new THREE.Clock();
         this.readXML();
         this.mainMenu();
         this.selectCar();
@@ -491,8 +495,7 @@ class MyContents {
             case this.state.END:
                 this.selectedLayer = this.layers.MENU;
                 this.updateSelectedLayer();
-
-                this.finalScreen.updateResult(this.winner, this.raceClock.getElapsedTime(), this.playerCar, this.opposingCar, this.difficultyName);
+                this.finalScreen.updateResult(this.playerName, this.playerCar, this.opposingCar, this.playerTime, this.cpuTime, this.difficultyName, this.winner);
                 this.objects.push(...this.finalScreen.objects.map(obj => {
                     obj.translateX(this.OFFSET * this.state.END);
                     return obj;
@@ -680,8 +683,14 @@ class MyContents {
         if (this.paused) return;
         for (const vehicle of this.vehicles) {
             vehicle.update(t, delta*50, this.track);
-            if (vehicle.completedLaps === this.track.laps) return this.endGame(vehicle.owner);
+            if (vehicle.completedLaps === this.track.laps && !vehicle.finished) {
+                vehicle.finished = true;
+                if (this.winner === null) this.winner = vehicle.owner;
+                vehicle.owner == this.playerName ? this.playerTime = this.raceClock.getElapsedTime() : this.cpuTime = this.raceClock.getElapsedTime();
+            }
         }
+        if (this.vehicles.every((v) => v.finished)) return this.endGame();
+
         for (const obs of this.collidableObjects) {
             if (this.playerVehicle.boundingBox.intersectsBox(obs.boundingBox)) {
                 this.collidableObjects = this.collidableObjects.filter((o) => o !== obs);
@@ -715,7 +724,7 @@ class MyContents {
     updateHUD() {
         this.hudTime.innerHTML = this.raceClock.getElapsedTime().toFixed(2);
         this.hudSpeed.innerHTML = (this.playerVehicle.velocity * 100).toFixed(2);
-        this.hudLap.innerHTML = `Lap ${this.playerVehicle.completedLaps + 1}/${this.track.laps}`;
+        this.hudLap.innerHTML = this.playerVehicle.finished ? "Finish" : `Lap ${this.playerVehicle.completedLaps + 1}/${this.track.laps}`;
         if (this.playerVehicle.modifier)
             this.hudPowerup.innerHTML = `${this.playerVehicle.modifier.name}: ${(this.playerVehicle.modifier.duration -
             this.playerVehicle.modifier.modifyingSince.getElapsedTime()).toFixed(2)}`
@@ -781,9 +790,8 @@ class MyContents {
         };
     }
 
-    endGame(winner) {
+    endGame() {
         this.hideHUD();
-        this.winner = winner;
         this.objects = this.objects.filter((o) => o !== this.playerVehicle && o !== this.cpuVehicle);
         this.app.scene.remove(this.playerVehicle);
         this.app.scene.remove(this.cpuVehicle);
@@ -895,6 +903,10 @@ class MyContents {
 
     playGame() {
         this.app.followCamera = true;
+        this.paused = false;
+        this.winner = null;
+        this.playerTime = 0;
+        this.cpuTime = 0;
         this.collidableObjects = this.powerups.concat(this.obstacles);
         for (const obj of this.collidableObjects) {
             this.circuit.add(obj);

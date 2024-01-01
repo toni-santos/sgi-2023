@@ -21,6 +21,7 @@ class MyVehicle extends MyCollidingObject {
         this.closestPointIndex = 0;
         this.visitedPoints = [0];
         this.completedLaps = 0;
+        this.finished = false;
         this.outOfBounds = false;
         this.modifier = null;
         this.material = new THREE.MeshBasicMaterial({color: 0xff00ff});
