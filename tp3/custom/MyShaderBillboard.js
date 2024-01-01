@@ -51,7 +51,9 @@ class MyShaderBillboard extends THREE.Object3D {
         }),
 
         this.waitForShaders();
-        this.rotateX(Math.PI/2)
+        this.rotateX(Math.PI/2);
+        this.rotateZ(-Math.PI/2);
+        this.position.set(0,1.25,0)
         this.add(this.plane, this.border);
     }
 

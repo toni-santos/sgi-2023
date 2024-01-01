@@ -42,7 +42,6 @@ class MyFirework {
         let x = THREE.MathUtils.randFloat( this.position.x - 0.5, this.position.x + 0.5 ) 
         let y = THREE.MathUtils.randFloat( this.height * 0.9, this.height * 1.1)
         let z = THREE.MathUtils.randFloat( this.position.z - 0.5, this.position.z + 0.5 ) 
-        console.log(x, y, z);
         this.dest.push( x, y, z )
         let vertices = [this.position.x, this.position.y, this.position.z]
         
@@ -53,7 +52,7 @@ class MyFirework {
         this.points.castShadow = true;
         this.points.receiveShadow = true;
         this.app.scene.add( this.points )  
-        console.log("firework launched")
+    //     console.log("firework launched")
     }
 
     /**
@@ -61,7 +60,6 @@ class MyFirework {
      * @param {*} vector 
      */
     explode(origin, n, rangeBegin, rangeEnd) {
-        console.log("origin: ", origin);
         this.app.scene.remove( this.points )
         const vector = new THREE.Vector3(origin[0], origin[1], origin[2]);
         this.dest = []; 
@@ -100,7 +98,7 @@ class MyFirework {
      * cleanup
      */
     reset() {
-        console.log("firework reseted")
+        // console.log("firework reseted")
         this.app.scene.remove( this.points )  
         this.dest     = [] 
         this.vertices = null

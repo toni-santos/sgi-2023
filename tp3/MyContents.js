@@ -10,8 +10,9 @@ import { MyFirework } from "./custom/MyFirework.js";
 import { Options } from "./custom/Options.js";
 import { PausedScreen } from "./custom/PausedScreen.js";
 import { ObstaclesScreen } from "./custom/ObstaclesScreen.js";
-import { MyTreeTrunk } from "./custom/MyTreeTrunk.js";
 import { MyModifier } from "./custom/MyModifier.js";
+import { MyStatusDisplay } from "./custom/MyStatusDisplay.js";
+import { MyShaderBillboard } from "./custom/MyShaderBillboard.js";
 
 /**
  *  This class contains the contents of out application
@@ -126,7 +127,7 @@ class MyContents {
                     break;
                 case this.state.OPTIONS:
                     this.optionsClickHandler(obj);
-                    break;    
+                    break;
                 case this.state.OBSTACLE:
                     this.obstacleClickHandler(obj, intersects[0].point);
                     break;
@@ -171,18 +172,17 @@ class MyContents {
                 this.currentState = this.state.PLAYING;
                 break;
             default:
+                this.obstaclesScreen.previous = this.obstaclesScreen.selected;
                 this.obstaclesScreen.selected = this.obstaclesScreen.obstacles[obj.name];
                 break;
         }
-        console.log(obj.name);
-        console.log(this.obstaclesScreen.selected);
     }
 
     pausedClickHandler(obj) {
         switch(obj.name) {
             case "Continue":
                 this.changePauseState(false);
-                
+
                 this.app.setActiveCamera("Play");
                 this.app.updateCameraIfRequired();
                 this.showHUD();
@@ -249,7 +249,7 @@ class MyContents {
                 break;
         }
     }
-    
+
     onPointerMove(event) {
         this.pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
         this.pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
@@ -264,7 +264,7 @@ class MyContents {
                 case this.state.MAIN:
                     this.mainMenuHoverHandler(obj, true);
                     break;
-                case this.state.CAR_SELECTION: 
+                case this.state.CAR_SELECTION:
                     this.carSelectionHoverHandler(obj, true);
                     break;
                 case this.state.TRACK_SELECTION:
@@ -321,7 +321,7 @@ class MyContents {
                     this.lastPickedObj.parent.scale.set(1,1,1);
                 this.lastPickedObj = obj;
                 this.lastPickedObj.parent.scale.set(1.1,1.1,1.1);
-            } 
+            }
         } else {
             this.lastPickedObj.parent.scale.set(1,1,1);
             this.lastPickedObj = null;
@@ -335,7 +335,7 @@ class MyContents {
                     this.lastPickedObj.parent.scale.set(1,1,1);
                 this.lastPickedObj = obj;
                 this.lastPickedObj.parent.scale.set(1.1,1.1,1.1);
-            } 
+            }
         } else {
             this.lastPickedObj.parent.scale.set(1,1,1);
             this.lastPickedObj = null;
@@ -343,19 +343,19 @@ class MyContents {
     }
 
     obstacleHoverHandler(obj, isHovering) {
-        if (isHovering && (obj.name != "Pick an obstacle" && obj.name != "Track")) {
+        if (isHovering && (obj.name != "Pick an obstacle" && obj.name != "Track" && obj.name != this.obstaclesScreen.selected.name)) {
             if (this.lastPickedObj != obj) {
                 if (this.lastPickedObj)
                     this.lastPickedObj.parent.scale.set(1,1,1);
                 this.lastPickedObj = obj;
                 this.lastPickedObj.parent.scale.set(1.1,1.1,1.1);
-            } 
+            }
         } else {
             this.lastPickedObj?.parent.scale.set(1,1,1);
             this.lastPickedObj = null;
         }
     }
-    
+
     optionsHoverHandler(obj, isHovering) {
         if (isHovering && (obj.name != "Options" && obj.name != this.playerName)) {
             if (this.lastPickedObj != obj) {
@@ -363,7 +363,7 @@ class MyContents {
                     this.lastPickedObj.parent.scale.set(1,1,1);
                 this.lastPickedObj = obj;
                 this.lastPickedObj.parent.scale.set(1.1,1.1,1.1);
-            } 
+            }
         } else {
             if (this.lastPickedObj) {
                 this.lastPickedObj.parent.scale.set(1,1,1);
@@ -379,7 +379,7 @@ class MyContents {
                     this.lastPickedObj.parent.scale.set(1,1,1);
                 this.lastPickedObj = obj;
                 this.lastPickedObj.parent.scale.set(1.1,1.1,1.1);
-            } 
+            }
         } else {
             if (this.lastPickedObj) {
                 this.lastPickedObj.parent.scale.set(1,1,1);
@@ -398,7 +398,7 @@ class MyContents {
                     this.lastPickedObj.parent.scale.set(1.1,1.1,1.1);
                 if (this.lastPickedObj.name == "Back" || this.lastPickedObj.name == "Confirm")
                     this.lastPickedObj.parent.scale.set(1.1,1.1,1.1);
-            } 
+            }
         } else {
             this.lastPickedObj.parent.scale.set(1,1,1);
             this.lastPickedObj = null;
@@ -486,7 +486,7 @@ class MyContents {
                 });
                 this.vehicles = [this.playerVehicle, this.cpuVehicle];
                 this.playGame();
-                //TODO: enhance this (timer before start (?)) 
+                //TODO: enhance this (timer before start (?))
                 break;
             case this.state.END:
                 this.selectedLayer = this.layers.MENU;
@@ -513,7 +513,7 @@ class MyContents {
                 this.selectedLayer = this.layers.MENU;
                 this.updateSelectedLayer();
                 this.nameInput.addEventListener("input", (e) => this.nameChanging(e));
-                
+
                 this.currentState = this.state.OPTIONS;
                 this.app.setActiveCamera("Menu");
                 this.app.updateCameraIfRequired();
@@ -524,7 +524,7 @@ class MyContents {
                 this.selectedLayer = this.layers.MENU;
                 this.updateSelectedLayer();
                 this.currentState = this.state.PAUSED;
-                
+
                 this.changePauseState(true);
                 this.hideHUD();
 
@@ -698,12 +698,15 @@ class MyContents {
             this.playerVehicle.getWorldPosition(pos);
             this.app.activeCamera.position.copy(pos).add(
                 new THREE.Vector3(
-                    - 3 * Math.sin(this.playerVehicle.angle), 
-                    1, 
+                    - 3 * Math.sin(this.playerVehicle.angle),
+                    1,
                     - 3 * Math.cos(this.playerVehicle.angle)
                     ));
             this.app.controls.target.set(pos.x, pos.y, pos.z);
         }
+
+        this.informationDisplay.update(this.playerVehicle.completedLaps + 1 + "", this.raceClock.getElapsedTime().toFixed(2), (this.playerVehicle.velocity * 100).toFixed(2), this.playerVehicle.modifier ? (this.playerVehicle.modifier.duration - this.playerVehicle.modifier.modifyingSince.getElapsedTime()).toFixed(2) : "0.00");
+
         this.updateHUD();
         this.control(delta*50);
     }
@@ -713,27 +716,27 @@ class MyContents {
         this.hudSpeed.innerHTML = (this.playerVehicle.velocity * 100).toFixed(2);
         this.hudLap.innerHTML = `Lap ${this.playerVehicle.completedLaps + 1}/${this.track.laps}`;
         if (this.playerVehicle.modifier)
-            this.hudPowerup.innerHTML = `${this.playerVehicle.modifier.name}: ${(this.playerVehicle.modifier.duration - 
+            this.hudPowerup.innerHTML = `${this.playerVehicle.modifier.name}: ${(this.playerVehicle.modifier.duration -
             this.playerVehicle.modifier.modifyingSince.getElapsedTime()).toFixed(2)}`
         else {this.hudPowerup.innerHTML = ""}
     }
 
     updateEnd(t) {
         this.winnerCar.rotateY(0.01);
-        if(this.finalScreen.fireworks.length < 1 ) {
+        if(THREE.MathUtils.randInt( 1, 20 ) === 10 ) {
             const firework = new MyFirework(this.app, this.winnerCar.position);
             this.finalScreen.fireworks.push(firework);
-            console.log("firework added")
+            // console.log("firework added")
         }
 
-        // for each fireworks 
+        // for each fireworks
         for( let i = 0; i < this.finalScreen.fireworks.length; i++ ) {
             // is firework finished?
             if (this.finalScreen.fireworks[i].done) {
-                // remove firework 
-                this.finalScreen.fireworks.splice(i,1) 
-                console.log("firework removed")
-                continue 
+                // remove firework
+                this.finalScreen.fireworks.splice(i,1)
+                // console.log("firework removed")
+                continue
             }
             // otherwise upsdate  firework
             this.finalScreen.fireworks[i].update()
@@ -772,7 +775,7 @@ class MyContents {
     animationPauseState() {
         if (this.paused) {
             this.mixer.timeScale = 0;
-        } else { 
+        } else {
             this.mixer.timeScale = 1;
         };
     }
@@ -807,13 +810,11 @@ class MyContents {
     }
 
     updateObstacle(t) {
-        if (this.previousObstacle && this.selectedObstacle && (this.previousObstacle != this.selectedObstacle)) {
-            this.obstaclesScreen.obstacles[this.selectedObstacle].position.y = 0;
-            this.obstaclesScreen.obstacles[this.selectedObstacle].setRotationFromAxisAngle(new THREE.Vector3(0,1,0), 0);
+        if (this.obstaclesScreen.previous && (this.obstaclesScreen.previous != this.obstaclesScreen.selected)) {
+            this.obstaclesScreen.previous.position.y = 0;
         }
-        if (this.selectedObstacle) {
-            this.obstaclesScreen.obstacles[this.selectedObstacle].position.y = 2;
-            this.obstaclesScreen.obstacles[this.selectedObstacle].rotateY(0.01);
+        if (this.obstaclesScreen.selected) {
+            this.obstaclesScreen.selected.position.y = 2;
         }
     }
 
@@ -863,7 +864,7 @@ class MyContents {
         }));
         this.display();
     }
-    
+
     obstaclesMenu() {
         this.obstaclesScreen = new ObstaclesScreen(this.app, this.layers.OBSTACLE);
         this.objects.push(...this.obstaclesScreen.objects.map(obj => {
@@ -880,9 +881,15 @@ class MyContents {
         this.route = this.xmlContents.reader.objects["route"];
         this.obstacles = this.xmlContents.reader.objects["obstacles"];
         this.powerups = this.xmlContents.reader.objects["powerups"];
-        // TODO: remove this, it's just a placeholder for testing
+        // TODO: Fix placement for these according to the XML
         this.envPlane = new MyEnvironmentPlane(this.app, 200,"scenes/feupzero/textures/envMap.jpg", "scenes/feupzero/textures/ground.jpg", "shaders/s1.vert", "shaders/s1.frag");
-        this.objects.push(this.envPlane);
+        this.informationDisplay = new MyStatusDisplay(this.app, "1", "2", "3", "4");
+        this.informationDisplay.position.set(-5, 0, 7);
+        this.informationDisplay.rotateY(5*Math.PI/6);
+        this.shaderBillboard = new MyShaderBillboard(this.app, "scenes/feupzero/textures/okcomp_map.jpg", "scenes/feupzero/textures/okcomp.jpg", "shaders/s1.vert", "shaders/s1.frag");
+        this.shaderBillboard.position.set(20, this.shaderBillboard.position.y, 5);
+        this.objects.push(this.envPlane, this.informationDisplay, this.shaderBillboard);
+        this.display();
     }
 
     playGame() {

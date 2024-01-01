@@ -26,6 +26,7 @@ class ObstaclesScreen {
         this.obstacles[this.limitSpeed.name] = this.limitSpeed;
         this.obstacles[this.spin.name] = this.spin;
 
+        this.previous = null;
         this.selected = this.limitSpeed;
 
         this.objects.push(this.section, this.confirmButton, this.limitSpeed, this.spin);
