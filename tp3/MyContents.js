@@ -173,9 +173,7 @@ class MyContents {
 
                 this.app.setActiveCamera("Play");
                 this.app.updateCameraIfRequired();
-                setTimeout(() => {
-                    this.currentState = this.state.PLAYING;
-                }, 100);
+                this.currentState = this.state.PLAYING;
                 break;
             default:
                 this.obstaclesScreen.previous = this.obstaclesScreen.selected;
@@ -700,7 +698,9 @@ class MyContents {
                 if (obs.positive) this.moveTo(this.state.OBSTACLE);
                 obs.apply(this.playerVehicle);
             }
-            obs.update(t);
+            if (obs.shader.ready) {   
+                obs.update(t);
+            }
         }
         this.mixer?.update(delta*this.difficulty);
         if (this.playerVehicle.boundingBox.intersectsBox(this.cpuVehicle.boundingBox))
