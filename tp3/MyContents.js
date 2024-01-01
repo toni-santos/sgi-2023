@@ -173,7 +173,9 @@ class MyContents {
 
                 this.app.setActiveCamera("Play");
                 this.app.updateCameraIfRequired();
-                this.currentState = this.state.PLAYING;
+                setTimeout(() => {
+                    this.currentState = this.state.PLAYING;
+                }, 100);
                 break;
             default:
                 this.obstaclesScreen.previous = this.obstaclesScreen.selected;
