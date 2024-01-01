@@ -8,7 +8,6 @@ class MainMenu {
 
         this.startButton = new MyText(this.app, "Start", layer, new THREE.Vector3(0, 0, -2));
         this.optionsButton = new MyText(this.app, "Options", layer, new THREE.Vector3(0, 0, 2));
-        
         this.startButton.layers.set(layer);
         this.optionsButton.layers.set(layer);
         this.objects.push(this.startButton, this.optionsButton);

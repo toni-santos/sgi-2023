@@ -689,6 +689,7 @@ class MyContents {
                 if (obs.positive) this.moveTo(this.state.OBSTACLE);
                 obs.apply(this.playerVehicle);
             }
+            obs.update(t);
         }
         this.mixer?.update(delta*this.difficulty);
         if (this.playerVehicle.boundingBox.intersectsBox(this.cpuVehicle.boundingBox))
