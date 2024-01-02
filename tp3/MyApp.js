@@ -90,9 +90,8 @@ class MyApp {
 
     togglePP(value) {
         if (value) {
-            if (this.renderPixelatedPass == null) {
+            if (this.renderPixelatedPass == null || this.renderPixelatedPass == undefined) {
                 this.composer = new EffectComposer( this.renderer );
-                this.composer.removePass(this.renderPixelatedPass);
                 this.renderPixelatedPass = new RenderPixelatedPass( 4, this.scene, this.activeCamera );
                 this.renderPixelatedPass.normalEdgeStrength = 0;
                 this.renderPixelatedPass.depthEdgeStrength = 0.1;
@@ -100,16 +99,22 @@ class MyApp {
                 this.outputPass = new OutputPass();
                 this.composer.addPass( this.outputPass );
             } else {
+                this.composer.removePass(this.renderPixelatedPass);
                 this.renderPixelatedPass = new RenderPixelatedPass( 4, this.scene, this.activeCamera );
                 this.renderPixelatedPass.normalEdgeStrength = 0;
                 this.renderPixelatedPass.depthEdgeStrength = 0.1;
                 this.composer.addPass( this.renderPixelatedPass );
+                this.composer.removePass(this.outputPass);
+                this.outputPass = new OutputPass();
+                this.composer.addPass( this.outputPass );
+
             }
         } else {
             this.composer.removePass(this.renderPixelatedPass);
             this.composer.removePass(this.outputPass);
             this.renderPixelatedPass = null;
         }
+        this.postProcessing = value;
     }
     
     /**
@@ -161,11 +166,7 @@ class MyApp {
 
             // update effects
             if (this.postProcessing) {
-                this.composer.removePass(this.renderPixelatedPass);
-                this.renderPixelatedPass = new RenderPixelatedPass( 5, this.scene, this.activeCamera );
-                this.renderPixelatedPass.normalEdgeStrength = 0;
-                this.renderPixelatedPass.depthEdgeStrength = 0.1;
-                this.composer.addPass( this.renderPixelatedPass );    
+                this.togglePP(true);
             }
 
             // are the controls yet?
