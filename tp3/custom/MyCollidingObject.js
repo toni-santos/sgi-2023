@@ -10,6 +10,12 @@ class MyCollidingObject extends THREE.Object3D {
         this.collisionMaterial = new THREE.MeshBasicMaterial({color: color});
     }
 
+    moveObject(vector) {
+        this.position.x += vector.x;
+        this.position.y += vector.y;
+        this.position.z += vector.z;
+    }
+
     setBoundingBox(object) {
         this.boundingBox = new THREE.Box3().setFromObject(object);
     }

@@ -13,8 +13,11 @@ class ObstaclesScreen {
         this.section = new MyText(this.app, "Pick an obstacle", 0, new THREE.Vector3(0, 0, -2));
         this.confirmButton = new MyText(this.app, "Confirm", layer, new THREE.Vector3(0, 0, 2));
 
-        this.limitSpeed = new MyModifier(this.app, 2, new THREE.Vector3(-1, 0, 0), 3, false);
-        this.spin = new MyModifier(this.app, 3, new THREE.Vector3(1, 0, 0), 3, false);
+        this.limitSpeed = new MyModifier(this.app, 2, new THREE.Vector3(0, 0, 0), 3, false);
+        this.spin = new MyModifier(this.app, 3, new THREE.Vector3(0, 0, 0), 3, false);
+
+        this.limitSpeed.moveObject(new THREE.Vector3(-2, 0, 0));
+        this.spin.moveObject(new THREE.Vector3(2, 0, 0));
 
         this.confirmButton.layers.set(layer);
         this.limitSpeed.mesh.layers.set(layer);

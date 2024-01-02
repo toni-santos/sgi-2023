@@ -881,7 +881,8 @@ class MyContents {
             this.obstaclesScreen.previous.position.y = 0;
         }
         if (this.obstaclesScreen.selected) {
-            this.obstaclesScreen.selected.position.y = 2;
+            this.obstaclesScreen.selected.rotateY(0.05);
+            this.obstaclesScreen.selected.position.y = 0.5;
         }
     }
 

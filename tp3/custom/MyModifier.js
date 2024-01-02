@@ -31,10 +31,7 @@ class MyModifier extends MyCollidingObject {
             "uSampler2": { type: 'sampler2D', value: this.texture } 
         });
         this.waitForShaders();
-
-        if (this.name != "Spin") {
-            this.mesh.position.set(position.x, 0.35, position.z);
-        }
+        this.mesh.position.set(position.x, this.name == "Spin" ? 0 : 0.35, position.z);
 
         this.setBoundingBox(this.mesh);
         this.addCollisionMesh(this.mesh);
