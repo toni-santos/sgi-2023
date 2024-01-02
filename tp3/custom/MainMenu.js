@@ -22,9 +22,21 @@ class MainMenu {
 
         this.startButton = new MyText(this.app, "Start", layer, new THREE.Vector3(0, 0, 0));
         this.optionsButton = new MyText(this.app, "Options", layer, new THREE.Vector3(0, 0, 2));
+
+        this.student1Name = new MyText(this.app, "Antonio Santos", 0, new THREE.Vector3(-2, 0, 4));
+        this.student2Name = new MyText(this.app, "Pedro Silva", 0, new THREE.Vector3(7, 0, 4));
+        this.student1Number = new MyText(this.app, "up202008004", 0, new THREE.Vector3(-2.5, 0, 4.7));
+        this.student2Number = new MyText(this.app, "up202004985", 0, new THREE.Vector3(7, 0, 4.7));
+
+        this.student1Name.scale.set(0.5, 0.5, 0.5);
+        this.student2Name.scale.set(0.5, 0.5, 0.5);
+        this.student1Number.scale.set(0.5, 0.5, 0.5);
+        this.student2Number.scale.set(0.5, 0.5, 0.5);
+
         this.startButton.layers.set(layer);
         this.optionsButton.layers.set(layer);
-        this.objects.push(this.startButton, this.optionsButton, this.logo, this.feup);
+
+        this.objects.push(this.startButton, this.optionsButton, this.logo, this.feup, this.student1Name, this.student2Name, this.student1Number, this.student2Number);
     }
 }
 
