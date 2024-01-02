@@ -14,6 +14,7 @@ import { MyModifier } from "./custom/MyModifier.js";
 import { MyStatusDisplay } from "./custom/MyStatusDisplay.js";
 import { MyShaderBillboard } from "./custom/MyShaderBillboard.js";
 import { TrackSelection } from "./custom/TrackSelection.js";
+import { MyEnvironmentBillboard } from "./custom/MyEnvironmentBillboard.js";
 
 /**
  *  This class contains the contents of out application
@@ -770,7 +771,9 @@ class MyContents {
             this.app.controls.target.set(pos.x, pos.y, pos.z);
         }
 
-        this.informationDisplay.update(this.playerVehicle.completedLaps + 1 + "", this.raceClock.getElapsedTime().toFixed(2), (this.playerVehicle.velocity * 100).toFixed(2), this.playerVehicle.modifier ? (this.playerVehicle.modifier.duration - this.playerVehicle.modifier.modifyingSince.getElapsedTime()).toFixed(2) : "0.00");
+        for (const billboard of this.billboards)
+            billboard.update(t);
+        // this.informationDisplay.update(this.playerVehicle.completedLaps + 1 + "", this.raceClock.getElapsedTime().toFixed(2), (this.playerVehicle.velocity * 100).toFixed(2), this.playerVehicle.modifier ? (this.playerVehicle.modifier.duration - this.playerVehicle.modifier.modifyingSince.getElapsedTime()).toFixed(2) : "0.00");
 
         this.updateHUD();
         this.control(delta*50);
@@ -1014,15 +1017,53 @@ class MyContents {
         this.obstacles = this.xmlContents.reader.objects["obstacles"];
         this.powerups = this.xmlContents.reader.objects["powerups"];
         // TODO: Fix placement for these according to the XML
-        this.envPlane = new MyEnvironmentPlane(this.app, 200,"scenes/feupzero/textures/envMap.jpg", "scenes/feupzero/textures/ground.jpg", "shaders/s1.vert", "shaders/s1.frag");
+        this.envPlane = new MyEnvironmentPlane(this.app, 200,"scenes/feupzero/textures/m3.jpg", "scenes/feupzero/textures/ground.jpg", "scenes/feupzero/textures/altimetry.png", "shaders/envPlane.vert", "shaders/envPlane.frag");
         this.informationDisplay = new MyStatusDisplay(this.app, "1", "2", "3", "4");
         this.informationDisplay.position.set(-5, 0, 7);
         this.informationDisplay.rotateY(5*Math.PI/6);
         this.shaderBillboard = new MyShaderBillboard(this.app, "scenes/feupzero/textures/okcomp_map.jpg", "scenes/feupzero/textures/okcomp.jpg", "shaders/s1.vert", "shaders/s1.frag");
         this.shaderBillboard.position.set(20, this.shaderBillboard.position.y, 5);
         this.objects.push(this.envPlane, this.informationDisplay, this.shaderBillboard);
+        // TODO: Might need to add a timeout here (generation takes time)
+        this.generateEnvironment();
         this.display();
         console.log("READ XML: ", this.trackScreen.selected);
+    }
+
+    generateEnvironment() {
+        this.billboards = [];
+        this.backTrees = [];
+        const area = 50;
+        const spacing = 5;
+        const core = 40;
+
+        const trackBox = new THREE.Box3().setFromObject(this.track);
+
+        for (let i = -area; i <= area; i = i + spacing) {
+            for (let j = -area; j <= area; j = j + spacing) {    
+                let model = "trees";
+
+                const offset = new THREE.Vector2(THREE.MathUtils.randFloat(-spacing, spacing), THREE.MathUtils.randFloat(-spacing, spacing));
+                const pos = new THREE.Vector3(i + offset.x, 0, j + offset.y);
+
+                if ( pos.x <= core && pos.x >= -core && pos.z <= core && pos.z >= -core) {
+                    model = "tree";
+                }
+                const tree = new MyEnvironmentBillboard(this.app, pos, model);
+                const treeBox = new THREE.Box3().setFromObject(tree);
+                if (trackBox.intersectsBox(treeBox)) {
+                    continue;
+                }
+                if (model == "tree") {
+                    this.billboards.push(tree);
+                } else {
+                    tree.lookAt(new THREE.Vector3(0, 0, 0));
+                    this.backTrees.push(tree);
+                }
+            }
+        }
+        this.objects.push(...this.billboards);
+        this.objects.push(...this.backTrees);
     }
 
     clearXML() {
@@ -1034,6 +1075,10 @@ class MyContents {
         this.app.scene.remove(this.envPlane);
         this.app.scene.remove(this.informationDisplay);
         this.app.scene.remove(this.shaderBillboard);
+        this.trees.forEach((tree) => this.app.scene.remove(tree));
+        this.backTrees.forEach((tree) => this.app.scene.remove(tree));
+        this.trees = [];
+        this.backTrees = [];
     }
 
     playGame() {

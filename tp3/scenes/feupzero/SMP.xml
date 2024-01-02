@@ -20,16 +20,16 @@
             top="30" /> 
     </cameras> 
 
-    <skybox size="100 100 100"
+    <skybox size="200 200 200"
         center="0 0 0" 
         emissive="1.0 1.0 1.0 0" 
         intensity="0.1" 
-        up="scenes/feupzero/textures/sterile_wall.jpg" 
-        down="scenes/feupzero/textures/sterile_wall.jpg" 
-        left="scenes/feupzero/textures/sterile_wall.jpg" 
-        right="scenes/feupzero/textures/sterile_wall.jpg" 
-        front="scenes/feupzero/textures/sterile_wall.jpg" 
-        back="scenes/feupzero/textures/sterile_wall.jpg"/>
+        up="scenes/feupzero/textures/skybox/vz_clear_up.png" 
+        down="scenes/feupzero/textures/skybox/vz_clear_down.png" 
+        left="scenes/feupzero/textures/skybox/vz_clear_left.png" 
+        right="scenes/feupzero/textures/skybox/vz_clear_right.png" 
+        front="scenes/feupzero/textures/skybox/vz_clear_front.png" 
+        back="scenes/feupzero/textures/skybox/vz_clear_back.png"/>
 
     <textures>
         <texture id="wallTex" filepath="scenes/feupzero/textures/sterile_wall.jpg" />

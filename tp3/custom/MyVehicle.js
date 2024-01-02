@@ -149,7 +149,6 @@ class MyVehicle extends MyCollidingObject {
     }
 
     velocityWithRestrictions(v) {
-        console.log(Math.min(Math.max(-0.04, v), this.outOfBounds ? this.maxSpeed/7 : this.maxSpeed));
         return Math.min(Math.max(-0.04, v), this.outOfBounds ? this.maxSpeed/7 : this.maxSpeed);
     }
 

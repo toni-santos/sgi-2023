@@ -177,7 +177,7 @@ class MyApp {
                 );
                 this.controls.enableZoom = true;
                 if (this.activeCameraName === "Menu") {
-                    this.controls.enabled = false;
+                    // this.controls.enabled = false;
                 }
                 this.controls.update();
                 this.contents?.xmlContents?.defineControls();

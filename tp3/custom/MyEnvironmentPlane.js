@@ -2,13 +2,14 @@ import * as THREE from "three";
 import { MyShader } from "./MyShader.js";
 
 class MyEnvironmentPlane extends THREE.Object3D {
-    constructor(app, size, map, texture, vertexShader, fragmentShader) {
+    constructor(app, size, map, texture, altimetry, vertexShader, fragmentShader) {
         super();
         this.app = app;
 
         this.texture = new THREE.TextureLoader().load(texture);
         this.texture.wrapS = THREE.RepeatWrapping;
         this.texture.wrapT = THREE.RepeatWrapping;
+        this.altimetry = new THREE.TextureLoader().load(altimetry);
         this.map = new THREE.TextureLoader().load(map);
         
         this.plane = new THREE.Mesh(new THREE.PlaneGeometry(size, size, 100, 100), new THREE.MeshBasicMaterial());
@@ -17,6 +18,7 @@ class MyEnvironmentPlane extends THREE.Object3D {
         this.shader = new MyShader(this.app, "Basic", "Basic shader", vertexShader, fragmentShader, {
             uSampler1: {type: 'sampler2D', value: this.map },
             uSampler2: {type: 'sampler2D', value: this.texture },
+            uSampler3: {type: 'sampler2D', value: this.altimetry },
             offset: {type: 'float', value: 20.0},
         });
         this.plane.position.y = -0.1;
