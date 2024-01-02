@@ -945,7 +945,6 @@ class MyContents {
         this.trackScreen = new TrackSelection(this.app, this.layers.TRACK_SELECTION);
         this.objects.push(...this.trackScreen.objects.map(obj => {
             obj.translateX(this.OFFSET * this.state.TRACK_SELECTION);
-            console.log(obj);
             return obj;
         }));
         this.display();
