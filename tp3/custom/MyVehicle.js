@@ -11,6 +11,8 @@ class MyVehicle extends MyCollidingObject {
         this.acceleration = acceleration;
         this.handling = handling;
         this.owner = owner;
+        this.name = model;
+        this.setDefaults();
         this.saveDefaults();
         this.app = app;
         this.type = 'Group';
@@ -32,7 +34,6 @@ class MyVehicle extends MyCollidingObject {
         // this.add(this.mesh);
         // this.add(this.collisionMesh);
         // console.log(this.boundingBox);
-        this.name = model;
         this.castShadow = shadow;
     }
 
@@ -98,6 +99,26 @@ class MyVehicle extends MyCollidingObject {
         this.angle = this.angle % (2*Math.PI);
     }
 
+    setDefaults() {
+        switch (this.name) {
+            case "ae86":
+                this.maxSpeed = 0.3;
+                this.acceleration = 1.9;
+                this.handling = 2.1;
+                break;
+            case "lancer":
+                this.maxSpeed = 0.40;
+                this.acceleration = 2.5;
+                this.handling = 1.3;
+                break;
+            case "skyline":
+                this.maxSpeed = 0.37;
+                this.acceleration = 2.1;
+                this.handling = 1.7;
+                break;
+        }
+    }
+
     saveDefaults() {
         this.defaultMaxSpeed = this.maxSpeed;
         this.defaultAcceleration = this.acceleration;
@@ -128,6 +149,7 @@ class MyVehicle extends MyCollidingObject {
     }
 
     velocityWithRestrictions(v) {
+        console.log(Math.min(Math.max(-0.04, v), this.outOfBounds ? this.maxSpeed/7 : this.maxSpeed));
         return Math.min(Math.max(-0.04, v), this.outOfBounds ? this.maxSpeed/7 : this.maxSpeed);
     }
 

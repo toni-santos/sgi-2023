@@ -248,18 +248,22 @@ class MyContents {
             case "player":
                 this.previousPlayerCar = this.playerCar;
                 this.playerCar = obj.name.split("_")[1];
+                this.updateCarDescription("Player".toLowerCase(), this.playerCar);
                 break;
             case "cpu":
                 this.previousOpposingCar = this.opposingCar;
                 this.opposingCar = obj.name.split("_")[1];
+                this.updateCarDescription("CPU".toLowerCase(), this.opposingCar);
                 break;
             case "Back":
                 this.moveTo(this.state.TRACK_SELECTION);
+                this.hideCarDescription();
                 break;
             case "Confirm":
                 if (this.playerCar && this.opposingCar) {
                     this.moveTo(this.state.PLAYING);
                 }
+                this.hideCarDescription();
                 break;
         }
     }
@@ -493,6 +497,9 @@ class MyContents {
                 this.selectedLayer = this.layers.CAR;
                 this.updateSelectedLayer();
                 this.currentState = this.state.CAR_SELECTION;
+                this.showCarDescription();
+                this.updateCarDescription("cpu", this.playerCar);
+                this.updateCarDescription("player", this.opposingCar);
 
                 this.app.setActiveCamera("Menu");
                 this.app.updateCameraIfRequired();
@@ -884,7 +891,6 @@ class MyContents {
         }
     }
 
-
     mainMenu() {
         this.mainmenu = new MainMenu(this.app, this.layers.MENU);
 
@@ -948,6 +954,51 @@ class MyContents {
             return obj;
         }));
         this.display();
+    }
+
+    showCarDescription() {
+        document.getElementById("playerCar").style.display = "flex";
+        document.getElementById("cpuCar").style.display = "flex";
+    }
+
+    hideCarDescription() {
+        document.getElementById("playerCar").style.display = "none";
+        document.getElementById("cpuCar").style.display = "none";
+    }
+
+    updateCarDescription(owner, car) {
+        let name = document.getElementById(`${owner}CarName`);
+        let description = document.getElementById(`${owner}CarDescription`);
+        let speed = document.getElementById(`${owner}CarSpeed`);
+        let acceleration = document.getElementById(`${owner}CarAcceleration`);
+        let handling = document.getElementById(`${owner}CarHandling`);
+        let image = document.getElementById(`${owner}CarImage`);
+        switch (car) {
+            case "ae86":
+                name.innerHTML = "Toyota AE86";
+                description.innerHTML = "An agile, small, old car. Perfect to deliver tofu!";
+                speed.innerHTML = "Speed: ★★★☆☆";
+                acceleration.innerHTML = "Acceleration: ★★★☆☆";
+                handling.innerHTML = "Handling: ★★★★★";
+                image.src = "image/cars/ae86.png";
+                break;
+            case "lancer":
+                name.innerHTML = "Mitsubishi Lancer Evo6";
+                description.innerHTML = "Mitsubishi's and Lancer's creation, a slick red dash!";
+                speed.innerHTML = "Speed: ★★★★★";
+                acceleration.innerHTML = "Acceleration: ★★★★☆";
+                handling.innerHTML = "Handling: ★★☆☆☆";
+                image.src = "image/cars/lancer.png";
+                break;
+            case "skyline":
+                name.innerHTML = "Nissan Skyline GT-R";
+                description.innerHTML = "The classic japanese sport beaut... with a spoiler!";
+                speed.innerHTML = "Speed: ★★★★☆";
+                acceleration.innerHTML = "Acceleration: ★★★★☆";
+                handling.innerHTML = "Handling: ★★★★☆";
+                image.src = "image/cars/skyline.png";
+                break;
+        }
     }
 
     setupScene() {

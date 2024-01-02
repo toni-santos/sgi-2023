@@ -49,6 +49,30 @@
                 transform: translate(-50%, -50%);
                 opacity: 0;
             }
+
+            #cpuCar, #playerCar {
+                font-family: 'Arial', sans-serif;
+                position: absolute;
+                display: none;
+                gap: 1em;
+                -webkit-text-stroke-width: 1px;
+                -webkit-text-stroke-color: black;
+            }
+
+            #cpuCar {
+                top: 55%;
+                right: 13%;
+            }
+
+            #playerCar {
+                top: 55%;
+                left: 13%;
+            }
+
+            #playerCarImage, #cpuCarImage {
+                width: 100px;
+                object-fit: contain;
+            }
         </style>
 
         <script
@@ -73,6 +97,26 @@
         <div id="powerup"></div>
         <div id="speed"></div>
         <input id="name"></input>
+        <div id="playerCar">
+            <div>
+                <h2 id="playerCarName"></h2>
+                <p id="playerCarDescription"></p>
+                <p id="playerCarSpeed"></p>
+                <p id="playerCarAcceleration"></p>
+                <p id="playerCarHandling"></p>
+            </div>
+            <img id="playerCarImage" src="image/cars/lancer.png" />
+        </div>
+        <div id="cpuCar">
+            <img id="cpuCarImage"  src="image/cars/lancer.png" />
+            <div>
+                <h2 id="cpuCarName"></h2>
+                <p id="cpuCarDescription"></p>
+                <p id="cpuCarSpeed"></p>
+                <p id="cpuCarAcceleration"></p>
+                <p id="cpuCarHandling"></p>
+            </div>
+        </div>
         <script type="module" src="main.js"></script>
     </body>
 </html>
