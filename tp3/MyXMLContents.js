@@ -15,7 +15,7 @@ class MyXMLContents {
        constructs the object
        @param {MyApp} app The application object
     */
-    constructor(app) {
+    constructor(app, path = "scenes/feupzero/feupzero.xml") {
         this.app = app;
         this.cameras = [];
         this.textures = [];
@@ -25,7 +25,7 @@ class MyXMLContents {
         this.helpers = [];
         this.controlsTargets = [];
         this.activeCameraTarget = null;
-        this.scenePath = "scenes/feupzero/feupzero.xml";
+        this.scenePath = path;
 
         this.reader = new MyReader(app);
         this.xmlReader = new MyFileReader(app, this, this.onSceneLoaded);
@@ -139,6 +139,7 @@ class MyXMLContents {
     convertGlobals(opt) {
         if (opt.background !== undefined) {
             let color = opt.background;
+            console.log(color);
             this.app.scene.background = color;
         }
 

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-16" standalone="yes"?>
+<yaf>
+    <globals background="0.612 0.706 0.675 1" ambient="0.6 0.6 0.6 1" />
+    <cameras initial="main"> 
+        <perspective id="main" 
+            angle="60" 
+            near="0.1" 
+            far="1000" 
+            location="15 15 15"
+            target="5 0 5" /> 
+
+        <orthogonal id="top" 
+            near="0.1"
+            far="1000"
+            location="5 30 0" 
+            target="0 0 0"  
+            left="-30" 
+            right="30" 
+            bottom="-30" 
+            top="30" /> 
+    </cameras> 
+
+    <skybox size="100 100 100"
+        center="0 0 0" 
+        emissive="1.0 1.0 1.0 0" 
+        intensity="0.1" 
+        up="scenes/feupzero/textures/sterile_wall.jpg" 
+        down="scenes/feupzero/textures/sterile_wall.jpg" 
+        left="scenes/feupzero/textures/sterile_wall.jpg" 
+        right="scenes/feupzero/textures/sterile_wall.jpg" 
+        front="scenes/feupzero/textures/sterile_wall.jpg" 
+        back="scenes/feupzero/textures/sterile_wall.jpg"/>
+
+    <textures>
+        <texture id="wallTex" filepath="scenes/feupzero/textures/sterile_wall.jpg" />
+    </textures>
+    <materials>
+        <material id="wallMat" 
+            emissive="0.0 0.0 0.0 1" 
+			color="0.8 0.8 0.8 1.0" 
+            specular="0 0 0 0" 
+            shininess="0" 
+            textureref="wallTex" 
+            texlength_s="1" 
+            texlength_t="1" 
+            twosided = "false" 
+        />
+    </materials>
+    <graph rootid="root">
+        <node id="root">
+            <children>
+                <noderef id="scene" />
+            </children>
+        </node>
+        <node id="scene">
+            <children>
+                <noderef id="raceCircuit" />
+            </children>
+        </node>
+        <node id="raceCircuit">
+            <children>
+                <primitive>
+                    <circuit
+                        width="8"
+                        track="2 2 20 30 30 20 30 0 12 -4 -12 -24 -24 -6"
+                        route="1 4 18 28 28 18 28 -2 12 -6 -12 -26 -24 -4"
+                        obstacles="8 8 12 -4 -12 -24"
+                        powerups="20 30 20 -2 -15 -5"
+                    />
+                </primitive>
+            </children>
+        </node>
+
+    </graph>
+</yaf>

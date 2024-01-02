@@ -13,6 +13,7 @@ import { ObstaclesScreen } from "./custom/ObstaclesScreen.js";
 import { MyModifier } from "./custom/MyModifier.js";
 import { MyStatusDisplay } from "./custom/MyStatusDisplay.js";
 import { MyShaderBillboard } from "./custom/MyShaderBillboard.js";
+import { TrackSelection } from "./custom/TrackSelection.js";
 
 /**
  *  This class contains the contents of out application
@@ -34,7 +35,8 @@ class MyContents {
         MENU: 1,
         CAR: 2,
         POWERUP: 3,
-        OBSTACLE: 4
+        OBSTACLE: 4,
+        TRACK_SELECTION: 5
     }
 
     cars = ["ae86", "skyline", "lancer"]
@@ -50,6 +52,9 @@ class MyContents {
         this.axis = null;
         this.objects = [];
         this.playerName = "Player"
+
+        this.bgColor = new THREE.Color(0.612, 0.706, 0.675, 1);
+        this.ambColor = new THREE.Color(0.6, 0.6, 0.6, 1);
 
         // HUD
         this.hudTime = document.getElementById("time");
@@ -118,7 +123,7 @@ class MyContents {
                     this.carSelectionClickHandler(obj);
                     break;
                 case this.state.TRACK_SELECTION:
-                    // this.trackSelectionHandler(obj);
+                    this.trackSelectionClickHandler(obj);
                     break;
                 case this.state.PLAYING:
                     // this.playingHandler(obj);
@@ -142,12 +147,30 @@ class MyContents {
     mainMenuClickHandler(obj) {
         switch(obj.name) {
             case "Start":
-                this.moveTo(this.state.CAR_SELECTION);
+                this.moveTo(this.state.TRACK_SELECTION);
                 break;
             case "Options":
                 this.moveTo(this.state.OPTIONS);
                 break;
         }
+    }
+
+    trackSelectionClickHandler(obj) {
+        switch(obj.name) {
+            case "Confirm":
+                this.readXML();
+                this.moveTo(this.state.CAR_SELECTION);
+                break;
+            case "Back":
+                this.moveTo(this.state.MAIN);
+                break;
+            default:
+                if (this.track)
+                    this.clearXML();
+                this.trackScreen.previous = this.trackScreen.selected;
+                this.trackScreen.selected = obj.name;
+                break;
+        }               
     }
 
     obstacleClickHandler(obj, position) {
@@ -201,7 +224,6 @@ class MyContents {
     }
 
     optionsClickHandler(obj) {
-        console.log(obj);
         switch(obj.name) {
             case "Back":
                 this.nameInput.style.display = "none";
@@ -232,11 +254,10 @@ class MyContents {
                 this.opposingCar = obj.name.split("_")[1];
                 break;
             case "Back":
-                this.moveTo(this.state.MAIN);
+                this.moveTo(this.state.TRACK_SELECTION);
                 break;
             case "Confirm":
                 if (this.playerCar && this.opposingCar) {
-                    // TODO: track selection
                     this.moveTo(this.state.PLAYING);
                 }
                 break;
@@ -265,6 +286,7 @@ class MyContents {
 
         if (intersects.length > 0) {
             const obj = intersects[0].object;
+
             switch (this.currentState) {
                 case this.state.MAIN:
                     this.mainMenuHoverHandler(obj, true);
@@ -273,6 +295,7 @@ class MyContents {
                     this.carSelectionHoverHandler(obj, true);
                     break;
                 case this.state.TRACK_SELECTION:
+                    this.trackSelectionHoverHandler(obj, true);
                     break;
                 case this.state.PLAYING:
                     break;
@@ -299,6 +322,7 @@ class MyContents {
                         this.carSelectionHoverHandler(null, false);
                         break;
                     case this.state.TRACK_SELECTION:
+                        this.trackSelectionHoverHandler(null, false);
                         break;
                     case this.state.PLAYING:
                         break;
@@ -410,6 +434,19 @@ class MyContents {
         }
     }
 
+    trackSelectionHoverHandler(obj, isHovering) {
+        if (isHovering) {
+            if (this.lastPickedObj != obj) {
+                if (this.lastPickedObj)
+                    this.lastPickedObj.parent.scale.set(1,1,1);
+                this.lastPickedObj = obj;
+                this.lastPickedObj.parent.scale.set(1.1,1.1,1.1);
+            }
+        } else {
+            this.lastPickedObj.parent.scale.set(1,1,1);
+            this.lastPickedObj = null;
+        }
+    }
 
     updateSelectedLayer() {
         switch (this.selectedLayer) {
@@ -428,13 +465,14 @@ class MyContents {
      * initializes the contents
      */
     init() {
-        this.readXML();
+        this.setupScene();
         this.mainMenu();
         this.selectCar();
         this.endScreen();
         this.optionsMenu();
         this.pauseMenu();
         this.obstaclesMenu();
+        this.trackMenu();
         // Change this to "PLAYING" to skip the menuing
         this.moveTo(this.state.MAIN);
     }
@@ -462,6 +500,14 @@ class MyContents {
                 this.app.controls.target.set(this.currentState * this.OFFSET, 0, 0);
                 break;
             case this.state.TRACK_SELECTION:
+                this.selectedLayer = this.layers.TRACK_SELECTION;
+                this.updateSelectedLayer();
+                this.currentState = this.state.TRACK_SELECTION;
+
+                this.app.setActiveCamera("Menu");
+                this.app.updateCameraIfRequired();
+                this.app.activeCamera.position.set(this.currentState * this.OFFSET, 7, 5);
+                this.app.controls.target.set(this.currentState * this.OFFSET, 0, 0);
                 break;
             case this.state.PLAYING:
                 this.playerVehicle = new MyVehicle(this.app, this.playerCar);
@@ -662,7 +708,7 @@ class MyContents {
                 this.updateCarSelection(t);
                 break;
             case this.state.TRACK_SELECTION:
-                // this.updateTrackSelection(t);
+                this.updateTrackSelection(t);
                 break;
             case this.state.PLAYING:
                 this.updatePlaying(t, delta);
@@ -829,6 +875,16 @@ class MyContents {
         }
     }
 
+    updateTrackSelection(t) {
+        if (this.trackScreen.previous && (this.trackScreen.previous != this.trackScreen.selected)) {
+            this.trackScreen.tracks[this.trackScreen.previous].scale.set(1,1,1);
+        }
+        if (this.trackScreen.selected) {
+            this.trackScreen.tracks[this.trackScreen.selected].scale.set(1.2,1.2,1.2);
+        }
+    }
+
+
     mainMenu() {
         this.mainmenu = new MainMenu(this.app, this.layers.MENU);
 
@@ -885,8 +941,23 @@ class MyContents {
         this.display();
     }
 
+    trackMenu() {
+        this.trackScreen = new TrackSelection(this.app, this.layers.TRACK_SELECTION);
+        this.objects.push(...this.trackScreen.objects.map(obj => {
+            obj.translateX(this.OFFSET * this.state.TRACK_SELECTION);
+            console.log(obj);
+            return obj;
+        }));
+        this.display();
+    }
+
+    setupScene() {
+        this.app.scene.background = this.bgColor;
+        this.app.scene.add(new THREE.AmbientLight(this.ambColor));
+    }
+
     readXML() {
-        this.xmlContents = new MyXMLContents(this.app);
+        this.xmlContents = new MyXMLContents(this.app, `scenes/feupzero/${this.trackScreen.selected}.xml`);
         this.circuit = this.xmlContents.reader.objects["circuit"];
         this.track = this.xmlContents.reader.objects["track"];
         this.route = this.xmlContents.reader.objects["route"];
@@ -901,6 +972,18 @@ class MyContents {
         this.shaderBillboard.position.set(20, this.shaderBillboard.position.y, 5);
         this.objects.push(this.envPlane, this.informationDisplay, this.shaderBillboard);
         this.display();
+        console.log("READ XML: ", this.trackScreen.selected);
+    }
+
+    clearXML() {
+        this.app.scene.remove(this.circuit);
+        this.app.scene.remove(this.track);
+        this.app.scene.remove(this.route);
+        this.app.scene.remove(this.obstacles);
+        this.app.scene.remove(this.powerups);
+        this.app.scene.remove(this.envPlane);
+        this.app.scene.remove(this.informationDisplay);
+        this.app.scene.remove(this.shaderBillboard);
     }
 
     playGame() {
