@@ -1020,10 +1020,10 @@ class MyContents {
         // TODO: Fix placement for these according to the XML
         this.envPlane = new MyEnvironmentPlane(this.app, 200,"scenes/feupzero/textures/m3.jpg", "scenes/feupzero/textures/ground.jpg", "scenes/feupzero/textures/altimetry.png", "shaders/envPlane.vert", "shaders/envPlane.frag");
         this.informationDisplay = new MyStatusDisplay(this.app, "1", "2", "3", "4");
-        this.informationDisplay.position.set(-5, 0, 7);
+        this.informationDisplay.position.set(-6, 0, 12);
         this.informationDisplay.rotateY(5*Math.PI/6);
         this.shaderBillboard = new MyShaderBillboard(this.app, "scenes/feupzero/textures/okcomp_map.jpg", "scenes/feupzero/textures/okcomp.jpg", "shaders/s1.vert", "shaders/s1.frag");
-        this.shaderBillboard.position.set(20, this.shaderBillboard.position.y, 5);
+        this.shaderBillboard.position.set(20, this.shaderBillboard.position.y, 2);
         this.objects.push(this.envPlane, this.informationDisplay, this.shaderBillboard);
         // TODO: Might need to add a timeout here (generation takes time)
         this.generateEnvironment();
