@@ -26,14 +26,6 @@ class MyVehicle extends MyCollidingObject {
         this.finished = false;
         this.outOfBounds = false;
         this.modifier = null;
-        this.material = new THREE.MeshBasicMaterial({color: 0xff00ff});
-        // this.mesh = new THREE.Mesh(new THREE.BoxGeometry(1, 0.5, 2), this.material);
-        // this.mesh.position.z += 0.5;
-        // this.setBoundingBox(this.mesh);
-        // this.addCollisionMesh(this.mesh);
-        // this.add(this.mesh);
-        // this.add(this.collisionMesh);
-        // console.log(this.boundingBox);
         this.castShadow = shadow;
     }
 
@@ -52,7 +44,7 @@ class MyVehicle extends MyCollidingObject {
                 child.name = self.name;
             }
         });
-        // self.mesh.scale.set(0.01, 0.01, 0.01);
+        self.mesh.position.z += 0.5;
         self.mesh.rotateY(Math.PI/2);
         self.setBoundingBox(self.mesh);
         self.addCollisionMesh(self.mesh);
@@ -71,10 +63,8 @@ class MyVehicle extends MyCollidingObject {
         if (this.mesh) {
             this.changePosition(delta);
             this.setBoundingBox(this.mesh);
-            //console.log(this.velocity * 100);
             this.slowReset();
             this.processModifiers();
-            // console.log(this.velocity);
         }
         if (this.closestPointIndex === 1) this.addLap(track.checkpoints);
 	}

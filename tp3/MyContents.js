@@ -63,6 +63,10 @@ class MyContents {
         this.hudLap = document.getElementById("lap");
         this.hudPowerup = document.getElementById("powerup");
 
+        // Helpers
+        this.visibleBoxes = false;
+        this.visibleRoute = false;
+
         // Picking
         this.raycaster = new THREE.Raycaster()
         this.raycaster.near = 1
@@ -185,6 +189,7 @@ class MyContents {
             case "Track":
                 const pos = new THREE.Vector3(position.x, position.y + 0.35, position.z);
                 const obs = new MyModifier(this.app, this.obstaclesScreen.selected.name, pos, 3, false);
+                if (this.visibleBoxes) obs.toggleCollisionMesh();
                 this.collidableObjects.push(obs);
                 this.circuit.add(obs);
                 this.display();
@@ -542,6 +547,7 @@ class MyContents {
                 load.finally(() => {
                     this.objects.push(this.playerVehicle);
                     this.display();
+                    if (this.visibleBoxes) this.playerVehicle.toggleCollisionMesh(true);
                     this.placeVehicle(this.playerVehicle, this.track.points[0]);
                 });
 
@@ -551,6 +557,7 @@ class MyContents {
                 load2.finally(() => {
                     this.objects.push(this.cpuVehicle);
                     this.display();
+                    if (this.visibleBoxes) this.cpuVehicle.toggleCollisionMesh(true);
                     this.setupCPUPath(this.cpuVehicle);
 
                     this.app.setActiveCamera("Play");
@@ -562,7 +569,6 @@ class MyContents {
                 });
                 this.vehicles = [this.playerVehicle, this.cpuVehicle];
                 this.playGame();
-                //TODO: enhance this (timer before start (?))
                 break;
             case this.state.END:
                 this.selectedLayer = this.layers.MENU;
@@ -1118,6 +1124,7 @@ class MyContents {
         this.cpuTime = 0;
         this.collidableObjects = this.powerups.concat(this.obstacles);
         for (const obj of this.collidableObjects) {
+            if (this.visibleBoxes) obj.toggleCollisionMesh(true);
             this.circuit.add(obj);
         }
         this.display();

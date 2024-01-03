@@ -35,35 +35,29 @@ class MyGuiInterface {
      * Initialize the gui interface
      */
     init() {
+        this.datgui.add(this.contents, "paused")
+        .name("Pause").onChange((value) => {
+            this.contents.changePauseState(value);
+        });
         const postProcessingFolder = this.datgui.addFolder("Post Processing");
         postProcessingFolder
             .add(this.app, "postProcessing")
             .name("Post Processing").onChange((value) => {
                 this.app.togglePP(value);
             });
-        const cameraFolder = this.datgui.addFolder("Camera");
-        this.datgui.add(this.contents, "paused")
-        .name("Pause").onChange((value) => {
-            this.contents.changePauseState(value);
+        const helpersFolder = this.datgui.addFolder("Display Helpers")
+        helpersFolder.add(this.contents, "visibleBoxes")
+        .name("Toggle Bounding Boxes").onChange((value) => {
+            this.contents.collidableObjects?.forEach((obj) => {
+                obj.toggleCollisionMesh(value);
+            });
+            if (this.contents.playerVehicle) this.contents.playerVehicle.toggleCollisionMesh(value);
+            if (this.contents.cpuVehicle) this.contents.cpuVehicle.toggleCollisionMesh(value);
         });
-        // cameraFolder
-        //     .add(
-        //         this.app,
-        //         "activeCameraName",
-        //         Object.keys(this.xmlContents.cameras)
-        //     )
-        //     .name("Active Camera");
-        // cameraFolder
-        //     .add(
-        //         this.contents,
-        //         "activeCameraTarget",
-        //         Object.keys(this.xmlContents.controlsTargets)
-        //     )
-        //     .name("Active Target")
-        //     .onChange((value) => {
-        //         this.xmlContents.changeControlsTarget(value);
-        //     });
-        cameraFolder.open();
+        helpersFolder.add(this.contents, "visibleRoute")
+        .name("Toggle CPU Route").onChange((value) => {
+            if (this.contents.route) this.contents.route.visible = value;
+        });
     }
 }
 
