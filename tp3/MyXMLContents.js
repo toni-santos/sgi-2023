@@ -121,14 +121,14 @@ class MyXMLContents {
      */
     convert(data) {
         this.data = data;
-        const allObjs = { ...data.nodes, ...data.lods };
+        this.allObjs = { ...data.nodes, ...data.lods };
         this.convertGlobals(data.options);
         this.convertCameras(data.cameras);
         this.convertSkyboxes(data.skyboxes);
         this.convertTextures(data.textures);
         this.convertMaterials(data.materials);
-        this.convertObjects(allObjs);
-        this.displayObjects(allObjs);
+        this.convertObjects(this.allObjs);
+        this.displayObjects(this.allObjs);
         this.defineControls();
     }
 
@@ -876,6 +876,17 @@ class MyXMLContents {
             if (meshes.length >= 1) {
                 for (const mesh of meshes) {
                     this.app.scene.add(mesh);
+                }
+            }
+        }
+    }
+
+    removeObjects(objects) {
+        for (const key of objects[this.data.rootId].children) {
+            const meshes = this.meshes[key.id] ?? this.meshes[key.type] ?? [];
+            if (meshes.length >= 1) {
+                for (const mesh of meshes) {
+                    this.app.scene.remove(mesh);
                 }
             }
         }

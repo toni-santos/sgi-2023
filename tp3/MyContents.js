@@ -773,7 +773,7 @@ class MyContents {
 
         for (const billboard of this.billboards)
             billboard.update(t);
-        // this.informationDisplay.update(this.playerVehicle.completedLaps + 1 + "", this.raceClock.getElapsedTime().toFixed(2), (this.playerVehicle.velocity * 100).toFixed(2), this.playerVehicle.modifier ? (this.playerVehicle.modifier.duration - this.playerVehicle.modifier.modifyingSince.getElapsedTime()).toFixed(2) : "0.00");
+        this.informationDisplay.update(this.playerVehicle.completedLaps + 1 + "", this.raceClock.getElapsedTime().toFixed(2), (this.playerVehicle.velocity * 100).toFixed(2), this.playerVehicle.modifier ? (this.playerVehicle.modifier.duration - this.playerVehicle.modifier.modifyingSince.getElapsedTime()).toFixed(2) : "0.00");
 
         this.updateHUD();
         this.control(delta*50);
@@ -1068,18 +1068,15 @@ class MyContents {
     }
 
     clearXML() {
-        this.app.scene.remove(this.circuit);
-        this.app.scene.remove(this.track);
-        this.app.scene.remove(this.route);
-        this.app.scene.remove(this.obstacles);
-        this.app.scene.remove(this.powerups);
+        this.xmlContents.removeObjects(this.xmlContents.allObjs);
         this.app.scene.remove(this.envPlane);
         this.app.scene.remove(this.informationDisplay);
         this.app.scene.remove(this.shaderBillboard);
-        this.trees.forEach((tree) => this.app.scene.remove(tree));
+        this.billboards.forEach((tree) => this.app.scene.remove(tree));
         this.backTrees.forEach((tree) => this.app.scene.remove(tree));
-        this.trees = [];
+        this.billboards = [];
         this.backTrees = [];
+        this.objects = [];
     }
 
     playGame() {
