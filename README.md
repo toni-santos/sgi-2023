@@ -48,6 +48,6 @@
 
 ----
 
-### [TP3 - ...](tp3)
-- (items briefly describing main strong points)
+### [TP3 - FEUPZero](tp3)
 
+- Available [here](./tp3/README.md).
