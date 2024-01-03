@@ -752,7 +752,7 @@ class MyContents {
                 if (obs.positive) this.moveTo(this.state.OBSTACLE);
                 obs.apply(this.playerVehicle);
             }
-            if (obs.shader.ready) {   
+            if (obs.shader?.ready) {   
                 obs.update(t);
             }
         }

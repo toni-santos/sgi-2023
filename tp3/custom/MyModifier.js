@@ -25,12 +25,17 @@ class MyModifier extends MyCollidingObject {
             this.texture = EFFECTS[this.name]["texture"];
         }
 
-        this.shader = new MyShader(this.app, "modifier", "", "shaders/s2.vert", "shaders/s2.frag", {
-            "time": { type: 'float', value: 0.0 },
-            "offset": { type: 'float', value: 0.01 },
-            "uSampler2": { type: 'sampler2D', value: this.texture } 
-        });
-        this.waitForShaders();
+        if (this.name == "Speed Limit") {
+            this.shader = new MyShader(this.app, "modifier", "", "shaders/s2.vert", "shaders/s2.frag", {
+                "time": { type: 'float', value: 0.0 },
+                "offset": { type: 'float', value: 0.01 },
+                "uSampler2": { type: 'sampler2D', value: this.texture },
+                "radius": { type: 'float', value: 0.25 },
+            });
+            this.waitForShaders();
+        } else {
+            this.mesh.material = new THREE.MeshBasicMaterial({map: this.texture});
+        }
         this.mesh.position.set(position.x, this.name == "Spin" ? 0 : 0.35, position.z);
 
         this.setBoundingBox(this.mesh);
@@ -49,9 +54,11 @@ class MyModifier extends MyCollidingObject {
     }
 
     update(t) {
-        this.shader.updateUniformsValue("time", t);
-        this.mesh.material = this.shader.material;
-        this.mesh.material.needsUpdate = true;
+        if (this.name == "Speed Limit") {
+            this.shader.updateUniformsValue("time", t);
+            this.mesh.material = this.shader.material;
+            this.mesh.material.needsUpdate = true;
+        }
     }
 
     apply(obj) {
