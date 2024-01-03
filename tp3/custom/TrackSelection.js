@@ -10,7 +10,7 @@ class TrackSelection {
         this.selected = "SMP";
         this.previous = null;
 
-        this.section = new MyText(app, "Track Selection", this.layer - 1, new THREE.Vector3(0, 0, -2));
+        this.section = new MyText(app, "Track Selection", 0, new THREE.Vector3(0, 0, -2));
         this.smp = new MyText(app, "SMP", this.layer, new THREE.Vector3(-4, 0, 0));
         this.adv = new MyText(app, "ADV", this.layer, new THREE.Vector3(4, 0, 0));
         this.confirm = new MyText(app, "Confirm", this.layer, new THREE.Vector3(4, 0, 4));

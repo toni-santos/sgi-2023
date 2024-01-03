@@ -5,12 +5,21 @@ class Options {
     constructor(app, layer, playerName) {
         this.app = app;
         this.objects = [];
+        this.difficulties = [];
         this.playerName = playerName;
+
+        this.selected = "Normal";
+        this.previous = null;
 
         this.section = new MyText(this.app, "Options", layer, new THREE.Vector3(0, 0, -4));
         this.diff1 = new MyText(this.app, "Easy", layer, new THREE.Vector3(-4.75, 0, -2), 0.75);
         this.diff2 = new MyText(this.app, "Normal", layer, new THREE.Vector3(0.75, 0, -2), 0.75);
         this.diff3 = new MyText(this.app, "Hard", layer, new THREE.Vector3(5.75, 0, -2), 0.75);
+
+        this.difficulties["Easy"] = this.diff1;
+        this.difficulties["Normal"] = this.diff2;
+        this.difficulties["Hard"] = this.diff3;
+
         this.back = new MyText(this.app, "Back", layer, new THREE.Vector3(0, 0, 4));
         
         this.name = new MyText(this.app, this.playerName, layer, new THREE.Vector3(0, 0, 0));

@@ -232,6 +232,12 @@ class MyContents {
                 this.moveTo(this.state.MAIN);
                 break;
             case "Easy":
+            case "Normal":
+            case "Hard":
+                this.options.previous = this.options.selected;
+                this.options.selected = obj.name;
+                this.difficultyName = obj.name;
+            case "Easy":
                 this.difficulty = 2;
                 break;
             case "Normal":
@@ -241,7 +247,7 @@ class MyContents {
                 this.difficulty = 4;
                 break;
         }
-        this.difficultyName = obj.name;
+        console.log(this.difficulty);
     }
 
     carSelectionClickHandler(obj) {
@@ -712,6 +718,8 @@ class MyContents {
             case this.state.MAIN:
                 // this.updateMain(t);
                 break;
+            case this.state.OPTIONS:
+                this.updateOptions();
             case this.state.CAR_SELECTION:
                 this.updateCarSelection(t);
                 break;
@@ -889,9 +897,20 @@ class MyContents {
     updateTrackSelection(t) {
         if (this.trackScreen.previous && (this.trackScreen.previous != this.trackScreen.selected)) {
             this.trackScreen.tracks[this.trackScreen.previous].scale.set(1,1,1);
+            this.trackScreen.previous = null;
         }
         if (this.trackScreen.selected) {
             this.trackScreen.tracks[this.trackScreen.selected].scale.set(1.2,1.2,1.2);
+        }
+    }
+
+    updateOptions(t) {
+        if (this.options.previous && (this.options.previous != this.options.selected)) {
+            this.options.difficulties[this.options.previous].scale.set(1,1,1);
+            this.options.previous = null;
+        }
+        if (this.options.selected) {
+            this.options.difficulties[this.options.selected].scale.set(1.2,1.2,1.2);
         }
     }
 
