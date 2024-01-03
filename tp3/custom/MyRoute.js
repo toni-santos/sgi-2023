@@ -7,6 +7,7 @@ class MyRoute extends THREE.Object3D {
         this.type = 'Group';
         this.points = new THREE.CatmullRomCurve3(points, true, "catmullrom", 0.2).getPoints(50);
         this.buildRoute();
+        this.visible = false;
     }
 
     buildRoute() {
