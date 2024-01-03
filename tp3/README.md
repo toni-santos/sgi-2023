@@ -36,7 +36,7 @@
     ![Obstacle Selection](../docs/tp3-obstacle1.png)
     ![Obstacle Placement](../docs/tp3-obstacle2.png)
 
-    - [**Pause Menu**](./custom/PausedScreen.js) - menu allowing the player to return to title or continue the ongoing race.
+    - [**Pause Menu**](./custom/PausedScreen.js) - menu allowing the player to return to title, restart or continue the ongoing race.
     ![Pause Menu](../docs/tp3-pause.png)
 
     - [**End Game**](./custom/EndScreen.js) - screen shown upon race completion showing the winner's car in a flare of fireworks, times for both the CPU and player and options to restart the same race or return to title.

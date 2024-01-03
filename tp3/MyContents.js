@@ -217,6 +217,18 @@ class MyContents {
 
                 this.currentState = this.state.PLAYING;
                 break;
+            case "Restart":
+                this.changePauseState(false);
+                this.hideHUD();
+                this.objects = this.objects.filter((o) => o !== this.playerVehicle && o !== this.cpuVehicle);
+                this.app.scene.remove(this.playerVehicle);
+                this.app.scene.remove(this.cpuVehicle);
+                for (const obj of this.collidableObjects) {
+                    this.circuit.remove(obj);
+                }
+        
+                this.moveTo(this.state.PLAYING);
+                break;
             case "Exit":
                 this.changePauseState(false);
                 this.moveTo(this.state.MAIN);

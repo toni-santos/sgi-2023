@@ -29,7 +29,7 @@ You are able to select 1 of 3 different cars, each with a different set of stats
 Upon colliding with a powerup (see [Powerups](#powerups)) you are able to select one of 2 obstacles (see [Obstacles](#obstacles)) and are then shown a map of the track you are racing on where you'll be able to click on any part of it, placing the obstacle and returning to the race with your active powerup.
 
 #### Pause Menu
-When pausing the game you'll be able to opt between unpausing, and continuing your race (**Continue**) or returning to the title screen (**Return**).
+When pausing the game you'll be able to opt between unpausing, and continuing your race (**Continue**), restarting the current race (**Restart**) and returning to the title screen (**Exit**).
 
 #### End Game
 When a race ends you are prompted to either return to the title screen via the **Return** button or replay the race with the same conditions, via **Restart**.
